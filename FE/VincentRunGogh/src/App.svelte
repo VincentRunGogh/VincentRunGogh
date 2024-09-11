@@ -5,6 +5,7 @@
 </script>
 
 <a use:link href="/makeroute">MakeRoute</a>
+<a use:link href="/drawingmap">Drawing Map</a>
 <Router {routes} />
 
 <style>
