@@ -1,10 +1,11 @@
 <script>
-  import Map from "./lib/components/Map.svelte";
-
-
+  import Router from 'svelte-spa-router'
+  import routes from './routes'
+  import { link } from 'svelte-spa-router';
 </script>
 
-<Map />
+<a use:link href="/makeroute">MakeRoute</a>
+<Router {routes} />
 
 <style>
 

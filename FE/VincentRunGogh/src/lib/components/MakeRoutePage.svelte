@@ -12,27 +12,30 @@
   let isDrawing = false;
   let isMouseDown = false;
   let isLocked = false;
+  let isFixed = false;
   let showControls = true;
   let northWest = null;
   let southEast = null;
   let latLngMessage = '';
 
+  //초기 렌더링
   onMount(() => {
+    //지도 생성
     map = L.map('map').setView([36.3593, 127.3416], 16);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap'
     }).addTo(map);
-    
+    //지도 재계산
     setTimeout(() => {
       map.invalidateSize(); 
     }, 100);
   });
 
+  //지도 잠그기
   function lockMap() {
     isLocked = true;
     isDrawing = true;
-    showControls = false;
     map.dragging.disable();
     map.scrollWheelZoom.disable();
     map.touchZoom.disable();
@@ -44,10 +47,12 @@
     southEast = bounds.getSouthEast();
   }
 
-  function unlockMap() {
+  //지도 잠금 풀기
+  function unlockMap(condition) {
     isLocked = false;
     isDrawing = false;
-    showControls = true;
+    
+    showControls = condition;
     map.dragging.enable();
     map.scrollWheelZoom.enable();
     map.touchZoom.enable();
@@ -55,19 +60,29 @@
     map.boxZoom.enable();
   }
 
+  //그리기 시작
   function startDrawing() {
     isDrawing = true;
+    isFixed = true;
     lockMap();
   }
 
+  //고정해제
+  function returnMap() {
+    isDrawing = false;
+    isFixed = false;
+    unlockMap(true);
+  }
+
+  //그리기 종료
   function stopDrawing() {
     if (isDrawing) {
       isDrawing = false;
-      latLngMessage = '여기에 문구가 나타납니다';
-      showControls = false;
+      latLngMessage = '위 아트로 진행하시겠습니까?';
     }
   }
 
+  //마우스 움직일 때
   function onMouseMove(e) {
     if (isDrawing && isMouseDown) {
       if (!currentPolyline) {
@@ -80,30 +95,36 @@
     }
   }
 
+  // 클릭했을 때
   function onMouseDown() {
     if (isDrawing) {
       isMouseDown = true;
     }
   }
-
+  // 마우스 클릭 뗐을 때
   function onMouseUp() {
     if (isDrawing && isMouseDown) {
       isMouseDown = false;
       currentPolyline.setLatLngs(currentLatLngs);
       currentPolyline.redraw();
       stopDrawing();
+      isFixed = false;
+      unlockMap(false);
     }
   }
 
+  //다시그리기
   function redraw() {
     if (currentPolyline) {
       map.removeLayer(currentPolyline);
       currentPolyline = null;
     }
     currentLatLngs = [];
-    unlockMap();
+    latLngMessage = '';
+    showControls = true;
   }
 
+  //다음 - 결과물 객체
   function next() {
     const drawForm = {
       PositionLIst: currentLatLngs.map(latlng => ({
@@ -124,24 +145,28 @@
     map.on('mouseup', onMouseUp);
   });
 </script>
+{#if isFixed}
+  <p>지도가 고정되었습니다.</p>
+{/if}
+
+<div id="map"></div>
+
+<div>
+  <p>{latLngMessage}</p>
+</div>
 
 <div id="controls">
-  {#if showControls}
+  {#if showControls && !isFixed}
     <button on:click={startDrawing}>고정하기</button>
+  {/if}
+  {#if showControls && isFixed}
+    <button on:click={returnMap}>고정해제</button>
   {/if}
 
   {#if !showControls}
     <button on:click={redraw}>다시그리기</button>
     <button on:click={next}>다음</button>
   {/if}
-</div>
-
-<div id="map"></div>
-
-<div>
-  <h2>좌상단: {northWest ? `${northWest.lat}, ${northWest.lng}` : 'N/A'}</h2>
-  <h2>우하단: {southEast ? `${southEast.lat}, ${southEast.lng}` : 'N/A'}</h2>
-  <p>{latLngMessage}</p>
 </div>
 
 <style>
