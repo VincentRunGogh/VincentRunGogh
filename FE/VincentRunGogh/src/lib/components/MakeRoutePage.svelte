@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import L from 'leaflet';
+  import L, { latLng } from 'leaflet';
   import 'leaflet/dist/leaflet.css';
   import 'leaflet-draw';
   import 'leaflet-draw/dist/leaflet.draw.css';
@@ -16,7 +16,10 @@
   let showControls = true;
   let northWest = null;
   let southEast = null;
-  let latLngMessage = '';
+  let drawForm = {};
+  let skip = 0;
+  let shortenLatLngs = [];
+  let latLngMessage = '지도를 움직여 원하는 장소를 고르신 후 고정해주세요';
 
   //초기 렌더링
   onMount(() => {
@@ -64,6 +67,7 @@
   function startDrawing() {
     isDrawing = true;
     isFixed = true;
+    latLngMessage = '지도 내에서 한붓그리기로 원하는 그림을 표현해보세요!'
     lockMap();
   }
 
@@ -78,11 +82,12 @@
   function stopDrawing() {
     if (isDrawing) {
       isDrawing = false;
-      latLngMessage = '위 아트로 진행하시겠습니까?';
+      latLngMessage = '위 아트를 기반으로 루트를 생성할까요?';
     }
   }
 
   //마우스 움직일 때
+  
   function onMouseMove(e) {
     if (isDrawing && isMouseDown) {
       if (!currentPolyline) {
@@ -110,6 +115,16 @@
       stopDrawing();
       isFixed = false;
       unlockMap(false);
+      for (let v in currentLatLngs) {
+        if (skip % 5 === 0) {
+          let dot = {
+            lat: currentLatLngs[v].lat,
+            lng: currentLatLngs[v].lng
+          }
+          shortenLatLngs.push(dot)
+        }
+        skip++;
+      }
     }
   }
 
@@ -122,15 +137,14 @@
     currentLatLngs = [];
     latLngMessage = '';
     showControls = true;
+    skip = 0;
+    shortenLatLngs = [];
   }
 
   //다음 - 결과물 객체
   function next() {
-    const drawForm = {
-      PositionLIst: currentLatLngs.map(latlng => ({
-        lat: latlng.lat,
-        lng: latlng.lng
-      })),
+    drawForm = {
+      positionList: shortenLatLngs,
       leftLat:northWest.lat,
       leftLng:northWest.lng,
       rightLat:southEast.lat,
@@ -144,6 +158,11 @@
     map.on('mousedown', onMouseDown);
     map.on('mouseup', onMouseUp);
   });
+
+  function testing () {
+    currentPolyline.setLatLngs(shortenLatLngs);
+    currentPolyline.redraw();
+  }
 </script>
 {#if isFixed}
   <p>지도가 고정되었습니다.</p>
@@ -167,6 +186,9 @@
     <button on:click={redraw}>다시그리기</button>
     <button on:click={next}>다음</button>
   {/if}
+
+  <button on:click={testing}>테스트</button>
+  
 </div>
 
 <style>
