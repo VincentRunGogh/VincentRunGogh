@@ -5,6 +5,7 @@
   import 'leaflet-draw';
   import 'leaflet-draw/dist/leaflet.draw.css';
   import './map.css';
+  import Swal from 'sweetalert2';
 
   let map;
   let currentPolyline = null;
@@ -151,6 +152,12 @@
       rightLng:southEast.lng,
     };
     console.log('결과 객체:', drawForm);
+    Swal.fire({
+      title: 'Submit!',
+      text: 'Do you want to continue',
+      icon: 'question',
+      confirmButtonText: 'Cool'
+    })
   }
 
   onMount(() => {
