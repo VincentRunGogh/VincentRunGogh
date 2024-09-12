@@ -1,15 +1,18 @@
 package com.vincentrungogh.domain.board.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.vincentrungogh.domain.route.entity.Route;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @Table(name = "boards")
 public class Board {
 
@@ -18,17 +21,16 @@ public class Board {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "comment")
+    @Column(name = "comment", nullable = false)
     private String comment;
 
-    @Column(name = "is_delete")
-    private boolean isDelete;
+    @Column(name = "is_delete", nullable = false)
+    private Boolean isDelete;
 
-    @Column(name = "like_count")
+    @Column(name = "like_count", nullable = false)
     private int likeCount;
 
-    @Column(name = "created")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "created", columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime created;
 
     @Builder
@@ -39,11 +41,11 @@ public class Board {
         this.created = created;
     }
 
-    public static Board createBoard(String comment, boolean isDelete, int likeCount) {
+    public static Board createBoard(String comment) {
         return Board.builder()
                 .comment(comment)
-                .isDelete(isDelete)
-                .likeCount(likeCount)
+                .isDelete(false)
+                .likeCount(0)
                 .created(LocalDateTime.now())
                 .build();
     }
