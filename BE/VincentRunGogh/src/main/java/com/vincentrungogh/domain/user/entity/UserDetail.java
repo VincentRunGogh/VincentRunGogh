@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Table(name = "user_detail")
+@Table(name = "users_detail")
 public class UserDetail {
 
     @Id
@@ -17,43 +17,49 @@ public class UserDetail {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "gener", nullable = false)
+    // 성별, 남자(0), 여자(1)
+    @Column(name = "gender", nullable = false)
     private int gender;
 
+    // 연령대
     @Column(name = "age", nullable = false)
     private int age;
 
-    @Column(name = "average_speed")
-    private double average_speed;
+    // 하루 평균 속도, km/h
+    @Column(name = "average_day_speed")
+    private double averageDaySpeed;
 
+    // 하루 평균 거리, meter
     @Column(name = "average_day_distance")
-    private double average_day_distance;
+    private int averageDayDistance;
 
+    // 하루 평균 운동 시간, second
     @Column(name = "average_day_runtime")
-    private double average_day_runtime;
+    private int averageDayRuntime;
 
     @Builder
-    private UserDetail(int gender, int age, int average_speed, double average_day_distance, double average_day_runtime) {
+    private UserDetail(int gender, int age, double averageDaySpeed, int averageDayDistance, int averageDayRuntime) {
         this.gender = gender;
         this.age = age;
-        this.average_speed = average_speed;
-        this.average_day_distance = average_day_distance;
-        this.average_day_runtime = average_day_runtime;
+        this.averageDaySpeed = averageDaySpeed;
+        this.averageDayDistance = averageDayDistance;
+        this.averageDayRuntime = averageDayRuntime;
     }
 
-    public static UserDetail createUserDetail(int gender, int age, int average_speed, double average_day_distance, double average_day_runtime) {
+    public static UserDetail createUserDetail(int gender, int age, double averageDaySpeed, int averageDayDistance, int averageDayRuntime) {
         return UserDetail.builder()
                 .gender(gender)
                 .age(age)
-                .average_speed(average_speed)
-                .average_day_distance(average_day_distance)
-                .average_day_runtime(average_day_runtime)
+                .averageDaySpeed(averageDaySpeed)
+                .averageDayDistance(averageDayDistance)
+                .averageDayRuntime(averageDayRuntime)
                 .build();
     }
 
-    public void updateUserDetail(int average_speed, double average_day_distance, double average_day_runtime) {
-        this.average_speed = average_speed;
-        this.average_day_distance = average_day_distance;
-        this.average_day_runtime = average_day_runtime;
+    // 속도, 거리, 운동 시간 업데이트
+    public void updateUserDetail(double averageDaySpeed, int averageDayDistance, int averageDayRuntime) {
+        this.averageDaySpeed = averageDaySpeed;
+        this.averageDayDistance = averageDayDistance;
+        this.averageDayRuntime = averageDayRuntime;
     }
 }
