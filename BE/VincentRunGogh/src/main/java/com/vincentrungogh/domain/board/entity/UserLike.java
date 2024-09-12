@@ -15,15 +15,15 @@ public class UserLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    int id;
+    private int id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    User user;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
-    Board board;
+    private Board board;
 
     @Builder
     private UserLike(User user, Board board) {
