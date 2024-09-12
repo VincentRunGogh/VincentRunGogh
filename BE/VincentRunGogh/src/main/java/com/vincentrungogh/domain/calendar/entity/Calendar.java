@@ -1,4 +1,4 @@
 package com.vincentrungogh.domain.calendar.entity;
 
-public class Calender {
+public class Calendar {
 }
