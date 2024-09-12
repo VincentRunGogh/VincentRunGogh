@@ -1,5 +1,7 @@
 package com.vincentrungogh.domain.drawing.entity;
 
+import com.vincentrungogh.domain.route.entity.Route;
+import com.vincentrungogh.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -41,6 +43,14 @@ public class Drawing {
     // 수정 날짜
     @Column(name = "updated", columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime updated;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "route_id")
+    private Route route;
 
     @Builder
     private Drawing(String title, Boolean isCompleted, Boolean isCreatedBoard, String accumulatedDrawingImage, LocalDateTime created, LocalDateTime updated) {
