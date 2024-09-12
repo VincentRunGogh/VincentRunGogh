@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { VitePWA } from 'vite-plugin-pwa';
+import path from 'path';
+import Icons from 'unplugin-icons/vite';
 
 export default defineConfig({
   plugins: [
@@ -8,15 +10,24 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       devOptions: {
-        enabled: false // 개발 중에는 서비스 워커를 비활성화
+        enabled: false, // 개발 중에는 서비스 워커를 비활성화
       },
-      includeAssets: ['favicon.svg', 'favicon.ico', 'android-chrome-192x192.png','android-chrome-512x512.png' , 'apple-touch-icon.png'],
+      includeAssets: [
+        'favicon.svg',
+        'favicon.ico',
+        'android-chrome-192x192.png',
+        'android-chrome-512x512.png',
+        'apple-touch-icon.png',
+      ],
       manifest: {
         name: 'Vincent Run Gogh',
         short_name: 'Vincent Run Gogh',
         description: 'Draw, Run!',
         theme_color: '#ffffff',
         icons: [
+          Icons({
+            compiler: 'svelte',
+          }),
           {
             src: 'android-chrome-192x192.png',
             sizes: '192x192',
@@ -37,4 +48,10 @@ export default defineConfig({
       },
     }),
   ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      '@map': path.resolve(__dirname, './src/components/map'),
+    },
+  },
 });
