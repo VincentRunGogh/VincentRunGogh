@@ -19,31 +19,31 @@ public class User {
     @Column(name = "id")
     private int id; //기본 아이디
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = false)
     private String email; //이메일
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password; //인코딩된 비밀번호
 
-    @Column(name = "nickname", unique = true, length = 10)
+    @Column(name = "nickname", unique = true, length = 10, nullable = false)
     private String nickname; //닉네임 한글, 영어, 숫자 포함 길이 최대 10글자
 
-    @Column(name = "gender")
+    @Column(name = "gender", nullable = false)
     private int gender; //0은 남자, 1은 여자
 
-    @Column(name = "birth")
+    @Column(name = "birth", nullable = false)
     private Date birth; //1999-01-01의 형태
 
-    @Column(name = "is_changed")
+    @Column(name = "is_changed", nullable = false)
     private Boolean isChanged; //비밀번호 재발급 여부 default는 false
 
-    @Column(name = "profile")
+    @Column(name = "profile", nullable = false)
     private String profile; //프로필 사진 s3 url
 
-    @Column(name = "height")
+    @Column(name = "height", nullable = false)
     private double height; //키
 
-    @Column(name = "weight")
+    @Column(name = "weight", nullable = false)
     private double weight; //몸무게
 
     @Builder
