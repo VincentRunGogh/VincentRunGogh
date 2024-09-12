@@ -1,28 +1,41 @@
 package com.vincentrungogh.domain.route.service;
 
 import com.vincentrungogh.domain.route.repository.RouteRepository;
+import com.vincentrungogh.domain.route.service.dto.common.Position;
 import com.vincentrungogh.domain.route.service.dto.request.ArtRouteRequestDto;
 import com.vincentrungogh.domain.route.service.dto.response.DataArtRouteResponseDto;
 import com.vincentrungogh.domain.route.service.dto.response.ArtRouteResponseDto;
 import com.vincentrungogh.global.util.ResultDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RouteService {
     private final RouteRepository routeRepository;
 //    private final UserRepository userRepository;
     private final RestTemplate restTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
+    @Transactional
     public ArtRouteResponseDto convertArtRoute(/*@AuthenticationPrincipal UserPrincipal principal,*/ArtRouteRequestDto requestDto) {
         //1. 사용자 확인
+        redisTemplate.opsForValue().set("1", requestDto.getPositionList());
+
+        List<Position> list = (List<Position>) redisTemplate.opsForValue().get("1");
+
+        log.info("fsdfsdfsdfsd "+list.toString());
 
         //2. request한 것을 토대로 파이썬으로 보내기
         URI uri = UriComponentsBuilder
@@ -46,6 +59,7 @@ public class RouteService {
         ArtRouteResponseDto responseDto = ArtRouteResponseDto.createArtRouteResponseDto(null);
 
         //4. 레디스에 key는 사용자 id로 임시로 저장
+//        redisTemplate.opsForValue().set(1, requestDto.getPositionList());
 
         return responseDto;
     }
