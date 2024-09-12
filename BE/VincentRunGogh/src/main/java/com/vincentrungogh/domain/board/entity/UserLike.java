@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(name = "users_like")
-public class UsersLike {
+public class UserLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -26,13 +26,13 @@ public class UsersLike {
     Board board;
 
     @Builder
-    private UsersLike(User user, Board board) {
+    private UserLike(User user, Board board) {
         this.user = user;
         this.board = board;
     }
 
-    public static UsersLike createUsersLike(User user, Board board) {
-        return UsersLike.builder()
+    public static UserLike createUsersLike(User user, Board board) {
+        return UserLike.builder()
                 .user(user)
                 .board(board)
                 .build();
