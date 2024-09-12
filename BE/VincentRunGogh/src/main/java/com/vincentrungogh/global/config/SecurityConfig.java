@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .csrf((csrf) -> csrf.disable())
                 .authorizeHttpRequests((authorize) -> authorize
                         //모두 접근 허용
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**").permitAll()
+                        .requestMatchers("/**","/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**").permitAll()
                         //유저만 접근 허용
                         .anyRequest().authenticated())
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -43,6 +43,6 @@ public class SecurityConfig {
         // 아래 url은 filter 에서 제외
         return web ->
                 web.ignoring()
-                        .requestMatchers("/login/**", "/token/refresh", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**");
+                        .requestMatchers("/**", "/login/**", "/token/refresh", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**");
     }
 }
