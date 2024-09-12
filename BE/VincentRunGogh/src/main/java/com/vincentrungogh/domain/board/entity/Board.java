@@ -24,14 +24,21 @@ public class Board {
     @Column(name = "comment", nullable = false)
     private String comment;
 
+    // 삭제 여부
     @Column(name = "is_delete", nullable = false)
     private Boolean isDelete;
 
+    // 좋아요 수
     @Column(name = "like_count", nullable = false)
     private int likeCount;
 
+    // 생성 날짜
     @Column(name = "created", columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime created;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "route_id")
+    private Route route;
 
     @Builder
     private Board(LocalDateTime created, String comment, boolean isDelete, int likeCount) {
@@ -48,5 +55,15 @@ public class Board {
                 .likeCount(0)
                 .created(LocalDateTime.now())
                 .build();
+    }
+
+    // 좋아요 추가
+    public void addLike(){
+        this.likeCount++;
+    }
+
+    // 좋아요 삭제
+    public void deleteLike(){
+        this.likeCount--;
     }
 }
