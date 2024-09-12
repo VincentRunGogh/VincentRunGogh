@@ -41,19 +41,21 @@ public class Board {
     private Route route;
 
     @Builder
-    private Board(LocalDateTime created, String comment, boolean isDelete, int likeCount) {
+    private Board(LocalDateTime created, String comment, boolean isDelete, int likeCount, Route route) {
         this.comment = comment;
         this.isDelete = isDelete;
         this.likeCount = likeCount;
         this.created = created;
+        this.route = route;
     }
 
-    public static Board createBoard(String comment) {
+    public static Board createBoard(String comment, Route route) {
         return Board.builder()
                 .comment(comment)
                 .isDelete(false)
                 .likeCount(0)
                 .created(LocalDateTime.now())
+                .route(route)
                 .build();
     }
 

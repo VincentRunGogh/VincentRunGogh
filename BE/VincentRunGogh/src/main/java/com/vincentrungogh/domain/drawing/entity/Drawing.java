@@ -53,16 +53,18 @@ public class Drawing {
     private Route route;
 
     @Builder
-    private Drawing(String title, Boolean isCompleted, Boolean isCreatedBoard, String accumulatedDrawingImage, LocalDateTime created, LocalDateTime updated) {
+    private Drawing(String title, Boolean isCompleted, Boolean isCreatedBoard, String accumulatedDrawingImage, LocalDateTime created, LocalDateTime updated, User user, Route route) {
         this.title = title;
         this.isCompleted = isCompleted;
         this.isCreatedBoard = isCreatedBoard;
         this.accumulatedDrawingImage = accumulatedDrawingImage;
         this.created = created;
         this.updated = updated;
+        this.user = user;
+        this.route = route;
     }
 
-    public static Drawing createDrawing(String title, String accumulatedDrawingImage) {
+    public static Drawing createDrawing(String title, String accumulatedDrawingImage, User user, Route route) {
         return Drawing.builder()
                 .title(title)
                 .isCompleted(false)
@@ -70,6 +72,8 @@ public class Drawing {
                 .accumulatedDrawingImage(accumulatedDrawingImage)
                 .created(LocalDateTime.now())
                 .updated(LocalDateTime.now())
+                .user(user)
+                .route(route)
                 .build();
     }
 

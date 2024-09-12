@@ -45,7 +45,7 @@ public class DrawingDetail {
     private Drawing drawing;
 
     @Builder
-    private DrawingDetail(Boolean isCompleted, int time, int distance, double speed, int step, String currentDrawingImage, LocalDateTime created) {
+    private DrawingDetail(Boolean isCompleted, int time, int distance, double speed, int step, String currentDrawingImage, LocalDateTime created, Drawing drawing) {
         this.isCompleted = isCompleted;
         this.time = time;
         this.distance = distance;
@@ -55,7 +55,7 @@ public class DrawingDetail {
         this.created = created;
     }
 
-    public static DrawingDetail createDrawingDetail(){
+    public static DrawingDetail createDrawingDetail(Drawing drawing){
         return DrawingDetail.builder()
                 .isCompleted(false)
                 .time(0)
@@ -64,6 +64,7 @@ public class DrawingDetail {
                 .step(0)
                 .currentDrawingImage(null)
                 .created(LocalDateTime.now())
+                .drawing(drawing)
                 .build();
     }
 
