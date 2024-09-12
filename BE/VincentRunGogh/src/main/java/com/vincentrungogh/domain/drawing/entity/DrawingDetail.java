@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Table(name = "drawing_detail")
+@Table(name = "drawings_detail")
 public class DrawingDetail {
 
     @Id
@@ -19,24 +19,31 @@ public class DrawingDetail {
     @Column(name = "id")
     private int id;
 
+    // 완료 여부
     @Column(name = "is_completed", nullable = false)
     private Boolean isCompleted;
 
+    // 걸린 시간
     @Column(name = "time")
     private int time;
 
+    // 거리
     @Column(name = "distance")
     private int distance;
 
+    // 속도
     @Column(name = "speed")
     private double speed;
 
+    // 걸음 수
     @Column(name = "step")
     private int step;
 
+    // 현재 드로잉 이미지
     @Column(name = "current_drawing_image")
     private String currentDrawingImage;
 
+    // 생성 날짜
     @Column(name = "created", columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime created;
 
