@@ -16,7 +16,7 @@ pipeline {
                 script {
                     checkout([
                         $class: 'GitSCM',
-                        branches: [[name: '*/merge-requests/${env.gitlabMergeRequestIid}/merge']],
+                        branches: [[name: '*/merge-requests/${env.gitlabMergeRequestIid}/DATA-merge']],
                         userRemoteConfigs: [[url: 'https://lab.ssafy.com/s11-bigdata-dist-sub1/S11P21B307.git']]  // 적절한 리포지토리 URL로 변경
                     ])
                 }
