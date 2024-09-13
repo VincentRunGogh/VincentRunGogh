@@ -1,12 +1,10 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import List
-app = FastAPI()
 
-# APIRouter 생성
 api_router = APIRouter()
 
-# Position 모델 정의 (필요에 따라 필드 추가)
+# Position 모델 정의
 class Position(BaseModel):
     lat: float
     lng: float
@@ -30,6 +28,3 @@ async def create_art_route(request: ArtRouteRequest):
         "rightLat": request.rightLat,
         "rightLng": request.rightLng
     }
-
-# "/api/v1"를 기본 경로로 설정하여 라우터 등록
-app.include_router(api_router, prefix="/api/v1")
