@@ -1,0 +1,80 @@
+pipeline {
+    agent any
+
+    environment {
+        imagename = "dltjrqja1/fastapi"
+        registryCredential = 'docker-hub'
+        version = 'latest'
+        dockerImage = ''
+    }
+
+    stages {
+        // 병합 후 브랜치 체크아웃 (GitLab 가상 병합 브랜치)
+        stage('Checkout Merged Branch') {
+            steps {
+                echo 'Checking out merged branch...'
+                script {
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: '*/merge-requests/${env.gitlabMergeRequestIid}/merge']],
+                        userRemoteConfigs: [[url: 'https://lab.ssafy.com/s11-bigdata-dist-sub1/S11P21B307.git']]  // 적절한 리포지토리 URL로 변경
+                    ])
+                }
+            }
+            post {
+                failure {
+                    error 'Failed to checkout merged branch...'
+                }
+            }
+        }
+
+        // Docker 이미지 빌드
+        stage('Build Docker Image') {
+            steps {
+                echo 'Building Docker Image...'
+                script {
+                    dockerImage = docker.build("${imagename}:${version}", "--no-cache .")
+                }
+            }
+            post {
+                failure {
+                    error 'Docker build failed...'
+                }
+            }
+        }
+
+        // Docker 이미지 푸시
+        stage('Push Docker Image') {
+            steps {
+                echo 'Pushing Docker Image to DockerHub...'
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', registryCredential) {
+                        dockerImage.push(version)
+                    }
+                }
+            }
+            post {
+                failure {
+                    error 'Failed to push Docker image...'
+                }
+            }
+        }
+
+        // Docker 컨테이너 배포
+        stage('Deploy Docker Container') {
+            steps {
+                echo 'Deploying Docker container...'
+                sh '''
+                docker stop fastapi || true
+                docker rm fastapi || true
+                docker run -d --name fastapi -p 8000:8000 ${imagename}:${version}
+                '''
+            }
+            post {
+                failure {
+                    error 'Deployment failed...'
+                }
+            }
+        }
+    }
+}
