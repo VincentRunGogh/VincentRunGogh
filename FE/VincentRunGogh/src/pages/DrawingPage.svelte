@@ -1,9 +1,15 @@
 <script>
   import { onMount } from 'svelte';
-
   import L from 'leaflet';
+  import Swal from 'sweetalert2';
+  import { get } from 'svelte/store';
+
   import { MapToolbar, MapGUI } from '@map';
   import currPosSvg from '@/assets/svg/currPos.svg';
+  import { isLockScreen, isPause } from '@/stores/drawingStore';
+
+  $: $isLockScreen = $isLockScreen;
+  $: $isPause = $isPause;
 
   let currPos;
   let map;
@@ -13,8 +19,6 @@
   let trackingIntervalId; // 10초마다 위치를 추적하는 setInterval의 ID  let trackingActive = false; // 트래킹이 활성화되어 있는지 확인하는 플래그
   let startPos;
   let startTime;
-
-  let isLockScreen = false; //화면 잠금 여부
 
   const posList = [
     [36.3528192, 127.3102336],
@@ -47,7 +51,7 @@
     });
 
     toolbarComponent.$on('click-reset', () => {
-      map.setView(currPos, 5, { animate: true });
+      map.setView(currPos, 16, { animate: true });
     });
 
     return div;
@@ -66,15 +70,16 @@
     let div = L.DomUtil.create('div');
     guiComponent = new MapGUI({
       target: div,
-      props: {},
+      props: { isLockScreen },
     });
 
-    guiComponent.$on('click-pause', ({ detail }) => {
-      toggleTracking(detail);
+    guiComponent.$on('click-pause', () => {
+      isPause.update((value) => !value);
+      toggleTracking();
     });
     guiComponent.$on('click-mute', ({ detail }) => {});
-    guiComponent.$on('click-lockScreen', ({ detail }) => {
-      isLockScreen = detail;
+    guiComponent.$on('click-lockScreen', () => {
+      isLockScreen.update((value) => !value); // store 값을 업데이트
     });
 
     return div;
@@ -90,7 +95,7 @@
   let markers = new Map();
 
   function markerIcon() {
-    let html = `<div class="map-marker"><img src=${currPosSvg}></div></div>`;
+    let html = `<div class="map-marker"><img src=${currPosSvg}/></div>`;
     return L.divIcon({
       html,
       className: 'map-marker',
@@ -131,8 +136,9 @@
     }
   }
 
-  function toggleTracking(trackingActive) {
+  function toggleTracking() {
     // 트래킹이 활성화되지 않은 경우 (트래킹 처음 시작 또는 재개 시)
+    const trackingActive = get(isPause);
     if (!trackingActive) {
       // 지도에서 현재 위치 찾기
       map.locate({ setView: true, maxZoom: 16 });
@@ -140,7 +146,7 @@
       map.on('locationfound', (e) => {
         const { lat, lng } = e.latlng;
         console.log(`Current position: ${lat}, ${lng}`);
-
+        currPos = { lat, lng };
         // 최초 위치 설정
         if (!startPos) {
           startPos = { lat, lng };
@@ -169,10 +175,10 @@
       // 10초마다 위치를 추적하는 setInterval
       trackingIntervalId = setInterval(() => {
         map.locate(); // 위치 추적
+
         console.log('Location updated');
       }, 10000); // 10초마다 실행
 
-      trackingActive = true; // 트래킹 활성화 상태
       console.log('Tracking started or resumed');
     } else {
       // 트래킹이 활성화된 상태일 때 (일시정지)
@@ -180,13 +186,11 @@
       clearInterval(trackingIntervalId); // 위치 추적 중지
       timerIntervalId = null;
       trackingIntervalId = null;
-      trackingActive = false; // 트래킹 비활성화 상태
       console.log('Tracking paused');
     }
   }
   function clickLockScreen() {
-    isLockScreen = !isLockScreen; // 잠금 상태를 반전
-    console.log('Lock Screen:', isLockScreen);
+    $isLockScreen = !$isLockScreen; // 잠금 상태를 반전
   }
   onMount(() => {
     mapAction();
@@ -199,38 +203,34 @@
 <div class="map-container" style="height:100vh; width:100%;">
   <div id="map" class="map" style="height:100%;width:100%" />
 </div>
-<div class="lock-overlay" class:is-active={isLockScreen}>
+<div class="lock-overlay" class:is-active={$isLockScreen}>
   <div class="overlay-content">
-    <!-- 이곳에 잠금 상태에서 보여질 추가 UI 요소를 넣을 수 있습니다. -->
-    <p>Screen is locked. Only the button below can unlock it.</p>
-
-    <!-- 오버레이 상에서 클릭이 가능한 버튼 (잠금 해제 버튼) -->
-    <button on:click={clickLockScreen} class="unlock-btn"> Unlock Screen </button>
+    <button on:click={clickLockScreen} class="unlock-btn"> </button>
   </div>
 </div>
 
 <style>
-  /* Lock Overlay: 화면 잠금을 위한 오버레이 */
+  /* 지도와 버튼을 포함한 컨테이너 */
+
   .lock-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.3); /* 투명 오버레이 */
+    background: rgba(0, 0, 0, 0.5);
     display: none;
     justify-content: center;
     align-items: center;
     z-index: 9999;
+    pointer-events: none; /* 기본적으로 모든 클릭을 차단 */
   }
 
-  /* 잠금 상태에서 오버레이 활성화 */
   .lock-overlay.is-active {
     display: flex;
-    pointer-events: auto;
+    pointer-events: auto; /* 활성화되면 클릭 가능 */
   }
 
-  /* 오버레이 위의 컨텐츠 스타일 */
   .overlay-content {
     background: rgba(255, 255, 255, 0.9);
     padding: 1rem 2rem;
@@ -238,7 +238,6 @@
     text-align: center;
   }
 
-  /* 잠금 해제 버튼 */
   .unlock-btn {
     background-color: purple;
     color: white;
@@ -248,26 +247,5 @@
     cursor: pointer;
     border-radius: 0.25rem;
     margin-top: 1rem;
-  }
-
-  /* 기본적으로는 클릭 이벤트를 차단 */
-  .lock-overlay {
-    pointer-events: none;
-  }
-
-  /* 잠금 해제 버튼만 클릭 가능하도록 설정 */
-  .lock-overlay.is-active .unlock-btn {
-    pointer-events: auto;
-  }
-
-  /* 잠금/해제 버튼 */
-  .lock-btn {
-    background-color: purple;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    cursor: pointer;
-    border-radius: 0.25rem;
   }
 </style>

@@ -17,6 +17,7 @@
     "prettier-plugin-svelte": "^3.2.6",
     "svelte": "^4.2.19",
     "svelte-spa-router": "^4.0.1",
+    "unplugin-icons": "^0.19.3",
     "vite": "^5.4.1",
     "vite-plugin-pwa": "^0.20.5"
   },

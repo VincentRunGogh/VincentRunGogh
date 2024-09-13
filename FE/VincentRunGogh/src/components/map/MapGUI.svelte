@@ -1,33 +1,35 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
-  const dispatch = createEventDispatcher();
+  import { onMount } from 'svelte';
 
-  //러닝 정보(시간, 총 길이, 평균 속도, 남은 거리)
-  let isPause = false;
+  import { createEventDispatcher } from 'svelte';
+  import { isLockScreen, isPause } from '@/stores/drawingStore';
+  import { get } from 'svelte/store';
+
+  const dispatch = createEventDispatcher();
+  $: $isLockScreen = $isLockScreen;
+  $: $isPause = $isPause;
   let isMute = false;
-  let isLockScreen = false;
+  //러닝 정보(시간, 총 길이, 평균 속도, 남은 거리)
   function clickPause() {
-    isPause = !isPause;
-    dispatch('click-pause', isPause);
+    dispatch('click-pause', $isPause);
   }
   function clickMute() {
     isMute = !isMute;
     dispatch('click-mute', isMute);
   }
   function clickLockScreen() {
-    isLockScreen = !isLockScreen;
-    dispatch('click-lockScreen', isLockScreen);
+    dispatch('click-lockScreen', $isLockScreen);
   }
+  onMount(() => {
+    console.log(get(isLockScreen));
+  });
 </script>
 
-<div class="lock-screen" class:is-active={isLockScreen}>
-  <p>Screen Locked</p>
-</div>
 <div class="leaflet-bottom-center">
   <div>
     <!-- 화면 잠금 -->
-    {#if isLockScreen}
-      <button type="button" on:click={clickLockScreen}>
+    {#if $isLockScreen}
+      <button type="button" on:click={clickLockScreen} class="lock-btn">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="1.2em"
@@ -93,7 +95,7 @@
           />
         </svg>
       </button>
-      <button type="button" on:click={clickLockScreen}>
+      <button type="button" on:click={clickLockScreen} class="lock-btn">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="1.2em"
@@ -137,4 +139,12 @@
     position: fixed;
     transform: translate(-50%, 0%);
   } */
+
+  /* 지도 안의 버튼 스타일 */
+  /* .lock-btn {
+    position: relative;
+    z-index: 100000; 
+    pointer-events: auto; 
+  } 
+  */
 </style>
