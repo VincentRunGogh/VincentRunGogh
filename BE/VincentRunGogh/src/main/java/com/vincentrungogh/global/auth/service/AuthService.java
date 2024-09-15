@@ -39,6 +39,7 @@ public class AuthService {
                 )
         );
 
+        log.info("AuthService : 2");
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         String accessToken = jwtService.buildAccessToken(userPrincipal.getId());
         String refreshToken = jwtService.buildRefreshToken(userPrincipal.getId());
