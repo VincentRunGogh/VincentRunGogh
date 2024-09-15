@@ -60,4 +60,10 @@ public class AuthController {
         authService.signup(signupRequest);
         return ResponseEntity.ok("");
     }
+
+    @PostMapping("/signup")
+    public ResponseEntity<?> signup(@RequestBody SignupRequest signupRequest){
+        authService.signup(signupRequest);
+        return ResponseEntity.ok("");
+    }
 }
