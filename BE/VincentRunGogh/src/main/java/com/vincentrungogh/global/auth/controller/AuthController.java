@@ -3,6 +3,7 @@ package com.vincentrungogh.global.auth.controller;
 
 import com.vincentrungogh.global.auth.service.AuthService;
 import com.vincentrungogh.global.auth.service.dto.request.LoginRequest;
+import com.vincentrungogh.global.auth.service.dto.request.SignupRequest;
 import com.vincentrungogh.global.auth.service.dto.response.LoginResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,5 +27,11 @@ public class AuthController {
         log.info("AuthController : 로그인 시작");
         LoginResponse response = authService.login(loginRequest);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/signup")
+    public ResponseEntity<?> signup(@RequestBody SignupRequest signupRequest){
+        authService.signup(signupRequest);
+        return ResponseEntity.ok("");
     }
 }
