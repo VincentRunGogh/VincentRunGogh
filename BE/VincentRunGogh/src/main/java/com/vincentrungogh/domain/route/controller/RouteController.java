@@ -5,6 +5,7 @@ import com.vincentrungogh.domain.route.service.dto.request.ArtRouteRequestDto;
 import com.vincentrungogh.domain.route.service.dto.request.SaveRouteRequestDto;
 import com.vincentrungogh.domain.route.service.dto.response.ArtRouteResponseDto;
 import com.vincentrungogh.domain.route.service.dto.response.SaveRouteResponseDto;
+import com.vincentrungogh.global.auth.service.dto.response.UserPrincipal;
 import com.vincentrungogh.global.util.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -45,9 +47,9 @@ public class RouteController {
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
     @PostMapping
-    public ResponseEntity<ResultDto> convertArtRoute(/*@AuthenticationPrincipal UserPrincipal principal,*/@RequestBody ArtRouteRequestDto requestDto) {
-        log.info(requestDto.toString());
-        ArtRouteResponseDto responseDto = routeService.convertArtRoute(/*principal,*/ requestDto);
+    public ResponseEntity<ResultDto> convertArtRoute(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody ArtRouteRequestDto requestDto) {
+        log.info("아트 루트화: " + requestDto.toString());
+        ArtRouteResponseDto responseDto = routeService.convertArtRoute(userPrincipal, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "루트화에 성공했습니다.", responseDto));
     }
 
@@ -55,7 +57,7 @@ public class RouteController {
     //아트 루트화
     @Operation(summary = "루트 최종 생성", description = "아트이미지와 루트명을 통해 루트 최종 생성하기")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "루트를 성공적으로 생성했습니다.",
+            @ApiResponse(responseCode = "200", description = "루트를 성공적으로 저장했습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "204", description = "저장할 루트가 없습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
@@ -71,10 +73,10 @@ public class RouteController {
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
     @PostMapping("/end")
-    public ResponseEntity<ResultDto> saveRoute(/*@AuthenticationPrincipal UserPrincipal principal,*/@RequestBody SaveRouteRequestDto requestDto) {
-        log.info(requestDto.toString());
-        SaveRouteResponseDto responseDto = routeService.saveRoute(/*principal,*/ requestDto);
-        return null;
+    public ResponseEntity<ResultDto> saveRoute(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody SaveRouteRequestDto requestDto) {
+        log.info("아트 저장: "+ requestDto.toString());
+        SaveRouteResponseDto responseDto = routeService.saveRoute(userPrincipal, requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "루트화를 성공적으로 저장했습니다.", responseDto));
     }
 
 }
