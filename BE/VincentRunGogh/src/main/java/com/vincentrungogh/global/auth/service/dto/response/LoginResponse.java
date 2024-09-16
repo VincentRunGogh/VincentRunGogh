@@ -1,11 +1,13 @@
 package com.vincentrungogh.global.auth.service.dto.response;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
+
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LoginResponse {
 
     private String accessToken;
