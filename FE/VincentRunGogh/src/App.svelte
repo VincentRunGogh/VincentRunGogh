@@ -1,4 +1,5 @@
-<script>
+<script lang="ts">
+  import "./app.css";
   import Router from 'svelte-spa-router'
   import routes from './routes'
   import { link } from 'svelte-spa-router';
@@ -8,6 +9,3 @@
 <a use:link href="/drawingmap">Drawing Map</a>
 <Router {routes} />
 
-<style>
-
-</style>
