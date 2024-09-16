@@ -2,8 +2,9 @@ package com.vincentrungogh.domain.route.controller;
 
 import com.vincentrungogh.domain.route.service.RouteService;
 import com.vincentrungogh.domain.route.service.dto.request.ArtRouteRequestDto;
-import com.vincentrungogh.domain.route.service.dto.request.CreateRouteRequestDto;
+import com.vincentrungogh.domain.route.service.dto.request.SaveRouteRequestDto;
 import com.vincentrungogh.domain.route.service.dto.response.ArtRouteResponseDto;
+import com.vincentrungogh.domain.route.service.dto.response.SaveRouteResponseDto;
 import com.vincentrungogh.global.util.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,10 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 
 @RestController
 @RequestMapping("/routes")
@@ -73,8 +71,9 @@ public class RouteController {
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
     @PostMapping("/end")
-    public ResponseEntity<ResultDto> createRoute(@RequestBody CreateRouteRequestDto requestDto) {
+    public ResponseEntity<ResultDto> saveRoute(/*@AuthenticationPrincipal UserPrincipal principal,*/@RequestBody SaveRouteRequestDto requestDto) {
         log.info(requestDto.toString());
+        SaveRouteResponseDto responseDto = routeService.saveRoute(/*principal,*/ requestDto);
         return null;
     }
 
