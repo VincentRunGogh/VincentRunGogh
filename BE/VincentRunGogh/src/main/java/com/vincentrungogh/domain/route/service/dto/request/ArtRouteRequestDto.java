@@ -7,7 +7,6 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @ToString
 public class ArtRouteRequestDto {
     private List<Position> positionList;
