@@ -13,6 +13,8 @@ import com.vincentrungogh.domain.route.service.dto.response.SaveRouteResponseDto
 import com.vincentrungogh.domain.route.service.dto.response.DataArtRouteResponseDto;
 import com.vincentrungogh.domain.route.service.dto.response.ArtRouteResponseDto;
 import com.vincentrungogh.domain.user.entity.User;
+import com.vincentrungogh.domain.user.repository.UserRepository;
+import com.vincentrungogh.global.auth.service.dto.response.UserPrincipal;
 import com.vincentrungogh.global.exception.CustomException;
 import com.vincentrungogh.global.exception.ErrorCode;
 import com.vincentrungogh.global.util.ResultDto;
@@ -22,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -36,9 +39,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 //@PropertySource("classpath:application.properties")
 public class RouteService {
+    private final UserRepository userRepository;
     private final RouteRepository routeRepository;
     private final MyHealthRepository myHealthRepository;
-//    private final UserRepository userRepository;
     private final RestTemplate restTemplate;
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -47,20 +50,20 @@ public class RouteService {
 
     private final String ROOTING_PREFIX = "rooting:";
 
+    private User findUser(int userId) {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+    }
+
     @Transactional
-    public ArtRouteResponseDto convertArtRoute(/*@AuthenticationPrincipal UserPrincipal principal,*/ArtRouteRequestDto requestDto) {
+    public ArtRouteResponseDto convertArtRoute(@AuthenticationPrincipal UserPrincipal userPrincipal, ArtRouteRequestDto requestDto) {
         //1. 사용자 확인
-        User user = null;
-//        redisTemplate.opsForValue().set("1", requestDto.getPositionList());
-//
-//        List<Position> list = (List<Position>) redisTemplate.opsForValue().get("1");
-//
-//        log.info(" "+list.toString());
+        User user = findUser(userPrincipal.getId());
 
         //2. request를 토대로 파이썬으로 보내기
         URI uri = UriComponentsBuilder
                 .fromUriString(dataUrl)
-//                .fromUriString("http://j11b307a.p.ssafy.io:8000")
                 .path("/api/v1/rootings/art")
                 .encode()
                 .build()
@@ -87,9 +90,9 @@ public class RouteService {
     }
 
     @Transactional
-    public SaveRouteResponseDto saveRoute(/*@AuthenticationPrincipal UserPrincipal principal,*/SaveRouteRequestDto requestDto) {
+    public SaveRouteResponseDto saveRoute(@AuthenticationPrincipal UserPrincipal userPrincipal, SaveRouteRequestDto requestDto) {
         //1. 사용자 확인
-        User user = null;
+        User user = findUser(userPrincipal.getId());
 
         //2. aws로 이미지 저장
 
