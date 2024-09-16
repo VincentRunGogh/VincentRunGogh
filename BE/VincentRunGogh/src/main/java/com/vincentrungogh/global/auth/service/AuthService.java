@@ -2,7 +2,6 @@ package com.vincentrungogh.global.auth.service;
 
 import com.vincentrungogh.domain.user.entity.User;
 import com.vincentrungogh.domain.user.repository.UserRepository;
-import com.vincentrungogh.domain.user.service.UserService;
 import com.vincentrungogh.global.auth.service.dto.request.LoginRequest;
 import com.vincentrungogh.global.auth.service.dto.request.SignupRequest;
 import com.vincentrungogh.global.auth.service.dto.response.LoginResponse;
@@ -39,7 +38,6 @@ public class AuthService {
                 )
         );
 
-        log.info("AuthService : 2");
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         String accessToken = jwtService.buildAccessToken(userPrincipal.getId());
         String refreshToken = jwtService.buildRefreshToken(userPrincipal.getId());
