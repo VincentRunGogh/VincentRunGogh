@@ -51,6 +51,12 @@ public class AuthService {
         // 4. refreshToken cookie에 넣기
         jwtService.addRefreshTokenToCookie(response, refreshToken);
 
+        // 5. DB에 저장
+        User user = userRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        user.addRefreshToken(refreshToken);
+        userRepository.save(user);
+
         return LoginResponse.createLoginResponse(accessToken);
     }
 
