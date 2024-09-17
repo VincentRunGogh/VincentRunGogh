@@ -78,6 +78,21 @@ public class AuthController {
                         "회원가입에 성공하셨습니다."));
     }
 
+    @Operation(summary = "닉네임 중복 확인", description = "사용자 닉네임 중복 확인 ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "닉네임 중복 요청에 성공하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "닉네임 중복 요청에 실패하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
     @GetMapping("/find-nickname")
     public ResponseEntity<?> findNickname(@RequestParam("nickname") String nickname){
 
