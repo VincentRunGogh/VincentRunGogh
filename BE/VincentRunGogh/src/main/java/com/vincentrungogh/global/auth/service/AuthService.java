@@ -4,7 +4,7 @@ import com.vincentrungogh.domain.user.entity.User;
 import com.vincentrungogh.domain.user.repository.UserRepository;
 import com.vincentrungogh.global.auth.service.dto.request.LoginRequest;
 import com.vincentrungogh.global.auth.service.dto.request.SignupRequest;
-import com.vincentrungogh.global.auth.service.dto.response.FindNicknameResponse;
+import com.vincentrungogh.global.auth.service.dto.response.FindDuplicatedResponse;
 import com.vincentrungogh.global.auth.service.dto.response.LoginResponse;
 import com.vincentrungogh.global.auth.service.dto.response.UserPrincipal;
 import com.vincentrungogh.global.exception.CustomException;
@@ -86,14 +86,21 @@ public class AuthService {
         return;
     }
 
-    public FindNicknameResponse findNickname(String nickname){
+    public FindDuplicatedResponse findNickname(String nickname){
         // 1. 닉네임 길이 확인
         if(nickname.length() > 10){
             throw new CustomException(ErrorCode.INVALID_NICKNAME_LENGTH);
         }
         // 2. 중복 확인
         boolean isDuplicated = checkDuplicateNickname(nickname);
-        return FindNicknameResponse.createFindNicknameResponse(isDuplicated);
+        return FindDuplicatedResponse.createFindDuplicatedResponse(isDuplicated);
+    }
+
+    public FindDuplicatedResponse findEmail(String email){
+
+        // 1. 중복 확인
+        boolean isDuplicated = checkDuplicateEmail(email);
+        return FindDuplicatedResponse.createFindDuplicatedResponse(isDuplicated);
     }
 
     private boolean checkDuplicateEmail(String email){
