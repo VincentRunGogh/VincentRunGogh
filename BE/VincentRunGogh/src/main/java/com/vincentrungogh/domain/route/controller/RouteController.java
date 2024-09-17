@@ -1,5 +1,6 @@
 package com.vincentrungogh.domain.route.controller;
 
+import com.vincentrungogh.domain.route.service.Facade.RouteFacade;
 import com.vincentrungogh.domain.route.service.RouteService;
 import com.vincentrungogh.domain.route.service.dto.request.ArtRouteRequestDto;
 import com.vincentrungogh.domain.route.service.dto.request.SaveRouteRequestDto;
@@ -26,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class RouteController {
 
-    private final RouteService routeService;
+    private final RouteFacade routeFacade;
 
     //아트 루트화
     @Operation(summary = "아트 루트화", description = "사용자가 그린 아트를 루트화하기")
@@ -49,7 +50,7 @@ public class RouteController {
     @PostMapping
     public ResponseEntity<ResultDto> convertArtRoute(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody ArtRouteRequestDto requestDto) {
         log.info("아트 루트화: " + requestDto.toString());
-        ArtRouteResponseDto responseDto = routeService.convertArtRoute(userPrincipal, requestDto);
+        ArtRouteResponseDto responseDto = routeFacade.convertArtRoute(userPrincipal, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "루트화에 성공했습니다.", responseDto));
     }
 
@@ -75,7 +76,7 @@ public class RouteController {
     @PostMapping("/end")
     public ResponseEntity<ResultDto> saveRoute(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody SaveRouteRequestDto requestDto) {
         log.info("아트 저장: "+ requestDto.toString());
-        SaveRouteResponseDto responseDto = routeService.saveRoute(userPrincipal, requestDto);
+        SaveRouteResponseDto responseDto = routeFacade.saveRoute(userPrincipal, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "루트화를 성공적으로 저장했습니다.", responseDto));
     }
 
