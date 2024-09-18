@@ -1,4 +1,5 @@
 import DrawingPage from "./DrawingPage.svelte";
 import MakeRoutePage from "./MakeRoutePage.svelte";
-
-export { DrawingPage, MakeRoutePage };
+import DrawingCapturePage from './DrawingCapturePage.svelte';
+import CalendarPage from "./CalendarPage.svelte";
+export { DrawingPage, MakeRoutePage, DrawingCapturePage, CalendarPage };

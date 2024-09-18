@@ -20,18 +20,15 @@
       "@/*": ["src/*"],
       "@pages/*": ["src/pages/*"],
       "@components/*": ["src/components/*"],
-      "@map/*": ["src/components/map/*"],
-      
+      "@map/*": ["src/components/map/*"]
     },
     "types": ["node"],
     "outDir": "./dist",
     "skipLibCheck": false,
     "typeRoots": ["./node_modules/@types", "src/types"],
     "moduleResolution": "node"
-
-
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules","dist"],
+  "exclude": ["node_modules", "dist"]
   // "references": [{ "path": "./tsconfig.node.json" }]
 }

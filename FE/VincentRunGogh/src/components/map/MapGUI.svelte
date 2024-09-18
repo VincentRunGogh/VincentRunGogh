@@ -1,14 +1,27 @@
-<script>
+<script lang="ts">
   import { onMount } from 'svelte';
-
   import { createEventDispatcher } from 'svelte';
-  import { isLockScreen, isPause } from '@/stores/drawingStore';
-  import { get } from 'svelte/store';
 
-  const dispatch = createEventDispatcher();
+  import {
+    isLockScreen,
+    isPause,
+    elapsedTime,
+    totalDistance,
+    averageSpeed,
+  } from '@/stores/drawingStore';
+  import { get } from 'svelte/store';
+  import { formatSecToMMSS } from '@/utils/calculateFuc';
+
+  const dispatch = createEventDispatcher<{
+    'click-pause': boolean;
+    'click-mute': boolean;
+    'click-lockScreen': boolean;
+  }>();
   $: $isLockScreen = $isLockScreen;
   $: $isPause = $isPause;
+
   let isMute = false;
+  let hasRoute = false;
   //러닝 정보(시간, 총 길이, 평균 속도, 남은 거리)
   function clickPause() {
     dispatch('click-pause', $isPause);
@@ -20,9 +33,6 @@
   function clickLockScreen() {
     dispatch('click-lockScreen', $isLockScreen);
   }
-  onMount(() => {
-    console.log(get(isLockScreen));
-  });
 </script>
 
 <div class="leaflet-bottom-center">
@@ -32,8 +42,8 @@
       <button type="button" on:click={clickLockScreen} class="lock-btn">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="1.2em"
-          height="1.2em"
+          width="2.2em"
+          height="2.2em"
           viewBox="0 0 24 24"
           {...$$props}
         >
@@ -49,8 +59,8 @@
         {#if isMute}
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="1em"
-            height="1em"
+            width="2em"
+            height="2em"
             viewBox="0 0 24 24"
             {...$$props}
           >
@@ -64,8 +74,8 @@
         {:else}
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="1em"
-            height="1em"
+            width="2em"
+            height="2em"
             viewBox="0 0 24 24"
             {...$$props}
           >
@@ -82,8 +92,8 @@
       <button type="button" on:click={clickPause}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="1em"
-          height="1em"
+          width="2em"
+          height="2em"
           viewBox="0 0 24 24"
           {...$$props}
         >
@@ -98,8 +108,8 @@
       <button type="button" on:click={clickLockScreen} class="lock-btn">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="1.2em"
-          height="1.2em"
+          width="2.2em"
+          height="2.2em"
           viewBox="0 0 48 48"
           {...$$props}
         >
@@ -124,9 +134,19 @@
 
   <div>
     <!-- 이동 시간 -->
-    <!-- 움직인 거리 -->
-    <!-- 평균 속도 -->
-    <!-- 남은 거리 -->
+    {formatSecToMMSS($elapsedTime)}
+    <div>
+      <!-- 움직인 거리 -->
+      이동거리:
+      {$totalDistance}
+      <!-- 평균 속도 -->
+      평균 속도:
+      {$averageSpeed}
+      <!-- 남은 거리 -->
+      {#if hasRoute}
+        남은 거리:
+      {/if}
+    </div>
   </div>
 </div>
 
@@ -147,4 +167,13 @@
     pointer-events: auto; 
   } 
   */
+  button {
+    width: 4rem;
+    height: 4rem;
+    border: 0;
+    background-color: transparent;
+    transition-property: background-color, background-opacity;
+    transition-duration: 250ms;
+    border-radius: 0.375rem;
+  }
 </style>
