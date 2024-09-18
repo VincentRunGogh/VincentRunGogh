@@ -1,9 +1,11 @@
 // import 컴포넌트
 // @ts-ignore
-import { DrawingPage, MakeRoutePage } from "../pages";
+import HomePage from '@/pages/HomePage.svelte';
+import { DrawingPage, MakeRoutePage } from '../pages';
 export default {
   // 링크 : 컴포넌트
   // :param, *any
-  "/makeroute": MakeRoutePage,
-  "/drawingmap": DrawingPage,
+  '/': HomePage,
+  '/makeroute': MakeRoutePage,
+  '/drawingmap': DrawingPage,
 };
