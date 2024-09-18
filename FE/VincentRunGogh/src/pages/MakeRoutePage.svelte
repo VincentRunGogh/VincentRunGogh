@@ -4,9 +4,9 @@
   import "leaflet/dist/leaflet.css";
   import "leaflet-draw";
   import "leaflet-draw/dist/leaflet.draw.css";
-  // import "./map.css";
+  import "@components/map.css";
   import Swal from "sweetalert2";
-  // import MakeLoadingAlert from "./MakeLoadingAlert.svelte";
+  import MakeLoadingAlert from "@components/makeroute/MakeLoadingAlert.svelte";
   // Chapter 2
   import html2canvas from "html2canvas";
   import { Canvg } from "canvg";
