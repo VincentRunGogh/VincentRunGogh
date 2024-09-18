@@ -1,10 +1,10 @@
 <script lang="ts">
   import { link } from 'svelte-spa-router';
-  
-  let dummyDrawingList: {name:string, date:Date}[] = [
-    {name: '1번드로잉', date: new Date()},
-    {name: '2번드로잉', date: new Date()},
-    {name: '3번드로잉', date: new Date()},
+
+  let dummyDrawingList: {name:string, date:any}[] = [
+    {name: '1번드로잉', date: '2024-09-04'},
+    {name: '2번드로잉', date: '2024-09-05'},
+    {name: '3번드로잉', date: '2024-09-06'},
   ];
 </script>
 
@@ -23,7 +23,7 @@
     {/each}
   </div>
   <div id="homepage-chart">
-
+    <div>차트가보여질거여요</div>
   </div>
   <div id="homepage-tabbar">
     <a use:link href="/makeroute">MakeRoute</a>
@@ -32,14 +32,34 @@
 </div>
 
 <style>
+  
   #homepage-body {
+    margin: 0;
+    width: 768px;
+    background: var(--white-bg-color, #F9F8EF);
     display: flex;
     flex-direction: column;
     place-items: center;
   }
 
+  #homepage-header {
+    height: 25vh;
+  }
+
+  #homepage-drawing {
+    height: 30vh;
+  }
+
   #ongoing-drawing {
     display: flex;
     justify-content: space-around;
+  }
+
+  #homepage-chart {
+    height: 30vh;
+  }
+
+  #homepage-tabbar {
+    height: 15vh;
   }
 </style>
