@@ -6,6 +6,8 @@ import {
   MakeRoutePage,
   DrawingCapturePage,
   CalendarPage,
+  RouteListPage,
+  HomePage,
 } from '../pages';
 export default {
   // 링크 : 컴포넌트
@@ -15,4 +17,6 @@ export default {
   '/drawingcapture': DrawingCapturePage,
   '/calendar': CalendarPage,
   '/drawingdetail/:id': DrawingDetailPage,
+  '/': HomePage,
+  '/routelist': RouteListPage,
 };
