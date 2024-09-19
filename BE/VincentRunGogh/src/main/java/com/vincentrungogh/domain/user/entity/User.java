@@ -46,7 +46,7 @@ public class User {
     @Column(name = "weight", nullable = false)
     private double weight; //몸무게
 
-    @Column(name = "refreshToken")
+    @Column(name = "refresh_token")
     private String refreshToken;
 
     @Builder

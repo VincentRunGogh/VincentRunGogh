@@ -1,12 +1,11 @@
 package com.vincentrungogh.global.util;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.*;
 
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 //프론트로 반환 시에 status, message, data의 값을 일정하게 보내주기 위한 클래스
