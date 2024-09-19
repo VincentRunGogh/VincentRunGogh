@@ -3,8 +3,9 @@ package com.vincentrungogh.domain.route.service.Facade;
 import com.vincentrungogh.domain.myhealth.entity.MyHealth;
 import com.vincentrungogh.domain.myhealth.service.MyHealthService;
 import com.vincentrungogh.domain.route.entity.Route;
-import com.vincentrungogh.domain.route.service.PythonApiService;
-import com.vincentrungogh.domain.route.service.RedisService;
+import com.vincentrungogh.global.service.AwsService;
+import com.vincentrungogh.global.service.PythonApiService;
+import com.vincentrungogh.global.service.RedisService;
 import com.vincentrungogh.domain.route.service.RouteService;
 import com.vincentrungogh.domain.route.service.dto.common.Position;
 import com.vincentrungogh.domain.route.service.dto.request.ArtRouteRequestDto;
@@ -32,6 +33,7 @@ public class RouteFacade {
     private final RedisService redisService;
     private final PythonApiService pythonApiService;
     private final MyHealthService myHealthService;
+    private final AwsService awsService;
 
     @Transactional
     public ArtRouteResponseDto convertArtRoute(UserPrincipal userPrincipal, ArtRouteRequestDto requestDto) {
@@ -54,9 +56,10 @@ public class RouteFacade {
         User user = userService.getUserById(userPrincipal.getId());
 
         // 2.aws 저장
+        String imageUrl = awsService.uploadFile(requestDto.getArtImage());
 
         // 3. 루트 저장
-        Route route = routeService.saveRoute(user, requestDto.getTitle(), requestDto.getArtImage());
+        Route route = routeService.saveRoute(user, requestDto.getTitle(), imageUrl);
 
         // 4. Redis에서 좌표 가져오기
         List<Position> positionList = redisService.getRoutePositionList(user.getId());
