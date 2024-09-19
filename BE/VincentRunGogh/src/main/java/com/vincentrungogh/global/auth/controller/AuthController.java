@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
+    // Infra test01
+
     private final AuthService authService;
 
     @Operation(summary = "로그인", description = "사용자 로그인하기")
