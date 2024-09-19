@@ -7,6 +7,7 @@
   import "@components/map.css";
   import Swal from "sweetalert2";
   import MakeLoadingAlert from "@components/makeroute/MakeLoadingAlert.svelte";
+  import { push } from 'svelte-spa-router';
   // Chapter 2
   import html2canvas from "html2canvas";
   import { Canvg } from "canvg";
@@ -338,14 +339,6 @@
     // 마무리하기
   }
 
-  //어떻게든캡쳐해내야한다
-  async function captureTest() {
-    Swal.fire({
-      title: "캡쳐!",
-      html: `<img src=${finalImage} style='width: 500px; height:500px;'>`,
-      text: "이걸캡쳐해냈습니다.",
-    });
-  }
 </script>
 
 <div class="make-route">
@@ -398,7 +391,7 @@
       <!-- <div id="test"></div> -->
       <img id="final" src="" alt="" />
       <p>끝!</p>
-      <button on:click={captureTest}>캡쳐</button>
+      <button on:click={() => push('/')}>홈으로</button>
       <img src="" alt="" id="resultImage" />
     {/if}
   {/if}

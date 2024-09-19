@@ -4,5 +4,5 @@
   import routes from './routes'
 </script>
 
-<Router {routes} useHash={false} />
+<Router {routes} />
 
