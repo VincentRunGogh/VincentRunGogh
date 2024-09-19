@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { link, push } from 'svelte-spa-router';
+  import { link, push, replace } from 'svelte-spa-router';
   import { BottomNav, BottomNavItem, Tooltip } from 'flowbite-svelte';
   import {
     HomeSolid,
@@ -42,7 +42,7 @@
   </div>
   <div id="homepage-tabbar">
     <BottomNav position="absolute" navType="application" classInner="grid-cols-5">
-      <BottomNavItem btnName="Home" appBtnPosition="left" on:click={() => push('/')}>
+      <BottomNavItem btnName="Home" appBtnPosition="left" on:click={() => replace('/')}>
         <HomeSolid
           class="w-6 h-6 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
         />
@@ -74,13 +74,17 @@
           <Tooltip arrow={false}>Start Drawing</Tooltip>
         </BottomNavItem>
       </div>
-      <BottomNavItem btnName="Route" appBtnPosition="middle" on:click={() => push('/makeroute')}>
+      <BottomNavItem btnName="Route" appBtnPosition="middle" on:click={() => replace('/makeroute')}>
         <PaletteOutline
           class="w-6 h-6 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
         />
         <Tooltip arrow={false}>Route</Tooltip>
       </BottomNavItem>
-      <BottomNavItem btnName="Myhealth" appBtnPosition="right">
+      <BottomNavItem
+        btnName="Myhealth"
+        appBtnPosition="right"
+        on:click={() => replace('/routelist')}
+      >
         <UserCircleSolid
           class="w-6 h-6 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
         />

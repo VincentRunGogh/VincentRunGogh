@@ -46,9 +46,14 @@ export default defineConfig({
       },
     }),
   ],
-  // server: {
-  //   historyApiFallback: true.
-  // },
+  server: {
+    hmr: {
+      overlay: true,
+    },
+    watch: {
+      usePolling: true, // 파일 변화를 감지하는 방식 변경
+    },
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
