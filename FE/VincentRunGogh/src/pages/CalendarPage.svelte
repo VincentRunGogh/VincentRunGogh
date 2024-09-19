@@ -48,7 +48,8 @@
 
   function handleDateClick(info) {
     const selectedDay = new Date(info.dateStr).getDate(); // '2024-09-18'에서 '18'을 추출
-    const dayData = get(monthInfo).dayList.find((day) => day.day === selectedDay);
+    const dayData = get(monthInfo).dayList.find((day) => day.date === info.dateStr);
+    console.log(dayData);
     if (dayData) {
       selectedDayInfo.set(dayData);
     } else {
@@ -58,7 +59,6 @@
   }
 
   function handleDatesSet(arg) {
-    console.log(arg);
     selectedYear.set(arg.start.getFullYear());
     selectedMonth.set(arg.start.getMonth() + 1); // 월은 0부터 시작하므로 +1
     selectedDayInfo.set(null);
