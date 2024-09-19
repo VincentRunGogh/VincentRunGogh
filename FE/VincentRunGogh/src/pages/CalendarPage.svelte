@@ -145,7 +145,7 @@
     <h3>Drawings:</h3>
     <ul>
       {#each $selectedDayInfo.drawingList as drawing}
-        <a use:link href="/drawingdetail/{drawing.drawingId}">
+        <a use:link href="/drawingdetail?id={drawing.drawingId}&date={}">
           <li>
             {drawing.drawingName} - Time: {drawing.drawingTime}, Distance: {drawing.drawingDistance}
           </li>

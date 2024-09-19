@@ -4,7 +4,8 @@
 
   onMount(() => {
     //TODO - 드로잉 상세 조회 api 연결
-    console.log('onMount');
     console.log(params.id);
   });
 </script>
+
+<div></div>
