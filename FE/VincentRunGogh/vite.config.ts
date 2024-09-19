@@ -47,11 +47,16 @@ export default defineConfig({
     }),
   ],
   resolve: {
+    dedupe: ['@fullcalendar/common'],
+
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@components': path.resolve(__dirname, './src/components'),
       '@map': path.resolve(__dirname, './src/components/map'),
       '@pages': path.resolve(__dirname, './src/pages'),
     },
+  },
+  optimizeDeps: {
+    include: ['@fullcalendar/common'],
   },
 });
