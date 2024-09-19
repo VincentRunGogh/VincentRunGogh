@@ -16,7 +16,7 @@
   }
 
   interface DayInfo {
-    day: number;
+    date: string;
     isRun: boolean;
     isDrawing: boolean;
     dayTotalTime: number;
@@ -71,7 +71,7 @@
       monthTotalDistance: 32553,
       dayList: [
         {
-          day: 13,
+          date: '2024-09-13',
           isRun: true,
           isDrawing: false,
           dayTotalTime: 4120,
@@ -98,7 +98,7 @@
           ],
         },
         {
-          day: 14,
+          date: '2024-09-14',
           isRun: true,
           isDrawing: true,
           dayTotalTime: 4120,
@@ -121,7 +121,7 @@
       plugins: [daygridPlugin, interactionPlugin],
       dateClick: handleDateClick,
       events: $monthInfo.dayList.map((day) => ({
-        date: new Date(new Date().getFullYear(), new Date().getMonth(), day.day),
+        date: day.date,
         color: getEventColor(day),
       })),
       datesSet: handleDatesSet,
@@ -145,7 +145,7 @@
     <h3>Drawings:</h3>
     <ul>
       {#each $selectedDayInfo.drawingList as drawing}
-        <a use:link href="/drawingdetail?id={drawing.drawingId}&date={}">
+        <a use:link href="/drawingdetail?id={drawing.drawingId}&date={drawing.date}">
           <li>
             {drawing.drawingName} - Time: {drawing.drawingTime}, Distance: {drawing.drawingDistance}
           </li>
