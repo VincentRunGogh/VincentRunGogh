@@ -1,10 +1,13 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
-  import { writable } from 'svelte/store';
+  import { link } from 'svelte-spa-router';
+  import { writable, get } from 'svelte/store';
   import type { CalendarOptions } from 'svelte-fullcalendar';
   import FullCalendar from 'svelte-fullcalendar';
   import daygridPlugin from '@fullcalendar/daygrid';
   import interactionPlugin from '@fullcalendar/interaction';
+
+  import DrawingSummaryInfo from '@/components/calendar/DrawingSummaryInfo.svelte';
 
   interface MonthInfo {
     monthTotalTime: number;
@@ -28,9 +31,10 @@
     drawingDistance: number;
   }
   let date = writable(new Date());
-  let activeStartDate = writable(new Date());
   let monthInfo = writable<MonthInfo | null>(null);
-  let selectedDay = writable(null);
+  let selectedDayInfo = writable(null);
+  let selectedYear = writable<number | null>(null);
+  let selectedMonth = writable<number | null>(null);
   let options: CalendarOptions;
 
   function getEventColor(day) {
@@ -42,11 +46,25 @@
     return 'gray';
   }
 
-  // Handle clicks on events specifically
-  function handleEventClick(arg) {
-    selectedDay.set(arg.event.extendedProps);
+  function handleDateClick(info) {
+    const selectedDay = new Date(info.dateStr).getDate(); // '2024-09-18'에서 '18'을 추출
+    const dayData = get(monthInfo).dayList.find((day) => day.day === selectedDay);
+    if (dayData) {
+      selectedDayInfo.set(dayData);
+    } else {
+      selectedDayInfo.set(null); // 일치하는 날짜가 없을 경우 빈 객체를 설정
+    }
+    // info.dayEl.style.backgroundColor = '#8BA2E7AD';
   }
 
+  function handleDatesSet(arg) {
+    console.log(arg);
+    selectedYear.set(arg.start.getFullYear());
+    selectedMonth.set(arg.start.getMonth() + 1); // 월은 0부터 시작하므로 +1
+    selectedDayInfo.set(null);
+    //TODO - 월별정보 가져오는 api 연결
+    // monthInfo.set()
+  }
   onMount(() => {
     monthInfo.set({
       monthTotalTime: 78061,
@@ -79,6 +97,21 @@
             },
           ],
         },
+        {
+          day: 14,
+          isRun: true,
+          isDrawing: true,
+          dayTotalTime: 4120,
+          dayTotalDistance: 2612,
+          drawingList: [
+            {
+              drawingId: 123,
+              drawingName: '마루는 강쥐',
+              drawingTime: 620,
+              drawingDistance: 503,
+            },
+          ],
+        },
       ],
     });
   });
@@ -86,37 +119,45 @@
     options = {
       initialView: 'dayGridMonth',
       plugins: [daygridPlugin, interactionPlugin],
-      eventClick: handleEventClick,
+      dateClick: handleDateClick,
       events: $monthInfo.dayList.map((day) => ({
         date: new Date(new Date().getFullYear(), new Date().getMonth(), day.day),
-        title: day.isDrawing ? 'Drawing' : 'Run',
         color: getEventColor(day),
-        extendedProps: day,
       })),
+      datesSet: handleDatesSet,
+
+      displayEventTime: false,
       locale: 'ko',
       selectable: true,
+      showNonCurrentDates: false,
+      fixedWeekCount: false,
     };
   }
 </script>
 
 <FullCalendar {options} />
-{#if $monthInfo}
-  <h2>Month Details:</h2>
-  <p>Total Time: {$monthInfo.monthTotalTime} seconds</p>
-  <p>Total Distance: {$monthInfo.monthTotalDistance} meters</p>
-{/if}
-{#if $selectedDay}
+
+{#if $selectedDayInfo}
   <div>
     <h2>Day Details:</h2>
-    <p>Total Time: {$selectedDay.dayTotalTime} seconds</p>
-    <p>Total Distance: {$selectedDay.dayTotalDistance} meters</p>
+    <p>Total Time: {$selectedDayInfo.dayTotalTime} seconds</p>
+    <p>Total Distance: {$selectedDayInfo.dayTotalDistance} meters</p>
     <h3>Drawings:</h3>
     <ul>
-      {#each $selectedDay.drawingList as drawing}
-        <li>
-          {drawing.drawingName} - Time: {drawing.drawingTime}, Distance: {drawing.drawingDistance}
-        </li>
+      {#each $selectedDayInfo.drawingList as drawing}
+        <a use:link href="/drawingdetail/{drawing.drawingId}">
+          <li>
+            {drawing.drawingName} - Time: {drawing.drawingTime}, Distance: {drawing.drawingDistance}
+          </li>
+        </a>
       {/each}
     </ul>
   </div>
+{:else if $monthInfo}
+  <h2>{$selectedYear}년 {$selectedMonth}월 통계</h2>
+  <DrawingSummaryInfo
+    time={$monthInfo.monthTotalTime}
+    averagePace="5'25''"
+    distance={$monthInfo.monthTotalDistance}
+  />
 {/if}
