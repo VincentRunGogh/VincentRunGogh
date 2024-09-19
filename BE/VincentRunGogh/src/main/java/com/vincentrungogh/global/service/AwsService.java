@@ -28,7 +28,7 @@ public class AwsService {
 
     private final AmazonS3 s3Client;
 
-    // 사용자의 loginUserId를 통해 파일명을 바꾸고 S3에 업로드
+    // UUID를 통해 파일명을 바꾸고 S3에 업로드
     public String uploadFile(String file) {
         try {
             byte[] decodedBytes = Base64.getDecoder().decode(file.getBytes(StandardCharsets.UTF_8));
