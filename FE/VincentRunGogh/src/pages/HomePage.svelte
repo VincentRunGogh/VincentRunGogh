@@ -8,12 +8,33 @@
     UserCircleSolid,
     PlusOutline,
   } from 'flowbite-svelte-icons';
+  import Swal from 'sweetalert2';
+  import SelectDrawing from '@/components/modals/SelectDrawing.svelte';
 
   let dummyDrawingList: { name: string; date: any }[] = [
     { name: '1번드로잉', date: '2024-09-04' },
     { name: '2번드로잉', date: '2024-09-05' },
     { name: '3번드로잉', date: '2024-09-06' },
   ];
+
+  function startDrawing() {
+    Swal.fire({
+      title: '어떤 드로잉을 시작하실건가요?',
+      html: '<div id="start-drawing"></div>',
+      showConfirmButton: false,
+      didOpen: () => {
+        // 'start-drawing'라는 ID를 가진 div에 Svelte 컴포넌트 렌더링
+        new SelectDrawing({
+          target: document.getElementById('start-drawing'),
+          props: {
+            onClose: () => {
+              Swal.close(); // 모달 닫기
+            },
+          },
+        });
+      },
+    });
+  }
 </script>
 
 <div id="homepage-body">
@@ -59,7 +80,7 @@
           btnName="Start Drawing"
           appBtnPosition="middle"
           btnClass="inline-flex items-center justify-center w-15 h-15 font-medium bg-primary-600 rounded-full hover:bg-primary-700 group focus:ring-4 focus:ring-primary-300 focus:outline-none dark:focus:ring-primary-800"
-          on:click={() => push('/drawingmap')}
+          on:click={startDrawing}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
