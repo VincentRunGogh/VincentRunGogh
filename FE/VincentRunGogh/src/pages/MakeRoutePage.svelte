@@ -1,16 +1,15 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import L, { latLng } from "leaflet";
-  import "leaflet/dist/leaflet.css";
-  import "leaflet-draw";
-  import "leaflet-draw/dist/leaflet.draw.css";
-  import "@components/map.css";
-  import Swal from "sweetalert2";
-  import MakeLoadingAlert from "@components/makeroute/MakeLoadingAlert.svelte";
+  import { onMount } from 'svelte';
+  import L, { latLng } from 'leaflet';
+  import 'leaflet/dist/leaflet.css';
+  import 'leaflet-draw';
+  import 'leaflet-draw/dist/leaflet.draw.css';
+  import Swal from 'sweetalert2';
+  import MakeLoadingAlert from '@components/makeroute/MakeLoadingAlert.svelte';
   import { push } from 'svelte-spa-router';
   // Chapter 2
-  import html2canvas from "html2canvas";
-  import { Canvg } from "canvg";
+  import html2canvas from 'html2canvas';
+  import { Canvg } from 'canvg';
 
   //진행 상태 변수
   let isChapterOne = true;
@@ -30,20 +29,20 @@
   let skip: number = 0;
   let shortenLatLngs: { lat: number; lng: number }[] = [];
   let latLngMessageList: string[] = [
-    "지도를 움직여 원하는 장소를 고르신 후 고정해주세요",
-    "지도 내에서 한붓그리기로 원하는 그림을 표현해보세요!",
-    "위 아트를 기반으로 루트를 생성할까요?",
+    '지도를 움직여 원하는 장소를 고르신 후 고정해주세요',
+    '지도 내에서 한붓그리기로 원하는 그림을 표현해보세요!',
+    '위 아트를 기반으로 루트를 생성할까요?',
   ];
   let latLngMessage: string = latLngMessageList[0];
 
   //초기 렌더링
   onMount(() => {
     //지도 생성
-    map = L.map("map").setView([36.3593, 127.3416], 16);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    map = L.map('map').setView([36.3593, 127.3416], 16);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      attribution: "© OpenStreetMap",
-      crossOrigin: "anonymous",
+      attribution: '© OpenStreetMap',
+      crossOrigin: 'anonymous',
     }).addTo(map);
 
     //지도 재계산
@@ -112,7 +111,7 @@
       if (!currentPolyline) {
         currentLatLngs = [e.latlng];
         currentPolyline = new L.Polyline(currentLatLngs, {
-          color: "blue",
+          color: 'blue',
         }).addTo(map);
       } else {
         currentLatLngs.push(e.latlng);
@@ -199,15 +198,15 @@
       rightLat: southEast.lat,
       rightLng: southEast.lng,
     };
-    console.log("결과 객체:", drawForm);
+    console.log('결과 객체:', drawForm);
     Swal.fire({
-      title: "아트를 생성중입니다...",
+      title: '아트를 생성중입니다...',
       html: '<div id="making-alert"></div>',
       showConfirmButton: false,
       didOpen: () => {
         // 'svelte-component'라는 ID를 가진 div에 Svelte 컴포넌트 렌더링
         new MakeLoadingAlert({
-          target: document.getElementById("making-alert"),
+          target: document.getElementById('making-alert'),
         });
         setTimeout(() => {
           Swal.close();
@@ -219,18 +218,12 @@
   }
 
   onMount(() => {
-    map.on("mousemove", onMouseMove);
-    map.on("mousedown", onMouseDown);
-    map.on("mouseup", onMouseUp);
-    map
-      .getContainer()
-      .addEventListener("touchstart", onTouchStart, { passive: false });
-    map
-      .getContainer()
-      .addEventListener("touchmove", onTouchMove, { passive: false });
-    map
-      .getContainer()
-      .addEventListener("touchend", onTouchEnd, { passive: false });
+    map.on('mousemove', onMouseMove);
+    map.on('mousedown', onMouseDown);
+    map.on('mouseup', onMouseUp);
+    map.getContainer().addEventListener('touchstart', onTouchStart, { passive: false });
+    map.getContainer().addEventListener('touchmove', onTouchMove, { passive: false });
+    map.getContainer().addEventListener('touchend', onTouchEnd, { passive: false });
   });
 
   function testing() {
@@ -242,7 +235,7 @@
 
   let isConfirm = false;
   let isSubmit = false;
-  let inputName = "";
+  let inputName = '';
   // 루트 확인후 진행
   function routeConfirm() {
     isConfirm = true;
@@ -262,7 +255,7 @@
     let svgSizeY = null;
 
     // SVG 캡쳐
-    const svg = document.querySelector("svg"); // SVG를 선택합니다.
+    const svg = document.querySelector('svg'); // SVG를 선택합니다.
     // SVG 사이즈
     svgSizeX = svg.width.baseVal.value;
     svgSizeY = svg.height.baseVal.value;
@@ -270,35 +263,35 @@
     const svgString = new XMLSerializer().serializeToString(svg);
 
     // canvas 및 context 생성
-    const svgCanvas = document.createElement("canvas");
-    const svgCtx = svgCanvas.getContext("2d");
+    const svgCanvas = document.createElement('canvas');
+    const svgCtx = svgCanvas.getContext('2d');
 
     // Canvg를 이용해 SVG를 캔버스에 그립니다
     const canvg = await Canvg.fromString(svgCtx, svgString);
     await canvg.render(); // 렌더링 완료될 때까지 기다림
 
     // 캔버스의 데이터를 base64로 변환
-    svgData = svgCanvas.toDataURL("image/png");
+    svgData = svgCanvas.toDataURL('image/png');
 
     // svg 숨기기
-    svg.style.display = "none";
+    svg.style.display = 'none';
 
     // 지도 캡쳐
     const mapCanvas = await html2canvas(document.querySelector(target), {
       useCORS: true,
     });
-    mapData = mapCanvas.toDataURL("image/png");
+    mapData = mapCanvas.toDataURL('image/png');
 
     // svg 다시보이기
     if (svg) {
-      svg.style.display = "";
+      svg.style.display = '';
     }
 
-    const finalCanvas = document.createElement("canvas");
+    const finalCanvas = document.createElement('canvas');
     finalCanvas.width = 500;
     finalCanvas.height = 500;
 
-    const ctx = finalCanvas.getContext("2d");
+    const ctx = finalCanvas.getContext('2d');
 
     // 지도, svg 모두 불러오기
 
@@ -320,7 +313,7 @@
         ctx.drawImage(svgImg, svgCropX, svgCropY, 500, 500, 0, 0, 500, 500);
 
         //결과
-        finalImage = finalCanvas.toDataURL("image/png");
+        finalImage = finalCanvas.toDataURL('image/png');
         document.querySelector(result).src = finalImage;
       };
     };
@@ -330,15 +323,14 @@
   async function nameConfirm() {
     isSubmit = true;
     // 캡쳐하기
-    await mapCapture("#map", "#final");
+    await mapCapture('#map', '#final');
     // 저장하기
     const makeRouteForm = {
       title: inputName,
-      artImage: "",
+      artImage: '',
     };
     // 마무리하기
   }
-
 </script>
 
 <div class="make-route">
@@ -378,12 +370,7 @@
       {/if}
       {#if isConfirm && !isSubmit}
         <label for="route-name">루트의 이름을 지어주세요!</label><br />
-        <input
-          bind:value={inputName}
-          type="text"
-          name="route-name"
-          id="route-name"
-        />
+        <input bind:value={inputName} type="text" name="route-name" id="route-name" />
         <button on:click={nameConfirm}>다음</button>
       {/if}
     </div>
