@@ -32,7 +32,8 @@ public class UserService implements UserDetailsService {
                     .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
             return UserPrincipal.createUserPrincipal(user.getId(), user.getEmail(), user.getPassword());
         } catch (Exception e){
-            throw new CustomException(ErrorCode.JSON_PROCESSING_ERROR);
+            log.info("loadUserByUsername: " + e.getMessage());
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
     }
 }

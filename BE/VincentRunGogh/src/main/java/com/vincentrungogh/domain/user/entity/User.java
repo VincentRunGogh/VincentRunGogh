@@ -59,7 +59,7 @@ public class User {
         this.weight = weight;
     }
 
-    public static User createUser(String email, String password, String nickname, int gender, Date birth, Boolean isChanged, String profile, double height, double weight) {
+    public static User createUser(String email, String password, String nickname, int gender, Date birth, double height, double weight) {
         return User.builder()
                 .email(email)
                 .password(password)
@@ -67,7 +67,7 @@ public class User {
                 .gender(gender)
                 .birth(birth)
                 .isChanged(false) //비밀번호 재발급 default false
-                .profile(null) //추후 기본 프로필로 변경
+                .profile("기본 프로필") //추후 기본 프로필로 변경
                 .height(height)
                 .weight(weight)
                 .build();
