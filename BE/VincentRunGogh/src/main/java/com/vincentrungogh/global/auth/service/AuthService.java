@@ -8,6 +8,7 @@ import com.vincentrungogh.global.auth.service.dto.response.LoginResponse;
 import com.vincentrungogh.global.auth.service.dto.response.UserPrincipal;
 import com.vincentrungogh.global.exception.CustomException;
 import com.vincentrungogh.global.exception.ErrorCode;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,8 +29,10 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public LoginResponse login(LoginRequest loginRequest) {
+    public LoginResponse login(LoginRequest loginRequest, HttpServletResponse response) {
         log.info("AuthService : 로그인 시작");
+
+        // 1. 유효성 확인
         Authentication authentication = authorizationManager.authenticate(
                 // 아이디, 패스워드 입력
                 new UsernamePasswordAuthenticationToken(
@@ -38,13 +41,23 @@ public class AuthService {
                 )
         );
 
+        // 2. 유저 정보 가져오기
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+
+        // 3. 토큰 생성
         String accessToken = jwtService.buildAccessToken(userPrincipal.getId());
         String refreshToken = jwtService.buildRefreshToken(userPrincipal.getId());
 
-        return LoginResponse.createLoginResponse(
-                accessToken,refreshToken
-        );
+        // 4. refreshToken cookie에 넣기
+        jwtService.addRefreshTokenToCookie(response, refreshToken);
+
+        // 5. DB에 저장
+        User user = userRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        user.addRefreshToken(refreshToken);
+        userRepository.save(user);
+
+        return LoginResponse.createLoginResponse(accessToken);
     }
 
     public void signup(SignupRequest signupRequest) {

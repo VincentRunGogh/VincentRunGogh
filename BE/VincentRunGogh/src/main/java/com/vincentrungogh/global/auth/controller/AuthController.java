@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -45,10 +46,10 @@ public class AuthController {
     })
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletResponse httpServletResponse){
 
         log.info("AuthController : 로그인 시작");
-        LoginResponse response = authService.login(loginRequest);
+        LoginResponse response = authService.login(loginRequest, httpServletResponse);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(),
