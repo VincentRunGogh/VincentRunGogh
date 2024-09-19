@@ -1,4 +1,4 @@
-package com.vincentrungogh.domain.route.service;
+package com.vincentrungogh.global.service;
 
 import com.vincentrungogh.domain.route.service.dto.common.Position;
 import lombok.RequiredArgsConstructor;
