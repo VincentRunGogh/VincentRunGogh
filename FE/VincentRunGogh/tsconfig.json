@@ -20,7 +20,7 @@
       "@/*": ["src/*"],
       "@pages/*": ["src/pages/*"],
       "@components/*": ["src/components/*"],
-      "@map/*": ["src/components/drawing/*ng/*"]
+      "@drawing/*": ["src/components/drawing/*"]
     },
     "types": ["node"],
     "outDir": "./dist",

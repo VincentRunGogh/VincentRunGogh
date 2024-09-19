@@ -52,7 +52,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@components': path.resolve(__dirname, './src/components'),
-      '@map': path.resolve(__dirname, './src/components/map'),
+      '@drawing': path.resolve(__dirname, './src/components/drawing'),
       '@pages': path.resolve(__dirname, './src/pages'),
     },
   },

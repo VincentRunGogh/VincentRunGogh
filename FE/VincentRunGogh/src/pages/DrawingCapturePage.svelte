@@ -7,7 +7,6 @@
   import 'leaflet/dist/leaflet.css';
   import 'leaflet-draw';
   import 'leaflet-draw/dist/leaflet.draw.css';
-  import '@components/map.css';
   import Swal from 'sweetalert2';
   import { location, querystring } from 'svelte-spa-router';
   import { get } from 'svelte/store';
