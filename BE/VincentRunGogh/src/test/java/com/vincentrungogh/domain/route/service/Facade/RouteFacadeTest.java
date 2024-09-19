@@ -8,6 +8,7 @@ import com.vincentrungogh.global.auth.service.dto.request.LoginRequest;
 import com.vincentrungogh.global.auth.service.dto.request.SignupRequest;
 import com.vincentrungogh.global.auth.service.dto.response.LoginResponse;
 import com.vincentrungogh.global.auth.service.dto.response.UserPrincipal;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBlank;
 import org.junit.jupiter.api.AfterEach;
@@ -15,7 +16,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
+import static org.mockito.Mockito.mock;
+
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,6 +41,8 @@ class RouteFacadeTest {
 
     @BeforeEach
     public void before() throws ParseException {
+        HttpServletResponse mockResponse = mock(HttpServletResponse.class);
+
         String dateString = "1999-09-12";
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date date = dateFormat.parse(dateString);
@@ -46,7 +50,7 @@ class RouteFacadeTest {
         authService.signup(signupRequest);
 
         LoginRequest loginRequest = new LoginRequest("1", "1");
-        LoginResponse login = authService.login(loginRequest);
+        LoginResponse login = authService.login(loginRequest, mockResponse);
         accessToken = login.getAccessToken();
     }
 
