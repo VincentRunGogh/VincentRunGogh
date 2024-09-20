@@ -16,6 +16,8 @@ public enum ErrorCode {
     INVALID_NICKNAME_LENGTH("10자 이하의 닉네임을 입력해주세요", HttpStatus.BAD_REQUEST),
     FAILED_CONVERT_FILE("파일을 변환하는데 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     FAILED_SEND_EMAIL("이메일을 전송하는데 실패했습니다", HttpStatus.INTERNAL_SERVER_ERROR),
+    CODE_NOT_FOUND("인증코드 발급내역이 존재하지 않습니다. 인증코드를 발급해 주세요", HttpStatus.NOT_FOUND),
+    CODE_EXPIRED("인증 코드가 만료되었습니다. 새로운 인증코드를 발급해 주세요", HttpStatus.GONE)
     ;
 
 

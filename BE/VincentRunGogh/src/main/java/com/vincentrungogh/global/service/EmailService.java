@@ -10,6 +10,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
 @Service
@@ -39,12 +41,18 @@ public class EmailService {
         int code = makeRandomCode();
 
         // 2. 이메일 작성
+        LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(3);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH:mm");
+        String formattedExpirationTime = expirationTime.format(formatter);
+
         String from = serviceName;
         String title = "회원 가입을 위한 이메일입니다!";
         String content =
                 "이메일을 인증하기 위한 절차입니다." +
                         "<br><br>" +
-                        "인증 번호는 " + code + "입니다.";
+                        "인증 번호는 " + code + "입니다." +
+                        "<br>" +
+                        "인증 번호는 " + formattedExpirationTime + "까지 유효합니다.";
 
         // 3. 이메일 전송 세팅
         MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -62,6 +70,6 @@ public class EmailService {
         }
 
         // redis에 5분 동안 이메일과 인증 코드 저장
-        redisService.saveEmailCode(to, String.valueOf(code));
+        redisService.saveEmailCode(to, String.valueOf(code), expirationTime);
     }
 }
