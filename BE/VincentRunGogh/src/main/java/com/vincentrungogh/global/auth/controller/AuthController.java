@@ -2,9 +2,11 @@ package com.vincentrungogh.global.auth.controller;
 
 
 import com.vincentrungogh.global.auth.service.AuthService;
+import com.vincentrungogh.global.auth.service.dto.request.CodeCheckRequest;
 import com.vincentrungogh.global.auth.service.dto.request.LoginRequest;
 import com.vincentrungogh.global.auth.service.dto.request.SendCodeRequest;
 import com.vincentrungogh.global.auth.service.dto.request.SignupRequest;
+import com.vincentrungogh.global.auth.service.dto.response.CodeCheckResponse;
 import com.vincentrungogh.global.auth.service.dto.response.FindDuplicatedResponse;
 import com.vincentrungogh.global.auth.service.dto.response.LoginResponse;
 import com.vincentrungogh.global.auth.service.dto.response.UserPrincipal;
@@ -138,7 +140,7 @@ public class AuthController {
     }
     @Operation(summary = "이메일 인증 코드 전송", description = "이메일 인증 코드 전송")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "인증 코드를 전송하였습니다.",
+            @ApiResponse(responseCode = "200", description = "인증 코드 전송 요청이 성공하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
@@ -146,7 +148,7 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "500", description = "인증 코드 전송에 실패하였습니다.",
+            @ApiResponse(responseCode = "500", description = "인증 코드 전송 요청이 실패하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
     @PostMapping("/code/send")
@@ -159,6 +161,7 @@ public class AuthController {
                 .body(ResultDto.res(HttpStatus.OK.value(),
                         "인증 코드를 전송하였습니다."));
     }
+
     @Operation(summary = "로그아웃", description = "사용자 로그아웃하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그아웃에 성공하셨습니다.",
@@ -182,4 +185,30 @@ public class AuthController {
                 .status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(), "로그아웃에 성공하였습니다."));
     }
+
+    @Operation(summary = "이메일 인증 코드 확인", description = "이메일 인증 코드 전송")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "인증 코드 확인 요청이 성공하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "410", description = "인증 코드가 만료되었습니다",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "인증 코드 확인 요청이 실패하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @PostMapping("/code/check")
+    public ResponseEntity<?> codeCheck(@RequestBody @Valid CodeCheckRequest codeCheckRequest){
+
+        CodeCheckResponse response = authService.codeCheck(codeCheckRequest);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(), "인증 코드 확인 요청이 성공하였습니다.", response));
+    }
+
 }

@@ -2,8 +2,10 @@ package com.vincentrungogh.global.auth.service;
 
 import com.vincentrungogh.domain.user.entity.User;
 import com.vincentrungogh.domain.user.repository.UserRepository;
+import com.vincentrungogh.global.auth.service.dto.request.CodeCheckRequest;
 import com.vincentrungogh.global.auth.service.dto.request.LoginRequest;
 import com.vincentrungogh.global.auth.service.dto.request.SignupRequest;
+import com.vincentrungogh.global.auth.service.dto.response.CodeCheckResponse;
 import com.vincentrungogh.global.auth.service.dto.response.FindDuplicatedResponse;
 import com.vincentrungogh.global.auth.service.dto.response.LoginResponse;
 import com.vincentrungogh.global.auth.service.dto.response.UserPrincipal;
@@ -21,6 +23,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -102,6 +105,31 @@ public class AuthService {
         // 1. 중복 확인
         boolean isDuplicated = checkDuplicateEmail(email);
         return FindDuplicatedResponse.createFindDuplicatedResponse(isDuplicated);
+    }
+
+
+    public CodeCheckResponse codeCheck(CodeCheckRequest request) {
+        // 1. redis에서 값 가져오기
+        String codeExpirationTime = redisService.getEmailExpirationTime(request.getEmail());
+        String codeAnswer = redisService.getEmailCode(request.getEmail());
+
+        if (codeExpirationTime == null) {
+            throw new CustomException(ErrorCode.CODE_NOT_FOUND);
+        }
+
+        // 2. 유효기간 확인
+        LocalDateTime currentTime = LocalDateTime.now();
+        if (currentTime.isAfter(LocalDateTime.parse(codeExpirationTime))) {
+            throw new CustomException(ErrorCode.CODE_EXPIRED);
+        }
+
+        // 3. 코드 일치 여부 확인
+        CodeCheckResponse response = CodeCheckResponse.createCodeCheckResponse();
+        if (codeAnswer.equals(request.getCode())) {
+            response.setIsAvailable();
+        }
+
+        return response;
     }
 
     public void logout(int userId){
