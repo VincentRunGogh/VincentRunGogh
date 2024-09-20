@@ -46,9 +46,6 @@ public class User {
     @Column(name = "weight", nullable = false)
     private double weight; //몸무게
 
-    @Column(name = "refresh_token")
-    private String refreshToken;
-
     @Builder
     private User(String email, String password, String nickname, int gender, Date birth, Boolean isChanged, String profile, double height, double weight, String refreshToken) {
         this.email = email;
@@ -60,7 +57,6 @@ public class User {
         this.profile = profile;
         this.height = height;
         this.weight = weight;
-        this.refreshToken = refreshToken;
     }
 
     public static User createUser(String email, String password, String nickname, int gender, Date birth, double height, double weight) {
@@ -87,15 +83,5 @@ public class User {
     public void updatePassword(String password) {
         this.password = password;
         this.isChanged = false;
-    }
-
-    // 로그아웃 시 사용
-    public void removeRefreshToken(){
-        this.refreshToken = null;
-    }
-
-    // 로그인 시 사용
-    public void addRefreshToken(String refreshToken){
-        this.refreshToken = refreshToken;
     }
 }

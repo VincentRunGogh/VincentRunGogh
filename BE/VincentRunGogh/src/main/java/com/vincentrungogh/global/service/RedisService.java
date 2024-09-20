@@ -14,15 +14,14 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class RedisService {
     private final RedisTemplate<String, Object> redisTemplate;
-    private final String ROOTING_PREFIX = "rooting:";
 
     public void saveRoutePositionList(int userId, List<Position> positionList) {
-        String key = ROOTING_PREFIX + userId;
+        String key = "rooting:" + userId;
         redisTemplate.opsForValue().set(key, positionList);
     }
 
     public List<Position> getRoutePositionList(int userId) {
-        String key = ROOTING_PREFIX + userId;
+        String key = "rooting:" + userId;
         return (List<Position>) redisTemplate.opsForValue().get(key);
     }
 
@@ -30,5 +29,20 @@ public class RedisService {
         long timeout = 5;
         TimeUnit timeUnit = TimeUnit.MINUTES;
         redisTemplate.opsForValue().set(email, code, timeout, timeUnit);
+    }
+
+    public void saveRefreshToken(int userId, String refreshToken){
+        String key = "refreshToken:" + userId;
+        redisTemplate.opsForValue().set(key, refreshToken);
+    }
+
+    public String getRefreshToken(int userId){
+        String key = "refreshToken:" + userId;
+        return (String) redisTemplate.opsForValue().get(key);
+    }
+
+    public void removeRefreshToken(int userId){
+        String key = "refreshToken:" + userId;
+        redisTemplate.delete(key);
     }
 }
