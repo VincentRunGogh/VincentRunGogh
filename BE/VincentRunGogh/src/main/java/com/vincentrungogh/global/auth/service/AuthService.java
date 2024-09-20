@@ -32,6 +32,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RedisService redisService;
 
     public LoginResponse login(LoginRequest loginRequest, HttpServletResponse response) {
         log.info("AuthService : 로그인 시작");
@@ -55,11 +56,8 @@ public class AuthService {
         // 4. refreshToken cookie에 넣기
         jwtService.addRefreshTokenToCookie(response, refreshToken);
 
-        // 5. DB에 저장
-        User user = userRepository.findById(userPrincipal.getId())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        user.addRefreshToken(refreshToken);
-        userRepository.save(user);
+        // 5. redis 저장
+        redisService.saveRefreshToken(userPrincipal.getId(), refreshToken);
 
         return LoginResponse.createLoginResponse(accessToken);
     }
