@@ -104,6 +104,10 @@ public class AuthService {
         return FindDuplicatedResponse.createFindDuplicatedResponse(isDuplicated);
     }
 
+    public void logout(int userId){
+        redisService.removeRefreshToken(userId);
+    }
+
     private boolean checkDuplicateEmail(String email){
         Optional<?> user = userRepository.findByEmail(email);
         return user.isPresent();
