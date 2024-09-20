@@ -2,13 +2,13 @@
   import { onDestroy, onMount } from 'svelte';
   import { link } from 'svelte-spa-router';
   import { writable, get } from 'svelte/store';
-  import type { CalendarOptions } from 'svelte-fullcalendar';
   import FullCalendar from 'svelte-fullcalendar';
+  import type { CalendarOptions } from 'svelte-fullcalendar';
   import daygridPlugin from '@fullcalendar/daygrid';
   import interactionPlugin from '@fullcalendar/interaction';
 
   import DrawingSummaryInfo from '@/components/calendar/DrawingSummaryInfo.svelte';
-
+  type CalendarOptions = typeof CalendarOptions;
   interface MonthInfo {
     monthTotalTime: number;
     monthTotalDistance: number;
@@ -32,7 +32,7 @@
   }
   let date = writable(new Date());
   let monthInfo = writable<MonthInfo | null>(null);
-  let selectedDayInfo = writable(null);
+  let selectedDayInfo = writable<DayInfo | null>(null);
   let selectedYear = writable<number | null>(null);
   let selectedMonth = writable<number | null>(null);
   let options: CalendarOptions;
@@ -47,15 +47,14 @@
   }
 
   function handleDateClick(info) {
-    const selectedDay = new Date(info.dateStr).getDate(); // '2024-09-18'에서 '18'을 추출
     const dayData = get(monthInfo).dayList.find((day) => day.date === info.dateStr);
-    console.log(dayData);
     if (dayData) {
       selectedDayInfo.set(dayData);
     } else {
       selectedDayInfo.set(null); // 일치하는 날짜가 없을 경우 빈 객체를 설정
     }
     // info.dayEl.style.backgroundColor = '#8BA2E7AD';
+    console.log($selectedDayInfo.date);
   }
 
   function handleDatesSet(arg) {
@@ -66,6 +65,8 @@
     // monthInfo.set()
   }
   onMount(() => {
+    //TODO - 월별정보 가져오는 api 연결
+    console.log(daygridPlugin);
     monthInfo.set({
       monthTotalTime: 78061,
       monthTotalDistance: 32553,
@@ -145,7 +146,7 @@
     <h3>Drawings:</h3>
     <ul>
       {#each $selectedDayInfo.drawingList as drawing}
-        <a use:link href="/drawingdetail?id={drawing.drawingId}&date={drawing.date}">
+        <a use:link href="/drawingdetail?id={drawing.drawingId}&date={$selectedDayInfo.date}">
           <li>
             {drawing.drawingName} - Time: {drawing.drawingTime}, Distance: {drawing.drawingDistance}
           </li>
@@ -157,7 +158,7 @@
   <h2>{$selectedYear}년 {$selectedMonth}월 통계</h2>
   <DrawingSummaryInfo
     time={$monthInfo.monthTotalTime}
-    averagePace="5'25''"
+    averagePace={null}
     distance={$monthInfo.monthTotalDistance}
   />
 {/if}
