@@ -124,11 +124,9 @@ public class AuthService {
         }
 
         // 3. 코드 일치 여부 확인
-        CodeCheckResponse response;
+        CodeCheckResponse response = CodeCheckResponse.createCodeCheckResponse();
         if (codeAnswer.equals(request.getCode())) {
-            response = CodeCheckResponse.createCodeCheckResponse(true);
-        } else {
-            response = CodeCheckResponse.createCodeCheckResponse(false);
+            response.setIsAvailable();
         }
 
         return response;

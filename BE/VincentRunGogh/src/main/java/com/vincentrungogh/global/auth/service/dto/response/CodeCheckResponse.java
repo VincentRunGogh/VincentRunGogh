@@ -15,9 +15,13 @@ public class CodeCheckResponse {
         this.isAvailable = isAvailable;
     }
 
-    public static CodeCheckResponse createCodeCheckResponse(Boolean isAvailable) {
+    public static CodeCheckResponse createCodeCheckResponse() {
         return CodeCheckResponse.builder()
-                .isAvailable(isAvailable)
+                .isAvailable(false)
                 .build();
+    }
+
+    public void setIsAvailable() {
+        this.isAvailable = true;
     }
 }
