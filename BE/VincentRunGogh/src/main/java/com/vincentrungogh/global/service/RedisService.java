@@ -7,6 +7,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -25,10 +26,20 @@ public class RedisService {
         return (List<Position>) redisTemplate.opsForValue().get(key);
     }
 
-    public void saveEmailCode(String email, String code){
-        long timeout = 5;
-        TimeUnit timeUnit = TimeUnit.MINUTES;
-        redisTemplate.opsForValue().set(email, code, timeout, timeUnit);
+    public void saveEmailCode(String email, String code,  LocalDateTime expirationTime){
+
+        redisTemplate.opsForValue().set(email, code);
+
+        redisTemplate.opsForValue().set(email+ "-expirationTime", expirationTime.toString());
+    }
+
+    public String getEmailCode(String email){
+        return (String) redisTemplate.opsForValue().get(email);
+    }
+
+    public String getEmailExpirationTime(String email){
+        String key = email + "-expirationTime";
+        return (String) redisTemplate.opsForValue().get(key);
     }
 
     public void saveRefreshToken(int userId, String refreshToken){
