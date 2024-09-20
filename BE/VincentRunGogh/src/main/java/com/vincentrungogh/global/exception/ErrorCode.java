@@ -14,7 +14,8 @@ public enum ErrorCode {
     DUPLICATED_EMAIL("존재하는 이메일입니다.", HttpStatus.BAD_REQUEST),
     DUPLICATED_NICKNAME("존재하는 닉네임입니다", HttpStatus.BAD_REQUEST),
     INVALID_NICKNAME_LENGTH("10자 이하의 닉네임을 입력해주세요", HttpStatus.BAD_REQUEST),
-    FAILED_CONVERT_FILE("파일을 변환하는데 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR)
+    FAILED_CONVERT_FILE("파일을 변환하는데 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    FAILED_SEND_EMAIL("이메일을 전송하는데 실패했습니다", HttpStatus.INTERNAL_SERVER_ERROR),
     ;
 
 
