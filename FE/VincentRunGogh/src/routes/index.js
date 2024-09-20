@@ -8,6 +8,8 @@ import {
   CalendarPage,
   RouteListPage,
   HomePage,
+  CommunityPage,
+  MyStoragePage,
 } from '../pages';
 export default {
   // 링크 : 컴포넌트
@@ -19,4 +21,6 @@ export default {
   '/drawingdetail/:id': DrawingDetailPage,
   '/': HomePage,
   '/routelist': RouteListPage,
+  '/community': CommunityPage,
+  '/community/mystorage': MyStoragePage,
 };

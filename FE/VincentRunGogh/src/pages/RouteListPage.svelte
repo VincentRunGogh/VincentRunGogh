@@ -1,4 +1,5 @@
 <script lang="ts">
+  import BackButton from '@/components/buttons/BackButton.svelte';
   import RouteDetail from '@/components/modals/RouteDetail.svelte';
   import { Tabs, TabItem, Card, Button } from 'flowbite-svelte';
   import { PaletteOutline, HeartSolid, MapPinSolid } from 'flowbite-svelte-icons';
@@ -44,6 +45,7 @@
   }
 </script>
 
+<BackButton />
 <Tabs tabStyle="underline">
   <TabItem open>
     <div slot="title" class="flex items-center gap-2">
@@ -80,7 +82,7 @@
     </div>
     <div class="space-y-4">
       {#each dummyRouteList2 as route}
-        <Card img="/4.png" on:click={clickRoute} horizontal size="sm">
+        <Card img="/4.png" on:click={() => showRouteDetail(route)} horizontal size="sm">
           <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
             나와의 거리 {route.near}km
           </p>
@@ -108,7 +110,7 @@
     </div>
     <div class="space-y-4">
       {#each dummyRouteList3 as route}
-        <Card img="/4.png" on:click={clickRoute} horizontal size="sm">
+        <Card img="/4.png" on:click={() => showRouteDetail(route)} horizontal size="sm">
           <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
             나와의 거리 {route.near}km
           </p>
