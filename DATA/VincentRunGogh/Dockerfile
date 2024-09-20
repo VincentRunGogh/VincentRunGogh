@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # 설정 파일을 컨테이너로 복사
-COPY /var/jenkins_home/workspace/vincent_run_gogh/config/Secrets.json /app/config/Secrets.json
+# COPY /var/jenkins_home/workspace/vincent_run_gogh/config/Secrets.json /app/config/Secrets.json
 
 # Uvicorn을 사용해 FastAPI 서버 실행
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
