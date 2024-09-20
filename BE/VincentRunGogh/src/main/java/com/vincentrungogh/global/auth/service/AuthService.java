@@ -107,31 +107,35 @@ public class AuthService {
         return FindDuplicatedResponse.createFindDuplicatedResponse(isDuplicated);
     }
 
-    public CodeCheckResponse codeCheck(CodeCheckRequest request){
+
+    public CodeCheckResponse codeCheck(CodeCheckRequest request) {
         // 1. redis에서 값 가져오기
         String codeExpirationTime = redisService.getEmailExpirationTime(request.getEmail());
         String codeAnswer = redisService.getEmailCode(request.getEmail());
 
-        if(codeExpirationTime == null) {
+        if (codeExpirationTime == null) {
             throw new CustomException(ErrorCode.CODE_NOT_FOUND);
         }
 
         // 2. 유효기간 확인
         LocalDateTime currentTime = LocalDateTime.now();
-        if(currentTime.isAfter(LocalDateTime.parse(codeExpirationTime))){
+        if (currentTime.isAfter(LocalDateTime.parse(codeExpirationTime))) {
             throw new CustomException(ErrorCode.CODE_EXPIRED);
         }
 
         // 3. 코드 일치 여부 확인
         CodeCheckResponse response;
-        if(codeAnswer.equals(request.getCode())){
+        if (codeAnswer.equals(request.getCode())) {
             response = CodeCheckResponse.createCodeCheckResponse(true);
-        }
-        else{
+        } else {
             response = CodeCheckResponse.createCodeCheckResponse(false);
         }
 
         return response;
+    }
+
+    public void logout(int userId){
+        redisService.removeRefreshToken(userId);
     }
 
     private boolean checkDuplicateEmail(String email){
