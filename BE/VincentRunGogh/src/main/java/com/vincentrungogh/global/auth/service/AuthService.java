@@ -6,6 +6,7 @@ import com.vincentrungogh.domain.user.entity.User;
 import com.vincentrungogh.domain.user.repository.UserRepository;
 import com.vincentrungogh.global.auth.service.dto.request.CodeCheckRequest;
 import com.vincentrungogh.global.auth.service.dto.request.LoginRequest;
+import com.vincentrungogh.global.auth.service.dto.request.ResetPasswordRequest;
 import com.vincentrungogh.global.auth.service.dto.request.SignupRequest;
 import com.vincentrungogh.global.auth.service.dto.response.CodeCheckResponse;
 import com.vincentrungogh.global.auth.service.dto.response.FindDuplicatedResponse;
@@ -15,6 +16,7 @@ import com.vincentrungogh.global.exception.CustomException;
 import com.vincentrungogh.global.exception.ErrorCode;
 import com.vincentrungogh.global.service.EmailService;
 import com.vincentrungogh.global.service.RedisService;
+import com.vincentrungogh.global.util.PasswordGenerator;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +28,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @Slf4j
@@ -40,6 +44,7 @@ public class AuthService {
     private final MyHealthRepository myHealthRepository;
     private final PasswordEncoder passwordEncoder;
     private final RedisService redisService;
+    private final EmailService emailService;
 
     public LoginResponse login(LoginRequest loginRequest, HttpServletResponse response) {
         log.info("AuthService : 로그인 시작");
@@ -145,8 +150,52 @@ public class AuthService {
         return response;
     }
 
+    public void sendCode(String email){
+        // 1. 인증 코드 생성
+        int code = makeRandomCode();
+
+        // 2. 이메일 전송
+        String expirationTime = emailService.sendCodeEmail(email, code);
+
+        // 3. 레디스 저장
+        redisService.saveEmailCode(email, String.valueOf(code), expirationTime);
+    }
+
+    public void resetPassword(ResetPasswordRequest request){
+        // 1. 유저 찾기
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // 2. 생일 확인
+        LocalDate inputBirth = request.getBirth();
+        if(!inputBirth.equals(user.getBirth())){
+            throw new CustomException(ErrorCode.BIRTH_INVALID);
+        }
+
+        // 3. 패스워드 재생성
+        String password = PasswordGenerator.generateRandomPassword();
+
+        // 4. 이메일 전송
+        emailService.sendPasswordEmail(request.getEmail(), password);
+
+        // 5. user DB 저장
+        user.updateRandomPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+    }
+
     public void logout(int userId){
         redisService.removeRefreshToken(userId);
+    }
+
+    // 랜덤 인증번호 생성
+    private int makeRandomCode(){
+        Random random = new Random();
+        String randomNumber = "";
+
+        for (int i = 0; i < 6; i++) {
+            randomNumber += random.nextInt(10);
+        }
+        return Integer.parseInt(randomNumber);
     }
 
     private boolean checkDuplicateEmail(String email){

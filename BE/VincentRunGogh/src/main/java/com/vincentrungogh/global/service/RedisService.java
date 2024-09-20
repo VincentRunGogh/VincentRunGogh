@@ -26,11 +26,11 @@ public class RedisService {
         return (List<Position>) redisTemplate.opsForValue().get(key);
     }
 
-    public void saveEmailCode(String email, String code,  LocalDateTime expirationTime){
+    public void saveEmailCode(String email, String code,  String expirationTime){
 
         redisTemplate.opsForValue().set(email, code);
 
-        redisTemplate.opsForValue().set(email+ "-expirationTime", expirationTime.toString());
+        redisTemplate.opsForValue().set(email+ "-expirationTime", expirationTime);
     }
 
     public String getEmailCode(String email){

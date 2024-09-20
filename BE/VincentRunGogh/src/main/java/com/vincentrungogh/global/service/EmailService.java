@@ -24,28 +24,12 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String serviceName;
 
-    // 랜덤 인증번호 생성
-    private int makeRandomCode(){
-        Random random = new Random();
-        String randomNumber = "";
-
-        for (int i = 0; i < 6; i++) {
-            randomNumber += random.nextInt(10);
-        }
-        return Integer.parseInt(randomNumber);
-    }
-
-    // 이메일 전송
-    public void sendEmail(String to){
-        // 1. 인증 코드 발급
-        int code = makeRandomCode();
-
-        // 2. 이메일 작성
+    // 인증 코드 이메일 전송
+    public String sendCodeEmail(String to, int code){
         LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(3);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH:mm");
         String formattedExpirationTime = expirationTime.format(formatter);
 
-        String from = serviceName;
         String title = "회원 가입을 위한 이메일입니다!";
         String content =
                 "이메일을 인증하기 위한 절차입니다." +
@@ -54,12 +38,34 @@ public class EmailService {
                         "<br>" +
                         "인증 번호는 " + formattedExpirationTime + "까지 유효합니다.";
 
-        // 3. 이메일 전송 세팅
+        sendEmail(to, title, content);
+
+        return expirationTime.toString();
+    }
+
+    // 비밀 번호 이메일 전송
+    public void sendPasswordEmail(String to, String password){
+        // 1. 이메일 작성
+        String from = serviceName;
+        String title = "비밀번호 재발급 안내입니다!";
+        String content =
+                "비밀번호 재발급 절차입니다." +
+                        "<br><br>" +
+                        "새로운 비밀번호는 " + password + "입니다." +
+                        "<br>" +
+                        "로그인 후 반드시 비밀번호를 변경해주시기 바랍니다.";
+
+        // 2. 전송
+        sendEmail(to, title, content);
+    }
+
+    private void sendEmail(String to, String title, String content){
+        // 이메일 전송
         MimeMessage mimeMessage = mailSender.createMimeMessage();
 
         try{
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "utf-8");
-            helper.setFrom(from);
+            helper.setFrom(serviceName);
             helper.setTo(to);
             helper.setSubject(title);
             helper.setText(content, true);
@@ -68,8 +74,5 @@ public class EmailService {
             log.info("이메일 전송 실패" + e.getMessage());
             throw new CustomException(ErrorCode.FAILED_SEND_EMAIL);
         }
-
-        // redis에 5분 동안 이메일과 인증 코드 저장
-        redisService.saveEmailCode(to, String.valueOf(code), expirationTime);
     }
 }

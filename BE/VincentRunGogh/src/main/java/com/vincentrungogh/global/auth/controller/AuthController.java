@@ -2,10 +2,7 @@ package com.vincentrungogh.global.auth.controller;
 
 
 import com.vincentrungogh.global.auth.service.AuthService;
-import com.vincentrungogh.global.auth.service.dto.request.CodeCheckRequest;
-import com.vincentrungogh.global.auth.service.dto.request.LoginRequest;
-import com.vincentrungogh.global.auth.service.dto.request.SendCodeRequest;
-import com.vincentrungogh.global.auth.service.dto.request.SignupRequest;
+import com.vincentrungogh.global.auth.service.dto.request.*;
 import com.vincentrungogh.global.auth.service.dto.response.CodeCheckResponse;
 import com.vincentrungogh.global.auth.service.dto.response.FindDuplicatedResponse;
 import com.vincentrungogh.global.auth.service.dto.response.LoginResponse;
@@ -34,7 +31,6 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
-    private final EmailService emailService;
 
     @Operation(summary = "로그인", description = "사용자 로그인하기")
     @ApiResponses(value = {
@@ -154,7 +150,7 @@ public class AuthController {
     @PostMapping("/code/send")
     public ResponseEntity<?> sendCode(@RequestBody @Valid SendCodeRequest sendCodeRequest){
 
-        emailService.sendEmail(sendCodeRequest.getEmail());
+        authService.sendCode(sendCodeRequest.getEmail());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -211,4 +207,25 @@ public class AuthController {
                 .body(ResultDto.res(HttpStatus.OK.value(), "인증 코드 확인 요청이 성공하였습니다.", response));
     }
 
+
+    @Operation(summary = "비밀번호 재발급", description = "비밀번호 재발급 후 이메일로 전송")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "비밀번호가 재발급되었습니다. 이메일을 확인해주세요",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "400", description = "이메일과 생년월일이 일치하지 않습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "비밀번호 재발급에 실패하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody @Valid ResetPasswordRequest request){
+
+        authService.resetPassword(request);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(), "비밀번호가 재발급되었습니다. 이메일을 확인해주세요."));
+    }
 }

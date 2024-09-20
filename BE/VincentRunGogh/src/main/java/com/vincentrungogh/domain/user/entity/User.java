@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -32,7 +33,7 @@ public class User {
     private int gender; //0은 남자, 1은 여자
 
     @Column(name = "birth", nullable = false)
-    private Date birth; //1999-01-01의 형태
+    private LocalDate birth; //1999-01-01의 형태
 
     @Column(name = "is_changed", nullable = false)
     private Boolean isChanged; //비밀번호 재발급 여부 default는 false
@@ -47,7 +48,7 @@ public class User {
     private double weight; //몸무게
 
     @Builder
-    private User(String email, String password, String nickname, int gender, Date birth, Boolean isChanged, String profile, double height, double weight, String refreshToken) {
+    private User(String email, String password, String nickname, int gender, LocalDate birth, Boolean isChanged, String profile, double height, double weight) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
@@ -59,7 +60,7 @@ public class User {
         this.weight = weight;
     }
 
-    public static User createUser(String email, String password, String nickname, int gender, Date birth, double height, double weight) {
+    public static User createUser(String email, String password, String nickname, int gender, LocalDate birth, double height, double weight) {
         return User.builder()
                 .email(email)
                 .password(password)
