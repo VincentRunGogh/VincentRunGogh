@@ -7,6 +7,7 @@ import com.vincentrungogh.global.auth.service.dto.request.SendCodeRequest;
 import com.vincentrungogh.global.auth.service.dto.request.SignupRequest;
 import com.vincentrungogh.global.auth.service.dto.response.FindDuplicatedResponse;
 import com.vincentrungogh.global.auth.service.dto.response.LoginResponse;
+import com.vincentrungogh.global.auth.service.dto.response.UserPrincipal;
 import com.vincentrungogh.global.service.EmailService;
 import com.vincentrungogh.global.util.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -158,5 +160,14 @@ public class AuthController {
                 .status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(),
                         "인증 코드를 전송하였습니다."));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@AuthenticationPrincipal UserPrincipal userPrincipal){
+
+        authService.logout();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(), "로그아웃에 성공하였습니다.."));
     }
 }
