@@ -1,5 +1,7 @@
 package com.vincentrungogh.global.auth.service;
 
+import com.vincentrungogh.domain.myhealth.entity.MyHealth;
+import com.vincentrungogh.domain.myhealth.repository.MyHealthRepository;
 import com.vincentrungogh.domain.user.entity.User;
 import com.vincentrungogh.domain.user.repository.UserRepository;
 import com.vincentrungogh.global.auth.service.dto.request.CodeCheckRequest;
@@ -14,6 +16,7 @@ import com.vincentrungogh.global.exception.ErrorCode;
 import com.vincentrungogh.global.service.EmailService;
 import com.vincentrungogh.global.service.RedisService;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -34,6 +37,7 @@ public class AuthService {
     private final AuthenticationManager authorizationManager;
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final MyHealthRepository myHealthRepository;
     private final PasswordEncoder passwordEncoder;
     private final RedisService redisService;
 
@@ -62,9 +66,14 @@ public class AuthService {
         // 5. redis 저장
         redisService.saveRefreshToken(userPrincipal.getId(), refreshToken);
 
-        return LoginResponse.createLoginResponse(accessToken);
+        // 6. user 정보 가져오기
+        User user = userRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        return LoginResponse.createLoginResponse(accessToken, user.getIsChanged(), user.getNickname());
     }
 
+    @Transactional
     public void signup(SignupRequest signupRequest) {
         // 1. 이메일 중복 확인
         if(checkDuplicateEmail(signupRequest.getEmail())){
@@ -85,8 +94,12 @@ public class AuthService {
                 signupRequest.getBirth(),
                 signupRequest.getHeight(),
                 signupRequest.getWeight());
-        // 5. db 저장
+        // 5. user 저장
         userRepository.save(user);
+        // 6. myHealth 저장
+        MyHealth myHealth = MyHealth.createMyHealth(user);
+        myHealthRepository.save(myHealth);
+
         return;
     }
 
