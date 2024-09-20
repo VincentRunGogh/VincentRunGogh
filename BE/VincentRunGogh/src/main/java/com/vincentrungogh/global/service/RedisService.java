@@ -14,15 +14,14 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class RedisService {
     private final RedisTemplate<String, Object> redisTemplate;
-    private final String ROOTING_PREFIX = "rooting:";
 
     public void saveRoutePositionList(int userId, List<Position> positionList) {
-        String key = ROOTING_PREFIX + userId;
+        String key = "rooting:" + userId;
         redisTemplate.opsForValue().set(key, positionList);
     }
 
     public List<Position> getRoutePositionList(int userId) {
-        String key = ROOTING_PREFIX + userId;
+        String key = "rooting:" + userId;
         return (List<Position>) redisTemplate.opsForValue().get(key);
     }
 
