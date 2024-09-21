@@ -18,7 +18,7 @@ export default {
   '/drawingmap': DrawingPage,
   '/drawingcapture': DrawingCapturePage,
   '/calendar': CalendarPage,
-  '/drawingdetail/:id': DrawingDetailPage,
+  '/drawingdetail': DrawingDetailPage,
   '/': HomePage,
   '/routelist': RouteListPage,
   '/community': CommunityPage,

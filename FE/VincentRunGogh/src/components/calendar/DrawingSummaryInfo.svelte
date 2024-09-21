@@ -1,6 +1,6 @@
 <script lang="ts">
   export let time: number;
-  export let averagePace: string;
+  export let averagePace: number | null;
   export let distance: number;
 </script>
 
@@ -9,10 +9,12 @@
     <div class="label">Time(H)</div>
     <div class="value">{time}</div>
   </div>
-  <div class="info">
-    <div class="label">Avr Pace</div>
-    <div class="value">{averagePace}</div>
-  </div>
+  {#if averagePace}
+    <div class="info">
+      <div class="label">Avr Pace</div>
+      <div class="value">{averagePace}</div>
+    </div>
+  {/if}
   <div class="info">
     <div class="label">Distance(KM)</div>
     <div class="value">{distance}</div>
