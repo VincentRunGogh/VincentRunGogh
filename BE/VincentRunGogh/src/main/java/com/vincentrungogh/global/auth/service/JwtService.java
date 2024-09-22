@@ -7,6 +7,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -86,6 +87,18 @@ public class JwtService implements InitializingBean {
         cookie.setHttpOnly(true);
         cookie.setSecure(true); // Secure 설정 추가
         response.addCookie(cookie);
+    }
+
+    public String extractRefreahToken(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("refresh_token")) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
     }
 
     // JWT 토큰 유효성 확인
