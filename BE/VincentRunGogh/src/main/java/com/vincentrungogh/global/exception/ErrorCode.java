@@ -19,6 +19,7 @@ public enum ErrorCode {
     CODE_NOT_FOUND("인증코드 발급내역이 존재하지 않습니다. 인증코드를 발급해 주세요", HttpStatus.NOT_FOUND),
     CODE_EXPIRED("인증 코드가 만료되었습니다. 새로운 인증코드를 발급해 주세요", HttpStatus.GONE),
     BIRTH_INVALID("이메일과 생년월일이 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_REFRESH_TOKEN("만료된 리프레시 토큰입니다.", HttpStatus.UNAUTHORIZED),
     ;
 
 

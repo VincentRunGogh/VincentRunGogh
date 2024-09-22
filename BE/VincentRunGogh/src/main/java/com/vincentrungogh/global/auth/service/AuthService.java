@@ -8,15 +8,13 @@ import com.vincentrungogh.global.auth.service.dto.request.CodeCheckRequest;
 import com.vincentrungogh.global.auth.service.dto.request.LoginRequest;
 import com.vincentrungogh.global.auth.service.dto.request.ResetPasswordRequest;
 import com.vincentrungogh.global.auth.service.dto.request.SignupRequest;
-import com.vincentrungogh.global.auth.service.dto.response.CodeCheckResponse;
-import com.vincentrungogh.global.auth.service.dto.response.FindDuplicatedResponse;
-import com.vincentrungogh.global.auth.service.dto.response.LoginResponse;
-import com.vincentrungogh.global.auth.service.dto.response.UserPrincipal;
+import com.vincentrungogh.global.auth.service.dto.response.*;
 import com.vincentrungogh.global.exception.CustomException;
 import com.vincentrungogh.global.exception.ErrorCode;
 import com.vincentrungogh.global.service.EmailService;
 import com.vincentrungogh.global.service.RedisService;
 import com.vincentrungogh.global.util.PasswordGenerator;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -186,6 +184,33 @@ public class AuthService {
     public void logout(int userId){
         redisService.removeRefreshToken(userId);
     }
+
+    public ReissueTokenResponse reissueAccessToken(HttpServletRequest request){
+
+        // 1. 쿠키에서 refreshToken 재발급
+        String token = jwtService.extractRefreahToken(request);
+
+        // 2. 유효성 검증
+        if(!jwtService.validateToken(token)){
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        // 3. userId 찾기
+        int userId = jwtService.getUserId(token);
+
+        // 4. refreshToken 일치 확인
+        String redisToken = redisService.getRefreshToken(userId);
+
+        if(!redisToken.equals(token)){
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        // 5. accessToken 재발급
+        String accessToken = jwtService.buildAccessToken(userId);
+
+        return ReissueTokenResponse.createReissueTokenResponse(accessToken);
+    }
+
 
     // 랜덤 인증번호 생성
     private int makeRandomCode(){
