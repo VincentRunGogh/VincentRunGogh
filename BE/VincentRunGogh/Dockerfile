@@ -9,3 +9,6 @@ COPY ${JAR_FILE} app.jar
 
 # 시스템 진입점 강제 정의 및 자동 실행 명령어
 ENTRYPOINT ["java", "-jar", "/app.jar"]
+
+# 컨테이너 내부 감시 포트(노출 포트)
+EXPOSE 8080
