@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -210,9 +212,11 @@ public class AuthController {
 
     @Operation(summary = "비밀번호 재발급", description = "비밀번호 재발급 후 이메일로 전송")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "비밀번호가 재발급되었습니다. 이메일을 확인해주세요",
+            @ApiResponse(responseCode = "200", description = "Refresh Token 재발급 요청에 성공하였습니다",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "400", description = "이메일과 생년월일이 일치하지 않습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "401", description = "만료된 리프레시 토큰입니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
@@ -227,5 +231,25 @@ public class AuthController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(), "비밀번호가 재발급되었습니다. 이메일을 확인해주세요."));
+    }
+
+    @Operation(summary = "refreshToken 재발급", description = "refreshToken 재발급 후 이메일로 전송")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Refresh Token 재발급 요청에 성공하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "400", description = "이메일과 생년월일이 일치하지 않습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "비밀번호 재발급에 실패하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @PostMapping("/token/refresh")
+    public ResponseEntity<?> reissueRefreshToken(HttpServletRequest request){
+
+        LoginResponse response = authService.reissueRefreshToken(request);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(), "Refresh Token 재발급 요청에 성공하였습니다."));
     }
 }
