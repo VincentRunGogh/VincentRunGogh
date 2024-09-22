@@ -238,7 +238,7 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "500", description = "비밀번호 재발급에 실패하였습니다.",
+            @ApiResponse(responseCode = "500", description = "accessToken이 재발급되었습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
     @PostMapping("/token/reissue")
@@ -247,6 +247,6 @@ public class AuthController {
         ReissueTokenResponse response = authService.reissueAccessToken(request);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ResultDto.res(HttpStatus.OK.value(), "Refresh Token 재발급 요청에 성공하였습니다.", response));
+                .body(ResultDto.res(HttpStatus.OK.value(), "accessToken이 재발급되었습니다.", response));
     }
 }
