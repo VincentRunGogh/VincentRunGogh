@@ -2,6 +2,7 @@ package com.vincentrungogh.domain.user.service;
 
 import com.vincentrungogh.domain.user.entity.User;
 import com.vincentrungogh.domain.user.repository.UserRepository;
+import com.vincentrungogh.domain.user.service.dto.response.UserProfileResponse;
 import com.vincentrungogh.global.auth.service.dto.response.UserPrincipal;
 import com.vincentrungogh.global.exception.CustomException;
 import com.vincentrungogh.global.exception.ErrorCode;
@@ -18,6 +19,18 @@ import org.springframework.stereotype.Service;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+
+    public UserProfileResponse getUserProfile(int userId){
+
+        // 1. 유저 찾기
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // 2. 반환
+        return UserProfileResponse.createUserProfileResponse(user.getNickname(), user.getGender(),
+                String.valueOf(user.getBirth()), user.getProfile(), user.getHeight(), user.getWeight());
+
+    }
+
 
     public User getUserById(int userId) {
         return userRepository.findById(userId)
