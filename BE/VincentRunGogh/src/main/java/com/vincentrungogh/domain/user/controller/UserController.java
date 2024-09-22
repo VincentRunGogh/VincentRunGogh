@@ -41,7 +41,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "프로필 요청에 실패하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<?> getUserProfile(@AuthenticationPrincipal UserPrincipal userPrincipal){
 
         UserProfileResponse response = userService.getUserProfile(userPrincipal.getId());
