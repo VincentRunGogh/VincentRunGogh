@@ -10,6 +10,10 @@ import {
   HomePage,
   CommunityPage,
   MyStoragePage,
+  LoginPage,
+  SignUpPage,
+  MyHealthPage,
+  ProgressPage
 } from '../pages';
 export default {
   // 링크 : 컴포넌트
@@ -23,4 +27,8 @@ export default {
   '/routelist': RouteListPage,
   '/community': CommunityPage,
   '/community/mystorage': MyStoragePage,
+  '/login': LoginPage,
+  '/signup': SignUpPage,
+  '/myhealth': MyHealthPage,
+  '/progress': ProgressPage
 };

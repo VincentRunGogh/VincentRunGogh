@@ -40,6 +40,11 @@
       ],
     };
   });
+  // onMount(async () => {
+  //   const response = await fetch('/api/drawings/detail');
+  //   const data = await response.json();
+  //   drawingDetail.set(data);
+  // });
 </script>
 
 <div>
@@ -58,6 +63,8 @@
           />
         </li>
       {/each}
+    {:else}
+      <p>Loading...</p>
     {/if}
   </ul>
 </div>

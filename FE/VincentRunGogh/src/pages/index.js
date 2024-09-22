@@ -7,7 +7,10 @@ import HomePage from './HomePage.svelte';
 import RouteListPage from './RouteListPage.svelte';
 import CommunityPage from './CommunityPage.svelte';
 import MyStoragePage from './MyStoragePage.svelte';
-
+import LoginPage from '@/pages/LoginPage.svelte';
+import SignUpPage from './SignUpPage.svelte';
+import MyHealthPage from './MyHealthPage.svelte';
+import ProgressPage from './ProgressPage.svelte';
 export {
   DrawingDetailPage,
   DrawingPage,
@@ -18,4 +21,8 @@ export {
   RouteListPage,
   CommunityPage,
   MyStoragePage,
+  LoginPage,
+  SignUpPage,
+  MyHealthPage,
+  ProgressPage
 };
