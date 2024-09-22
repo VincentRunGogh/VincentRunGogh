@@ -3,10 +3,7 @@ package com.vincentrungogh.global.auth.controller;
 
 import com.vincentrungogh.global.auth.service.AuthService;
 import com.vincentrungogh.global.auth.service.dto.request.*;
-import com.vincentrungogh.global.auth.service.dto.response.CodeCheckResponse;
-import com.vincentrungogh.global.auth.service.dto.response.FindDuplicatedResponse;
-import com.vincentrungogh.global.auth.service.dto.response.LoginResponse;
-import com.vincentrungogh.global.auth.service.dto.response.UserPrincipal;
+import com.vincentrungogh.global.auth.service.dto.response.*;
 import com.vincentrungogh.global.service.EmailService;
 import com.vincentrungogh.global.util.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -233,7 +230,7 @@ public class AuthController {
                 .body(ResultDto.res(HttpStatus.OK.value(), "비밀번호가 재발급되었습니다. 이메일을 확인해주세요."));
     }
 
-    @Operation(summary = "refreshToken 재발급", description = "refreshToken 재발급 후 이메일로 전송")
+    @Operation(summary = "accessToken 재발급", description = "accessToken 재발급 후 이메일로 전송")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Refresh Token 재발급 요청에 성공하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
@@ -244,12 +241,12 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "비밀번호 재발급에 실패하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
-    @PostMapping("/token/refresh")
-    public ResponseEntity<?> reissueRefreshToken(HttpServletRequest request){
+    @PostMapping("/token/reissue")
+    public ResponseEntity<?> reissueAccessToken(HttpServletRequest request){
 
-        LoginResponse response = authService.reissueRefreshToken(request);
+        ReissueTokenResponse response = authService.reissueAccessToken(request);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ResultDto.res(HttpStatus.OK.value(), "Refresh Token 재발급 요청에 성공하였습니다."));
+                .body(ResultDto.res(HttpStatus.OK.value(), "Refresh Token 재발급 요청에 성공하였습니다.", response));
     }
 }
