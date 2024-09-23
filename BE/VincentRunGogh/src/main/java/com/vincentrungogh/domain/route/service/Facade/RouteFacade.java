@@ -3,6 +3,12 @@ package com.vincentrungogh.domain.route.service.Facade;
 import com.vincentrungogh.domain.myhealth.entity.MyHealth;
 import com.vincentrungogh.domain.myhealth.service.MyHealthService;
 import com.vincentrungogh.domain.route.entity.Route;
+import com.vincentrungogh.domain.route.entity.RouteType;
+import com.vincentrungogh.domain.route.service.RouteContext;
+import com.vincentrungogh.domain.route.service.dto.common.FindRoute;
+import com.vincentrungogh.domain.route.service.dto.response.*;
+import com.vincentrungogh.global.exception.CustomException;
+import com.vincentrungogh.global.exception.ErrorCode;
 import com.vincentrungogh.global.service.AwsService;
 import com.vincentrungogh.global.service.PythonApiService;
 import com.vincentrungogh.global.service.RedisService;
@@ -11,10 +17,6 @@ import com.vincentrungogh.domain.route.service.dto.common.Position;
 import com.vincentrungogh.domain.route.service.dto.request.ArtRouteRequestDto;
 import com.vincentrungogh.domain.route.service.dto.request.DataSaveRouteRequestDto;
 import com.vincentrungogh.domain.route.service.dto.request.SaveRouteRequestDto;
-import com.vincentrungogh.domain.route.service.dto.response.ArtRouteResponseDto;
-import com.vincentrungogh.domain.route.service.dto.response.DataArtRouteResponseDto;
-import com.vincentrungogh.domain.route.service.dto.response.DataSaveRouteResponseDto;
-import com.vincentrungogh.domain.route.service.dto.response.SaveRouteResponseDto;
 import com.vincentrungogh.domain.user.entity.User;
 import com.vincentrungogh.domain.user.service.UserService;
 import com.vincentrungogh.global.auth.service.dto.response.UserPrincipal;
@@ -34,6 +36,7 @@ public class RouteFacade {
     private final PythonApiService pythonApiService;
     private final MyHealthService myHealthService;
     private final AwsService awsService;
+    private final RouteContext routeContext;
 
     @Transactional
     public ArtRouteResponseDto convertArtRoute(UserPrincipal userPrincipal, ArtRouteRequestDto requestDto) {
@@ -56,7 +59,8 @@ public class RouteFacade {
         User user = userService.getUserById(userPrincipal.getId());
 
         // 2.aws 저장
-        String imageUrl = awsService.uploadFile(requestDto.getArtImage());
+        String saveUrl = awsService.uploadFile(requestDto.getArtImage());
+        String imageUrl = awsService.getImageUrl(saveUrl);
 
         // 3. Redis에서 좌표 가져오기
         List<Position> positionList = redisService.getRoutePositionList(user.getId());
@@ -76,4 +80,27 @@ public class RouteFacade {
 
         return SaveRouteResponseDto.createSaveRouteResponseDto(route, myHealth.getAverageSpeed());
     }
+
+    @Transactional
+    public FindRouteResponseDto getRoute(UserPrincipal userPrincipal, String type, Double lat, Double lng) {
+        // 1. 사용자 확인
+        User user = userService.getUserById(userPrincipal.getId());
+
+        // 2. 사용자 평균 속력
+        MyHealth myHealth = myHealthService.getMyHealth(user);
+
+        //파라미터로 들어온 타입이 mine, others, like, history 가 아니면 에러 발생
+        RouteType routeType;
+        try {
+            routeType = RouteType.valueOf(type.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new CustomException(ErrorCode.INVALID_PARAM_TYPE);
+        }
+
+        //전략 패턴을 이용하여 응답 반환
+        FindRouteResponseDto responseDto = routeContext.findRoute(user, routeType, lat, lng, myHealth.getAverageSpeed());
+
+        return responseDto;
+    }
+
 }
