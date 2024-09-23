@@ -59,13 +59,16 @@ public class UserService implements UserDetailsService {
 
     public void updateProfileImage(int userId, MultipartFile image){
         // 1. aws 저장
-        String imageUrl = awsService.uploadFile(image, userId);
+        String awsImage = awsService.uploadFile(image, userId);
 
         // 2. 유저 찾기
         User user = getUserById(userId);
 
-        // 3. DB 저장
-        user.updateProfileImage(imageUrl);
+        // 3. aws url 가져오기
+        String url = awsService.getImageUrl(awsImage);
+
+        // 4. DB 저장
+        user.updateProfileImage(url);
         userRepository.save(user);
     }
 
