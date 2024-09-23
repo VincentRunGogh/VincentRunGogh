@@ -89,7 +89,7 @@ public class RouteFacade {
         // 2. 사용자 평균 속력
         MyHealth myHealth = myHealthService.getMyHealth(user);
 
-        //파라미터로 들어온 타입이 mine, others, like, history 가 아니면 에러 발생
+        //파라미터로 들어온 타입이 mine, others, like 가 아니면 에러 발생
         RouteType routeType;
         try {
             routeType = RouteType.valueOf(type.toUpperCase());
