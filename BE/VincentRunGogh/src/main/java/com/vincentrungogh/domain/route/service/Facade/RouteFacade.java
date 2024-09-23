@@ -58,18 +58,18 @@ public class RouteFacade {
         // 2.aws 저장
         String imageUrl = awsService.uploadFile(requestDto.getArtImage());
 
-        // 3. 루트 저장
-        Route route = routeService.saveRoute(user, requestDto.getTitle(), imageUrl);
-
-        // 4. Redis에서 좌표 가져오기
+        // 3. Redis에서 좌표 가져오기
         List<Position> positionList = redisService.getRoutePositionList(user.getId());
 
-        // 5. 파이썬 API 호출하여 데이터 저장
-        DataSaveRouteRequestDto dataRequestDto = DataSaveRouteRequestDto.createDataSaveRouteRequestDto(route.getId(), positionList);
+        // 4. 파이썬 API 호출하여 데이터 저장
+        DataSaveRouteRequestDto dataRequestDto = DataSaveRouteRequestDto.createDataSaveRouteRequestDto(positionList);
         DataSaveRouteResponseDto dataSaveResponse = pythonApiService.saveRoute(dataRequestDto);
 
-        // 6. Route 업데이트
-        routeService.updateRoute(route, dataSaveResponse.getCenterLat(), dataSaveResponse.getCenterLng(), dataSaveResponse.getDistance());
+        // 5. 루트 저장
+        Route route = routeService.saveRoute(user, requestDto.getTitle(), imageUrl, dataSaveResponse);
+
+        // 6. Route에 존재하는 좌표들 삭제
+        redisService.removeRoutePositionList(user.getId());
 
         // 7. MyHealth 정보 가져오기
         MyHealth myHealth = myHealthService.getMyHealth(user);
