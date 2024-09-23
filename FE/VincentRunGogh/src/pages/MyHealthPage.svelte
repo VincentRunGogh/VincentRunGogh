@@ -1,6 +1,6 @@
 <script lang="ts">
   import { writable, derived } from 'svelte/store';
-  import { Card, Modal, Listgroup } from 'flowbite-svelte';
+  import { Card, Modal, Listgroup, Button } from 'flowbite-svelte';
   import { link } from 'svelte-spa-router';
 
   import { onMount } from 'svelte';
@@ -12,7 +12,9 @@
     LockOutline,
     ArrowRightToBracketOutline,
   } from 'flowbite-svelte-icons';
-  import BMIChart from '@/components/chart/BMIChart.svelte';
+  import BMIChart from '@/components/myhealth/BMIChart.svelte';
+  import ProfileForm from '@/components/forms/ProfileForm.svelte';
+  import { formStore } from '@/stores/formStore';
 
   let userInfo;
 
@@ -74,20 +76,62 @@
     { name: '비밀번호 변경', icon: LockOutline, url: '/changepassword' },
     { name: '로그아웃', icon: ArrowRightToBracketOutline, url: '/logout' },
   ];
+
+  let editFormModal: boolean = false;
+  let submitAttempt: boolean = false;
+  function closeForm() {
+    editFormModal = false;
+    submitAttempt = false;
+  }
+
+  const onClickEditBtn = () => {
+    editFormModal = true;
+  };
+  // 폼 제출 함수
+  const { values, helpers } = formStore;
+  async function submitForm() {
+    submitAttempt = true;
+    const allValid = Object.values($helpers).every((helper) => helper.color === 'green');
+
+    if (allValid) {
+      // Perform API submission
+      const response = await fetch('/api/update-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify($values),
+      });
+
+      if (response.ok) {
+        closeForm();
+      } else {
+        alert('Failed to update profile.');
+      }
+    } else {
+      alert('Please correct the errors before submitting.');
+    }
+  }
 </script>
 
 <!-- // SECTION - profile -->
 <div class="flex items-center space-x-4 rtl:space-x-reverse">
   <div class="wrap">
     <img src={$profileImage} alt="프로필 이미지" class="main-profile-img" />
-    <!-- <button class="edit-button"><EditOutline /></button> -->
-    <span class="icon"><EditOutline /></span>
+    <span class="icon" on:click={onClickEditBtn}><EditOutline /></span>
   </div>
   <div class="space-y-1 font-medium dark:text-white">
     <div>{$nickname}</div>
     <div class="text-sm text-gray-500 dark:text-gray-400">{$birth} {getGenderSymbol($gender)}</div>
   </div>
 </div>
+<Modal title="프로필 변경" bind:open={editFormModal} autoclose={false}>
+  <ProfileForm bind:submitAttempt />
+  <!-- Modal 하단 버튼 -->
+
+  <svelte:fragment slot="footer">
+    <Button on:click={submitForm}>수정</Button>
+    <Button color="alternative" on:click={closeForm}>취소</Button>
+  </svelte:fragment>
+</Modal>
 <!-- //SECTION - bmi -->
 <Card padding="md">
   <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">BMI</h5>
