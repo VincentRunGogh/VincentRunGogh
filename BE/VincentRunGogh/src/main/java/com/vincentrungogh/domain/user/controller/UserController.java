@@ -1,6 +1,7 @@
 package com.vincentrungogh.domain.user.controller;
 
 import com.vincentrungogh.domain.user.service.UserService;
+import com.vincentrungogh.domain.user.service.dto.request.UpdatePasswordRequest;
 import com.vincentrungogh.domain.user.service.dto.request.UpdateUserProfileRequest;
 import com.vincentrungogh.domain.user.service.dto.response.UserProfileResponse;
 import com.vincentrungogh.global.auth.service.dto.response.UserPrincipal;
@@ -103,6 +104,32 @@ public class UserController {
                 .status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(), "프로필 이미지 수정에 성공하였습니다."));
 
+    }
+
+    @Operation(summary = "비밀번호 수정", description = "사용자 비밀번호 수정하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "비밀번호 수정에 성공하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 접근입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "비밀번호 수정에 실패하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @PutMapping("/password")
+    public ResponseEntity<?> updatePassword(@AuthenticationPrincipal UserPrincipal userPrincipal,@RequestBody @Valid UpdatePasswordRequest request
+    ){
+
+        userService.updatePassword(userPrincipal.getId(), request.getPassword());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(), "비밀번호 수정에 성공하였습니다."));
     }
 
 }
