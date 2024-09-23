@@ -7,12 +7,14 @@ import com.vincentrungogh.domain.user.service.dto.response.UserProfileResponse;
 import com.vincentrungogh.global.auth.service.dto.response.UserPrincipal;
 import com.vincentrungogh.global.exception.CustomException;
 import com.vincentrungogh.global.exception.ErrorCode;
+import com.vincentrungogh.global.service.AwsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -22,6 +24,7 @@ import java.util.Optional;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final AwsService awsService;
 
     public UserProfileResponse getUserProfile(int userId){
 
@@ -51,6 +54,18 @@ public class UserService implements UserDetailsService {
 
         // 4. 저장
         user.updateProfile(request.getNickname(), request.getWeight(), request.getHeight());
+        userRepository.save(user);
+    }
+
+    public void updateProfileImage(int userId, MultipartFile image){
+        // 1. aws 저장
+        String imageUrl = awsService.uploadFile(image, userId);
+
+        // 2. 유저 찾기
+        User user = getUserById(userId);
+
+        // 3. DB 저장
+        user.updateProfileImage(imageUrl);
         userRepository.save(user);
     }
 

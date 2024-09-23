@@ -92,4 +92,9 @@ public class User {
         this.weight = weight;
         this.height = height;
     }
+
+    // 프로필 이미지 수정 시 사용
+    public void updateProfileImage(String profile){
+        this.profile = profile;
+    }
 }
