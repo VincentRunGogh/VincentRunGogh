@@ -20,6 +20,8 @@ public enum ErrorCode {
     CODE_EXPIRED("인증 코드가 만료되었습니다. 새로운 인증코드를 발급해 주세요", HttpStatus.GONE),
     BIRTH_INVALID("이메일과 생년월일이 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
     INVALID_REFRESH_TOKEN("만료된 리프레시 토큰입니다.", HttpStatus.UNAUTHORIZED),
+    INVALID_PARAM_TYPE("유효하지 않는 타입입니다.", HttpStatus.BAD_REQUEST),
+    SPEED_DIVIDE_BY_ZERO("평균 속력은 0보다 커야 합니다.", HttpStatus.BAD_REQUEST),
     ;
 
 
