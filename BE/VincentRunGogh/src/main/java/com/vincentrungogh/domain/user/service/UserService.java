@@ -37,7 +37,7 @@ public class UserService implements UserDetailsService {
     public void updateUserProfile(int userId, UpdateUserProfileRequest request){
         // 1. 키 몸무게 0인지 확인
         if(request.getHeight() * request.getWeight() == 0){
-            throw new CustomException(ErrorCode.FAILED_UPDATE_PROFILE);
+            throw new CustomException(ErrorCode.INVALID_WEIGHT_AND_HEIGHT);
         }
 
         // 2. 닉네임 중복 확인

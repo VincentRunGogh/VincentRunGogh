@@ -58,7 +58,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "프로필 수정에 성공하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.",
+            @ApiResponse(responseCode = "400", description = "몸무게와 키는 0 이상이어야 합니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
