@@ -46,6 +46,9 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest loginRequest, HttpServletResponse response) {
         log.info("AuthService : 로그인 시작");
+        // 0. 유저 존재 여부 확인
+       userRepository.findByEmail(loginRequest.getEmail())
+               .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // 1. 유효성 확인
         Authentication authentication = authorizationManager.authenticate(
