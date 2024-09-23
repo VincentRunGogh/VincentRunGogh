@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +26,7 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final AwsService awsService;
+    private final PasswordEncoder passwordEncoder;
 
     public UserProfileResponse getUserProfile(int userId){
 
@@ -69,6 +71,24 @@ public class UserService implements UserDetailsService {
 
         // 4. DB 저장
         user.updateProfileImage(url);
+        userRepository.save(user);
+    }
+
+    public void updatePassword(int userId, String rawPassword){
+
+        // 0. 비밀번호 길이 확인
+        if(rawPassword.length() >= 20) {
+            throw new CustomException(ErrorCode.INVALID_PASSWORD_LENGTH);
+        }
+
+        // 1. 비밀번호 암호화
+        String password = passwordEncoder.encode(rawPassword);
+
+        // 2. 유저 찾기
+        User user = getUserById(userId);
+
+        // 3. DB 저장
+        user.updatePassword(password);
         userRepository.save(user);
     }
 
