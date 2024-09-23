@@ -9,13 +9,13 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SaveRouteResponseDto {
-    private int routeId;
+    private String routeId;
     private String artImage;
     private int distance;
     private int predictTime;
 
     @Builder
-    private SaveRouteResponseDto(int routeId, String artImage, int distance, int predictTime) {
+    private SaveRouteResponseDto(String routeId, String artImage, int distance, int predictTime) {
         this.routeId = routeId;
         this.artImage = artImage;
         this.distance = distance;
