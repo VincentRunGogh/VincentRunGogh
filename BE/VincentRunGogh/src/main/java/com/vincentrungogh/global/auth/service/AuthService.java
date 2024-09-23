@@ -50,14 +50,14 @@ public class AuthService {
        userRepository.findByEmail(loginRequest.getEmail())
                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        // 1. 유효성 확인
-        Authentication authentication = authorizationManager.authenticate(
+       // 1. 유효성 확인
+       Authentication authentication = authorizationManager.authenticate(
                 // 아이디, 패스워드 입력
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
                         loginRequest.getPassword()
                 )
-        );
+       );
 
         // 2. 유저 정보 가져오기
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
@@ -89,8 +89,13 @@ public class AuthService {
         if(checkDuplicateNickname(signupRequest.getNickname())){
             throw new CustomException(ErrorCode.DUPLICATED_NICKNAME);
         }
-        // 3. 비밀번호 인코딩
+        // 3. 비밀번호 확인
+        if(signupRequest.getPassword().length() >= 20) {
+            throw new CustomException(ErrorCode.INVALID_PASSWORD_LENGTH);
+        }
+
         String encodedPassword = passwordEncoder.encode(signupRequest.getPassword());
+
         // 4. User 엔티티 생성
         User user = User.createUser(
                 signupRequest.getEmail(),

@@ -75,14 +75,20 @@ public class UserService implements UserDetailsService {
     }
 
     public void updatePassword(int userId, String rawPassword){
+
+        // 0. 비밀번호 길이 확인
+        if(rawPassword.length() >= 20) {
+            throw new CustomException(ErrorCode.INVALID_PASSWORD_LENGTH);
+        }
+
         // 1. 비밀번호 암호화
-        String pasword = passwordEncoder.encode(rawPassword);
+        String password = passwordEncoder.encode(rawPassword);
 
         // 2. 유저 찾기
         User user = getUserById(userId);
 
         // 3. DB 저장
-        user.updatePassword(pasword);
+        user.updatePassword(password);
         userRepository.save(user);
     }
 
