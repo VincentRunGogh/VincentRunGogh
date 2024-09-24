@@ -1,6 +1,8 @@
 package com.vincentrungogh.domain.user.controller;
 
 import com.vincentrungogh.domain.user.service.UserService;
+import com.vincentrungogh.domain.user.service.dto.request.UpdatePasswordRequest;
+import com.vincentrungogh.domain.user.service.dto.request.UpdateUserProfileRequest;
 import com.vincentrungogh.domain.user.service.dto.response.UserProfileResponse;
 import com.vincentrungogh.global.auth.service.dto.response.UserPrincipal;
 import com.vincentrungogh.global.util.CommonSwaggerResponse;
@@ -14,9 +16,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @CrossOrigin(origins = "*")

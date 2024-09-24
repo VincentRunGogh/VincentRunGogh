@@ -21,6 +21,11 @@ public class RedisService {
         redisTemplate.opsForValue().set(key, positionList);
     }
 
+    public void removeRoutePositionList(int userId){
+        String key = "rooting:" + userId;
+        redisTemplate.delete(key);
+    }
+
     public List<Position> getRoutePositionList(int userId) {
         String key = "rooting:" + userId;
         return (List<Position>) redisTemplate.opsForValue().get(key);

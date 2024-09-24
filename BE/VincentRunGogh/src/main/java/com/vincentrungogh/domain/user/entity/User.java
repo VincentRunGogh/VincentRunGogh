@@ -85,4 +85,16 @@ public class User {
         this.password = password;
         this.isChanged = false;
     }
+
+    // 프로필 수정 시 사용
+    public void updateProfile(String nickname, double weight, double height){
+        this.nickname = nickname;
+        this.weight = weight;
+        this.height = height;
+    }
+
+    // 프로필 이미지 수정 시 사용
+    public void updateProfileImage(String profile){
+        this.profile = profile;
+    }
 }

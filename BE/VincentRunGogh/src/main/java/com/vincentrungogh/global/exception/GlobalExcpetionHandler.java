@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @Slf4j
 @ControllerAdvice
@@ -39,5 +40,15 @@ public class GlobalExcpetionHandler {
         );
 
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<?> handleMaxSizeException(MaxUploadSizeExceededException exc) {
+        ResultDto<Object> response = ResultDto.res(
+                HttpStatus.BAD_REQUEST.value(),
+                "파일 크기가 너무 큽니다. 최대 10MB까지 업로드할 수 있습니다."
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }

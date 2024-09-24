@@ -2,16 +2,22 @@ package com.vincentrungogh.domain.user.service;
 
 import com.vincentrungogh.domain.user.entity.User;
 import com.vincentrungogh.domain.user.repository.UserRepository;
+import com.vincentrungogh.domain.user.service.dto.request.UpdateUserProfileRequest;
 import com.vincentrungogh.domain.user.service.dto.response.UserProfileResponse;
 import com.vincentrungogh.global.auth.service.dto.response.UserPrincipal;
 import com.vincentrungogh.global.exception.CustomException;
 import com.vincentrungogh.global.exception.ErrorCode;
+import com.vincentrungogh.global.service.AwsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -19,16 +25,71 @@ import org.springframework.stereotype.Service;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final AwsService awsService;
+    private final PasswordEncoder passwordEncoder;
 
     public UserProfileResponse getUserProfile(int userId){
 
         // 1. 유저 찾기
-        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        User user = getUserById(userId);
 
         // 2. 반환
         return UserProfileResponse.createUserProfileResponse(user.getNickname(), user.getGender(),
                 String.valueOf(user.getBirth()), user.getProfile(), user.getHeight(), user.getWeight());
 
+    }
+
+    public void updateUserProfile(int userId, UpdateUserProfileRequest request){
+        // 1. 키 몸무게 0인지 확인
+        if(request.getHeight() * request.getWeight() == 0){
+            throw new CustomException(ErrorCode.INVALID_WEIGHT_AND_HEIGHT);
+        }
+
+        // 2. 닉네임 중복 확인
+        Optional<User> optionalUser = userRepository.findByNickname(request.getNickname());
+        if(optionalUser.isPresent()){
+            throw new CustomException(ErrorCode.DUPLICATED_NICKNAME);
+        }
+
+        // 3. 유저 찾기
+        User user = getUserById(userId);
+
+        // 4. 저장
+        user.updateProfile(request.getNickname(), request.getWeight(), request.getHeight());
+        userRepository.save(user);
+    }
+
+    public void updateProfileImage(int userId, MultipartFile image){
+        // 1. aws 저장
+        String awsImage = awsService.uploadFile(image, userId);
+
+        // 2. 유저 찾기
+        User user = getUserById(userId);
+
+        // 3. aws url 가져오기
+        String url = awsService.getImageUrl(awsImage);
+
+        // 4. DB 저장
+        user.updateProfileImage(url);
+        userRepository.save(user);
+    }
+
+    public void updatePassword(int userId, String rawPassword){
+
+        // 0. 비밀번호 길이 확인
+        if(rawPassword.length() >= 20) {
+            throw new CustomException(ErrorCode.INVALID_PASSWORD_LENGTH);
+        }
+
+        // 1. 비밀번호 암호화
+        String password = passwordEncoder.encode(rawPassword);
+
+        // 2. 유저 찾기
+        User user = getUserById(userId);
+
+        // 3. DB 저장
+        user.updatePassword(password);
+        userRepository.save(user);
     }
 
 

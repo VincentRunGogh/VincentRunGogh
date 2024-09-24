@@ -1,5 +1,6 @@
 package com.vincentrungogh.domain.route.entity;
 
+import com.vincentrungogh.domain.route.service.dto.response.DataSaveRouteResponseDto;
 import com.vincentrungogh.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -17,9 +18,8 @@ import java.util.Date;
 @Table(name = "routes")
 public class Route {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -47,7 +47,8 @@ public class Route {
     private String accumulatedDrawingImage;
 
     @Builder
-    private Route(User user, String title, Double centerLat, Double centerLng, int distance, String artImage, LocalDateTime created, String accumulatedDrawingImage) {
+    private Route(String id, User user, String title, Double centerLat, Double centerLng, int distance, String artImage, LocalDateTime created, String accumulatedDrawingImage) {
+        this.id = id;
         this.user = user;
         this.title = title;
         this.centerLat = centerLat;
@@ -58,13 +59,14 @@ public class Route {
         this.accumulatedDrawingImage = accumulatedDrawingImage;
     }
 
-    public static Route createRoute(User user, String title, String artImage) {
+    public static Route createRoute(User user, String title, String artImage, DataSaveRouteResponseDto responseDto) {
         return Route.builder()
+                .id(responseDto.getRouteId())
                 .user(user)
                 .title(title)
-                .centerLat(null)
-                .centerLng(null)
-                .distance(0)
+                .centerLat(responseDto.getCenterLat())
+                .centerLng(responseDto.getCenterLng())
+                .distance(responseDto.getDistance())
                 .artImage(artImage)
                 .created(LocalDateTime.now())
                 .accumulatedDrawingImage(null)

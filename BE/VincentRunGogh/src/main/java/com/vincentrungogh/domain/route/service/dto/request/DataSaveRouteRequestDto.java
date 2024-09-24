@@ -11,18 +11,15 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DataSaveRouteRequestDto {
-    private int routeId;
     private List<Position> positionList;
 
     @Builder
-    private DataSaveRouteRequestDto(int routeId, List<Position> positionList) {
-        this.routeId = routeId;
+    private DataSaveRouteRequestDto(List<Position> positionList) {
         this.positionList = positionList;
     }
 
-    public static DataSaveRouteRequestDto createDataSaveRouteRequestDto(int routeId, List<Position> positionList) {
+    public static DataSaveRouteRequestDto createDataSaveRouteRequestDto(List<Position> positionList) {
         return DataSaveRouteRequestDto.builder()
-                .routeId(routeId)
                 .positionList(positionList)
                 .build();
     }
