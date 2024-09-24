@@ -11,14 +11,14 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WeekExerciseResponse {
 
-    private List<Integer> week;
+    private int[] week = new int[7];
 
     @Builder
-    private WeekExerciseResponse(List<Integer> week) {
+    private WeekExerciseResponse(int[] week) {
         this.week = week;
     }
 
-    public static WeekExerciseResponse createWeekExerciseResponse(List<Integer> week) {
+    public static WeekExerciseResponse createWeekExerciseResponse(int[] week) {
         return WeekExerciseResponse.builder()
                 .week(week)
                 .build();

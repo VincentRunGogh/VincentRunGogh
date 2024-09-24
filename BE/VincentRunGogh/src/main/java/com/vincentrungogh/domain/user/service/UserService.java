@@ -124,18 +124,14 @@ public class UserService implements UserDetailsService {
         }
 
         // 5.일주일 정보 리스트 생성
-        List<Integer> week = new ArrayList<>();
-        for (int i = 0; i < 7; i++) {
-            week.add(0);
-        }
+        int[] week = new int[7];
 
         // 6. 저장
         for (DrawingDetail drawingDetail : weekDrawingsDetail) {
             int index = (int) ChronoUnit.DAYS.between(drawingDetail.getCreated().toLocalDate(), date);
-            week.set(index, week.get(index) + drawingDetail.getDistance());
+            week[6 - index] = week[6 - index]+ drawingDetail.getDistance();
         }
 
-        Collections.reverse(week);
         return WeekExerciseResponse.createWeekExerciseResponse(week);
     }
 

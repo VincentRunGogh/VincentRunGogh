@@ -110,21 +110,14 @@ public class UserController {
                 .body(ResultDto.res(HttpStatus.OK.value(), "비밀번호 수정에 성공하였습니다."));
     }
 
-    @Operation(summary = "일주일 운동 정보 조회", description = "일주일 운동 정보 조회")
+    @Operation(summary = "일주일 운동 정보 조회", description = "현재 날짜 포함 7일의 운동 정보 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "일주일 운동 정보 조회에 성공하였습니다.",
                     content = @Content(schema = @Schema(implementation = WeekExerciseResponse.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 접근입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "일주일 운동 정보 조회에 실패하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
+    @CommonSwaggerResponse.CommonResponses
     @GetMapping("/week")
     public ResponseEntity<?> getWeekExercise(@AuthenticationPrincipal UserPrincipal userPrincipal) {
 
