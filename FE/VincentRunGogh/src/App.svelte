@@ -1,6 +1,7 @@
 <script lang="ts">
-  import './app.css';
+  import { wrap } from 'svelte-spa-router/wrap';
   import Router from 'svelte-spa-router';
+
   import { userStore } from '@/stores/userStore';
   import {
     DrawingDetailPage,
@@ -20,29 +21,43 @@
 
   userStore.initialize();
 
-  let isAuthenticated = false;
-  userStore.subscribe(($user) => {
-    isAuthenticated = $user !== null;
-  });
+  // Check if the user is authenticated
+  function isAuthenticated() {
+    let auth = false;
+    userStore.subscribe(($user) => {
+      auth = $user !== null;
+    });
+    return auth;
+  }
+
+  // Redirect if not authenticated
+  function requireAuth() {
+    if (isAuthenticated()) {
+      return wrap({
+        component: HomePage,
+      });
+    } else {
+      return wrap({
+        component: LoginPage,
+      });
+    }
+  }
 
   const routes = {
-    // 링크 : 컴포넌트
-    // :param, *any
-    '/makeroute': MakeRoutePage,
-    '/drawingmap': DrawingPage,
-    '/drawingcapture': DrawingCapturePage,
-    '/calendar': CalendarPage,
-    '/drawingdetail': DrawingDetailPage,
-    '/': isAuthenticated ? HomePage : LoginPage,
-    '/routelist': RouteListPage,
-    '/community': CommunityPage,
-    '/community/mystorage': MyStoragePage,
+    '/': requireAuth(),
+    '/makeroute': requireAuth(),
+    '/drawingmap': requireAuth(),
+    '/drawingcapture': requireAuth(),
+    '/calendar': requireAuth(),
+    '/drawingdetail': requireAuth(),
+    '/routelist': requireAuth(),
+    '/community': requireAuth(),
+    '/community/mystorage': requireAuth(),
     '/login': LoginPage,
     '/signup': SignUpPage,
-    '/myhealth': MyHealthPage,
-    '/progress': ProgressPage,
-
-    '*': isAuthenticated ? HomePage : LoginPage,
+    '/myhealth': requireAuth(),
+    '/progress': requireAuth(),
+    '*': requireAuth(), // Fallback route
   };
 </script>
 

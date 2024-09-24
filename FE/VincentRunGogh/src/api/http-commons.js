@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { successAlert } from '@/util/notificationAlert';
+import { successAlert, errorAlert } from '@/utils/notificationAlert';
 
 function Axios() {
   const instance = axios.create({
@@ -11,9 +11,16 @@ function Axios() {
     withCredentials: true,
   });
 
-  instance.defaults.headers.post['Content-Type'] = 'application/json';
-  instance.defaults.headers.put['Content-Type'] = 'application/json';
+  // instance.defaults.headers.post['Content-Type'] = 'application/json';
+  // instance.defaults.headers.put['Content-Type'] = 'application/json';
 
+  instance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      errorAlert(error.response.data.message);
+      return Promise.reject(error);
+    }
+  );
   return instance;
 }
 
@@ -55,7 +62,7 @@ function loginAxios() {
     (response) => response,
     async (error) => {
       const originalRequest = error.config;
-      if (error.response.status === 401 || error.response.status === 403) {
+      if (error.response.status === 401) {
         try {
           const response = await tokenRegeneration();
           const newAccessToken = response.data.data.accessToken;
