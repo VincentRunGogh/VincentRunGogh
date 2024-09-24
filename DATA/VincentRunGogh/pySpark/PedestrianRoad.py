@@ -80,10 +80,16 @@ road_df = process_road_data(road_data,region)
 
 # 데이터 확인
 if road_df:
-    road_df.show(5)
+    # road_df.show(5)
     # 추가 중복 제거 전처리
     pedestrian_df = road_df.dropDuplicates()
-    # 컬럼 기반 데이터 프레임 parquet으로 저장 후 사용하기
-    pedestrian_df.write.parquet("./pedestrian_data_daejeon.parquet")
+    # 기존 파티션 수 확인
+    num_partitions = pedestrian_df.rdd.getNumPartitions()
+    # print(f"기존 파티션 수: {num_partitions}")
+    pedestrian_df.write.option("header", "true").csv("./pedestrian_daejeon")
+
+    loaded_df = spark.read.option("header","true").csv("pedestrian_daejeon")
+    # loaded_df.show(10)
+
 
 
