@@ -1,13 +1,16 @@
 <script lang="ts">
+  import FeedArticle from '@/components/cards/FeedArticle.svelte';
   import Tabbar from '@/components/tabbar/Tabbar.svelte';
-  import { Card, Button, Carousel } from 'flowbite-svelte';
   import { replace } from 'svelte-spa-router';
   import Swal from 'sweetalert2';
+  import { HeartOutline, HeartSolid } from 'flowbite-svelte-icons';
+  import { Card, Button } from 'flowbite-svelte';
 
   let dummyArticleList: {
-    id: number;
+    boardId: number;
     nickname: string;
     profile: string;
+    title: string;
     drawingImage: string;
     artImage: string;
     comment: string;
@@ -19,144 +22,154 @@
     distanceFromUser: number;
   }[] = [
     {
-      id: 1,
+      boardId: 1,
       nickname: 'test1',
       profile: '/default.png',
+      title: '런닝으로 스트레스 해소하기',
       drawingImage: 'http://via.placeholder.com/150x150',
       artImage: 'http://via.placeholder.com/150x150/FFFF00',
-      comment: '런닝 후 상쾌함이 느껴졌어요! 추천합니다.',
+      comment: '정말 기분이 좋았어요!',
+      likeCount: 23,
+      isLiked: true,
+      distance: 4500,
+      time: 3600,
+      created: new Date(2024, 0, 5),
+      distanceFromUser: 3000,
+    },
+    {
+      boardId: 2,
+      nickname: 'test2',
+      profile: '/default.png',
+      title: '하루 5km 달리기 도전!',
+      drawingImage: 'http://via.placeholder.com/150x150',
+      artImage: 'http://via.placeholder.com/150x150/FFFF00',
+      comment: '정말 힘들었지만 재밌어요!',
+      likeCount: 57,
+      isLiked: false,
+      distance: 3200,
+      time: 5400,
+      created: new Date(2024, 2, 15),
+      distanceFromUser: 4500,
+    },
+    {
+      boardId: 3,
+      nickname: 'test1',
+      profile: '/default.png',
+      title: '런닝으로 건강한 삶 만들기',
+      drawingImage: 'http://via.placeholder.com/150x150',
+      artImage: 'http://via.placeholder.com/150x150/FFFF00',
+      comment: '매일 조금씩 달려요!',
       likeCount: 34,
       isLiked: true,
-      distance: 3200,
-      time: 1500,
-      created: null,
-      distanceFromUser: 1800,
+      distance: 2500,
+      time: 4800,
+      created: new Date(2024, 3, 20),
+      distanceFromUser: 5200,
     },
     {
-      id: 2,
+      boardId: 4,
       nickname: 'test2',
       profile: '/default.png',
+      title: '런닝으로 에너지 충전하기',
       drawingImage: 'http://via.placeholder.com/150x150',
       artImage: 'http://via.placeholder.com/150x150/FFFF00',
-      comment: '오늘의 런닝 정말 기분 좋았어요.',
-      likeCount: 58,
+      comment: '이 기분이 좋네요!',
+      likeCount: 12,
       isLiked: false,
-      distance: 5000,
-      time: 2200,
-      created: null,
-      distanceFromUser: 2400,
+      distance: 6700,
+      time: 7200,
+      created: new Date(2024, 5, 10),
+      distanceFromUser: 6100,
     },
     {
-      id: 3,
+      boardId: 5,
       nickname: 'test1',
       profile: '/default.png',
+      title: '달리기로 시작하는 아침',
       drawingImage: 'http://via.placeholder.com/150x150',
       artImage: 'http://via.placeholder.com/150x150/FFFF00',
-      comment: '힘든 런닝이었지만 후련하네요.',
-      likeCount: 21,
+      comment: '하루의 시작은 달리기!',
+      likeCount: 40,
       isLiked: true,
-      distance: 4100,
-      time: 1700,
-      created: null,
-      distanceFromUser: 1300,
+      distance: 5400,
+      time: 3000,
+      created: new Date(2024, 6, 25),
+      distanceFromUser: 7800,
     },
     {
-      id: 4,
+      boardId: 6,
       nickname: 'test2',
       profile: '/default.png',
+      title: '즐거운 런닝 클래스',
       drawingImage: 'http://via.placeholder.com/150x150',
       artImage: 'http://via.placeholder.com/150x150/FFFF00',
-      comment: '상쾌한 아침 런닝 최고입니다.',
-      likeCount: 76,
+      comment: '함께 달리니 더 재밌어요!',
+      likeCount: 85,
+      isLiked: true,
+      distance: 8900,
+      time: 1500,
+      created: new Date(2024, 7, 18),
+      distanceFromUser: 6500,
+    },
+    {
+      boardId: 7,
+      nickname: 'test1',
+      profile: '/default.png',
+      title: '산책처럼 가벼운 달리기',
+      drawingImage: 'http://via.placeholder.com/150x150',
+      artImage: 'http://via.placeholder.com/150x150/FFFF00',
+      comment: '부담 없이 달려요!',
+      likeCount: 77,
       isLiked: false,
       distance: 2900,
-      time: 2000,
-      created: null,
-      distanceFromUser: 2200,
+      time: 7200,
+      created: new Date(2024, 1, 12),
+      distanceFromUser: 9000,
     },
     {
-      id: 5,
-      nickname: 'test1',
-      profile: '/default.png',
-      drawingImage: 'http://via.placeholder.com/150x150',
-      artImage: 'http://via.placeholder.com/150x150/FFFF00',
-      comment: '런닝 후 기분이 정말 좋아졌어요.',
-      likeCount: 43,
-      isLiked: true,
-      distance: 3500,
-      time: 1900,
-      created: null,
-      distanceFromUser: 1600,
-    },
-    {
-      id: 6,
+      boardId: 8,
       nickname: 'test2',
       profile: '/default.png',
+      title: '친구와 함께하는 런닝',
       drawingImage: 'http://via.placeholder.com/150x150',
       artImage: 'http://via.placeholder.com/150x150/FFFF00',
-      comment: '지친 몸에 활력을 주는 런닝이었습니다.',
-      likeCount: 64,
-      isLiked: false,
+      comment: '함께하면 더 즐거워요!',
+      likeCount: 16,
+      isLiked: true,
       distance: 4800,
-      time: 2100,
-      created: null,
-      distanceFromUser: 2500,
+      time: 3600,
+      created: new Date(2024, 4, 28),
+      distanceFromUser: 7200,
     },
     {
-      id: 7,
+      boardId: 9,
       nickname: 'test1',
       profile: '/default.png',
+      title: '매일 10분 런닝 도전!',
       drawingImage: 'http://via.placeholder.com/150x150',
       artImage: 'http://via.placeholder.com/150x150/FFFF00',
-      comment: '운동 후 상쾌한 기분이 좋네요.',
-      likeCount: 32,
-      isLiked: true,
-      distance: 3900,
-      time: 2300,
-      created: null,
-      distanceFromUser: 1900,
+      comment: '작은 목표부터 시작해요!',
+      likeCount: 39,
+      isLiked: false,
+      distance: 3100,
+      time: 9000,
+      created: new Date(2024, 8, 5),
+      distanceFromUser: 4000,
     },
     {
-      id: 8,
+      boardId: 10,
       nickname: 'test2',
       profile: '/default.png',
+      title: '새로운 길에서 런닝',
       drawingImage: 'http://via.placeholder.com/150x150',
       artImage: 'http://via.placeholder.com/150x150/FFFF00',
-      comment: '런닝 후 피로가 풀리는 느낌이었습니다.',
-      likeCount: 55,
-      isLiked: false,
-      distance: 4300,
-      time: 2600,
-      created: null,
-      distanceFromUser: 2700,
-    },
-    {
-      id: 9,
-      nickname: 'test1',
-      profile: '/default.png',
-      drawingImage: 'http://via.placeholder.com/150x150',
-      artImage: 'http://via.placeholder.com/150x150/FFFF00',
-      comment: '런닝 덕분에 하루가 상쾌해졌어요!',
-      likeCount: 29,
+      comment: '새로운 장소에서의 달리기!',
+      likeCount: 60,
       isLiked: true,
-      distance: 4700,
-      time: 2800,
-      created: null,
-      distanceFromUser: 2100,
-    },
-    {
-      id: 10,
-      nickname: 'test2',
-      profile: '/default.png',
-      drawingImage: 'http://via.placeholder.com/150x150',
-      artImage: 'http://via.placeholder.com/150x150/FFFF00',
-      comment: '오랜만에 런닝 후 기분이 너무 좋았습니다.',
-      likeCount: 83,
-      isLiked: false,
-      distance: 5500,
-      time: 3000,
-      created: null,
-      distanceFromUser: 3000,
+      distance: 7100,
+      time: 2000,
+      created: new Date(2024, 2, 25),
+      distanceFromUser: 5300,
     },
   ];
 
@@ -194,6 +207,43 @@
       }
     });
   }
+
+  // 작성시간 파악 함수
+  function timeAgo(created: Date): string {
+    const now = new Date();
+    const diffInMilliseconds = now.getTime() - created.getTime();
+
+    const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    const diffInDays = Math.floor(diffInHours / 24);
+
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds}초 전`;
+    } else if (diffInMinutes < 60) {
+      return `${diffInMinutes}분 전`;
+    } else if (diffInHours < 24) {
+      return `${diffInHours}시간 전`;
+    } else {
+      return `${diffInDays}일 전`;
+    }
+  }
+
+  // 좋아요버튼 클릭
+  async function switchLiked(article: any) {
+    // 현재 좋아요 상태를 반전시키고 새로운 객체로 대체
+    const updatedArticle = { ...article, isLiked: !article.isLiked };
+
+    // dummyArticleList에서 해당 article 업데이트
+    const articleIndex = dummyArticleList.findIndex((dummy) => dummy.boardId === article.boardId);
+
+    if (articleIndex !== -1) {
+      dummyArticleList[articleIndex] = updatedArticle; // 배열 내 객체 교체
+    }
+
+    // API 요청하여 좋아요 처리하기
+    // 예: await api.likeArticle(updatedArticle);
+  }
 </script>
 
 <div id="community-body">
@@ -211,41 +261,40 @@
     </div>
   </div>
   <div id="community-content">
-    <button on:click={searchCondition}>검색 반경 설정</button>
-    <p>반경 {range}km내의 루트만 표시됩니다.</p>
+    <Button on:click={searchCondition}>검색 반경 설정</Button>
+    <p class="my-5 font-bold">반경 {range}km내의 루트만 표시됩니다.</p>
     {#each dummyArticleList as article}
       {#if article.distanceFromUser <= range * 1000}
         <Card class="mb-5">
-          <div class="flex">
+          <div class="flex mb-3 items-center">
             <img src={article.profile} alt="" style="width: 50px;" />
-            <p>{article.nickname}</p>
+            <p class="ml-5">{article.nickname}</p>
           </div>
-          <div class="max-w-4xl">
-            <Carousel
-              images={[
-                { src: article.drawingImage, alt: 'drawingImage' },
-                { src: article.artImage, alt: 'artImage' },
-              ]}
-              let:Indicators
-            >
-              <Indicators />
-            </Carousel>
-          </div>
+          <FeedArticle {article} />
           <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
             {article.comment}
           </p>
-          <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
-            <span>나와의 거리 {article.distanceFromUser / 1000}km</span>
-            <span>총 길이 {article.distance / 1000}km</span>
-          </p>
-          <div>
-            {#if article.isLiked}
-              찜!
-            {/if}
-            <Button color={article.isLiked ? 'red' : 'blue'}>
-              {article.isLiked ? '좋아요 취소' : '좋아용'}
-            </Button>
-            {article.likeCount}
+          <div class="flex justify-between items-center">
+            {timeAgo(new Date(article.created))}
+            <div class="flex justify-between items-center">
+              {#if article.isLiked}
+                <button
+                  on:click={() => switchLiked(article)}
+                  color={article.isLiked ? 'red' : 'blue'}
+                >
+                  <HeartSolid size="lg" color={'red'} />
+                </button>
+                <p>{article.likeCount}</p>
+              {:else}
+                <button
+                  on:click={() => switchLiked(article)}
+                  color={article.isLiked ? 'red' : 'blue'}
+                >
+                  <HeartOutline size="lg" />
+                </button>
+                <p>{article.likeCount}</p>
+              {/if}
+            </div>
           </div>
         </Card>
       {/if}
@@ -304,14 +353,5 @@
 
   #community-tabbar {
     height: 15vh;
-  }
-  .carousel-indicators button {
-    background-color: transparent; /* 배경을 투명하게 설정 */
-    border: none; /* 불필요한 테두리 제거 */
-    box-shadow: none; /* 네모 그림자가 있으면 제거 */
-  }
-
-  .carousel-indicators button.active {
-    background-color: gray; /* 활성화된 Indicator의 색상 */
   }
 </style>
