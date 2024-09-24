@@ -1,9 +1,14 @@
 package com.vincentrungogh.domain.user.service;
 
+import com.vincentrungogh.domain.drawing.entity.Drawing;
+import com.vincentrungogh.domain.drawing.entity.DrawingDetail;
+import com.vincentrungogh.domain.drawing.repository.DrawingDetailRepository;
+import com.vincentrungogh.domain.drawing.repository.DrawingRepository;
 import com.vincentrungogh.domain.user.entity.User;
 import com.vincentrungogh.domain.user.repository.UserRepository;
 import com.vincentrungogh.domain.user.service.dto.request.UpdateUserProfileRequest;
 import com.vincentrungogh.domain.user.service.dto.response.UserProfileResponse;
+import com.vincentrungogh.domain.user.service.dto.response.WeekExerciseResponse;
 import com.vincentrungogh.global.auth.service.dto.response.UserPrincipal;
 import com.vincentrungogh.global.exception.CustomException;
 import com.vincentrungogh.global.exception.ErrorCode;
@@ -17,7 +22,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -25,6 +33,8 @@ import java.util.Optional;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final DrawingRepository drawingRepository;
+    private final DrawingDetailRepository drawingDetailRepository;
     private final AwsService awsService;
     private final PasswordEncoder passwordEncoder;
 
@@ -90,6 +100,39 @@ public class UserService implements UserDetailsService {
         // 3. DB 저장
         user.updatePassword(password);
         userRepository.save(user);
+    }
+
+    public WeekExerciseResponse getWeekExercise(int userId) {
+        // 0. 유저 찾기
+        User user = getUserById(userId);
+
+        // 1. 현재 날짜
+        LocalDate date = LocalDate.now();
+
+        // 2. 시작 날짜
+        LocalDate startDate = date.minusWeeks(1);
+
+        // 3. 드로잉 정보 가져오기
+        List<Drawing> weekDrawings = drawingRepository.findAllByUser(user);
+
+        // 4. 드로잉 디테일 가져오기
+        List<DrawingDetail> weekDrawingsDetail = new ArrayList<>();
+        for (Drawing drawing : weekDrawings) {
+            weekDrawingsDetail.addAll(drawingDetailRepository
+                    .findAllByDrawingAndCreatedBetween(drawing, startDate.atTime(LocalTime.MIN),
+                            date.atTime(LocalTime.MAX)));
+        }
+
+        // 5.일주일 정보 리스트 생성
+        int[] week = new int[7];
+
+        // 6. 저장
+        for (DrawingDetail drawingDetail : weekDrawingsDetail) {
+            int index = (int) ChronoUnit.DAYS.between(drawingDetail.getCreated().toLocalDate(), date);
+            week[6 - index] = week[6 - index]+ drawingDetail.getDistance();
+        }
+
+        return WeekExerciseResponse.createWeekExerciseResponse(week);
     }
 
 

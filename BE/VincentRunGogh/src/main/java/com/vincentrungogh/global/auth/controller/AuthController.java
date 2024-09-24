@@ -34,9 +34,9 @@ public class AuthController {
     @Operation(summary = "로그인", description = "사용자 로그인하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그인에 성공하셨습니다.",
-                    content = @Content(schema = @Schema(implementation = LoginResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "로그인에 실패하셨습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+                    content = @Content(schema = @Schema(implementation = LoginResponse.class))),
     })
     @CommonSwaggerResponse.CommonResponses
     @PostMapping("/login")
