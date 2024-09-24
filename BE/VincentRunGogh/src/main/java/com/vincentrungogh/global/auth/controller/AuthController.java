@@ -35,7 +35,7 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그인에 성공하셨습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.",
+            @ApiResponse(responseCode = "400", description = "비밀번호가 일치하지 않습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),

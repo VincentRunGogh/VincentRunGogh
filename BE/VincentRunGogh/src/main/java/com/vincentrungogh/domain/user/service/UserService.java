@@ -1,6 +1,8 @@
 package com.vincentrungogh.domain.user.service;
 
 import com.vincentrungogh.domain.drawing.entity.Drawing;
+import com.vincentrungogh.domain.drawing.entity.DrawingDetail;
+import com.vincentrungogh.domain.drawing.repository.DrawingDetailRepository;
 import com.vincentrungogh.domain.drawing.repository.DrawingRepository;
 import com.vincentrungogh.domain.user.entity.User;
 import com.vincentrungogh.domain.user.repository.UserRepository;
@@ -20,10 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,6 +33,7 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final DrawingRepository drawingRepository;
+    private final DrawingDetailRepository drawingDetailRepository;
     private final AwsService awsService;
 
     public UserProfileResponse getUserProfile(int userId){
@@ -93,6 +95,14 @@ public class UserService implements UserDetailsService {
         // 3. 드로잉 정보 가져오기
         List<Drawing> weekDrawings = drawingRepository.findAllByUser(user);
 
+        // 4. 드로잉 디테일 가져오기
+        List<DrawingDetail> weekDrawingsDetail = new ArrayList<>();
+        for(Drawing drawing : weekDrawings){
+            weekDrawingsDetail.addAll(drawingDetailRepository
+                    .findAllByDrawingAndCreatedBetween(drawing, startDate.atTime(LocalTime.MIN),
+                            date.atTime(LocalTime.MAX)));
+        }
+
         // 5.일주일 정보 리스트 생성
         List<Integer> week = new ArrayList<>();
         for(int i = 0 ; i < 7; i++){
@@ -100,11 +110,13 @@ public class UserService implements UserDetailsService {
         }
 
         // 6. 저장
-        for(Drawing drawing : weekDrawings){
-            int index = (int) ChronoUnit.DAYS.between(drawing.getCreated().toLocalDate(), date);
-            week.set(index, week.get(index) + drawing.getRoute());
+        for(DrawingDetail drawingDetail : weekDrawingsDetail){
+            int index = (int) ChronoUnit.DAYS.between(drawingDetail.getCreated().toLocalDate(), date);
+            week.set(index, week.get(index) + drawingDetail.getDistance());
         }
 
+        Collections.reverse(week);
+        return WeekExerciseResponse.createWeekExerciseResponse(week);
     }
 
 

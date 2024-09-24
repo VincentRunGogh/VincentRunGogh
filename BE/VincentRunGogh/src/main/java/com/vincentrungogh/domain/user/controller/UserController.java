@@ -109,7 +109,7 @@ public class UserController {
     @Operation(summary = "일주일 운동 정보 조회", description = "일주일 운동 정보 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "일주일 운동 정보 조회에 성공하였습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+                    content = @Content(schema = @Schema(implementation = WeekExerciseResponse.class))),
             @ApiResponse(responseCode = "400", description = "잘못된 접근입니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
@@ -124,7 +124,7 @@ public class UserController {
     @GetMapping("/week")
     public ResponseEntity<?> getWeekExercise(@AuthenticationPrincipal UserPrincipal userPrincipal){
 
-        WeekExerciseResponse response = userService.getWeekExercise();
+        WeekExerciseResponse response = userService.getWeekExercise(userPrincipal.getId());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(), "일주일 운동 정보 조회에 성공하였습니다.", response));
