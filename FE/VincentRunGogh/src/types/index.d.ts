@@ -1,4 +1,4 @@
-// declare module `html2canvas`
+// declare module`html2canvas`;
 // declare module 'leaflet' {
 //   namespace Control {
 //     function extend(props: any): { new (...args: any[]): any } & typeof Control;
@@ -21,3 +21,5 @@ declare module 'leaflet-hotline' {
     options: HotlineOptions
   ): L.Polyline;
 }
+declare module 'svelte-spa-router';
+declare module 'svelte-fullcalendar';

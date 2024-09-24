@@ -48,6 +48,7 @@
     "@fullcalendar/common": "^5.11.5",
     "@fullcalendar/interaction": "^6.1.15",
     "@types/html2canvas": "^1.0.0",
+    "axios": "^1.7.7",
     "canvg": "^4.0.2",
     "chart.js": "^4.4.4",
     "chartjs-gauge": "^0.3.0",
