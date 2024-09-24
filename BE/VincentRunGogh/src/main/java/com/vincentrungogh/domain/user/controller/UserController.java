@@ -71,6 +71,7 @@ public class UserController {
                 .body(ResultDto.res(HttpStatus.OK.value(), "프로필 수정에 성공하였습니다."));
     }
 
+
     @Operation(summary = "프로필 이미지 수정", description = "사용자 이미지 프로필 수정하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "프로필 이미지 수정에 성공하였습니다.",
