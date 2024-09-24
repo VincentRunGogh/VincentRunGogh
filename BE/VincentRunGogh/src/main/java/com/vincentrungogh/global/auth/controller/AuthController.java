@@ -161,7 +161,6 @@ public class AuthController {
                 .body(ResultDto.res(HttpStatus.OK.value(), "인증 코드 확인 요청이 성공하였습니다.", response));
     }
 
-
     @Operation(summary = "비밀번호 재발급", description = "비밀번호 재발급 후 이메일로 전송")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Refresh Token 재발급 요청에 성공하였습니다",
@@ -188,7 +187,7 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Refresh Token 재발급 요청에 성공하였습니다.",
                     content = @Content(schema = @Schema(implementation = ReissueTokenResponse.class))),
-            @ApiResponse(responseCode = "500", description = "accessToken이 재발급되었습니다.",
+            @ApiResponse(responseCode = "500", description = "accessToken 재발급에 실패했습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
     @CommonSwaggerResponse.CommonResponses
