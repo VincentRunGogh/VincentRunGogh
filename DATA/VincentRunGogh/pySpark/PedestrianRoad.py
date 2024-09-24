@@ -83,5 +83,7 @@ if road_df:
     road_df.show(5)
     # 추가 중복 제거 전처리
     pedestrian_df = road_df.dropDuplicates()
+    # 컬럼 기반 데이터 프레임 parquet으로 저장 후 사용하기
+    pedestrian_df.write.parquet("./pedestrian_data_daejeon.parquet")
 
 
