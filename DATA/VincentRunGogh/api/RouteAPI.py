@@ -21,7 +21,6 @@ class ArtRouteRequest(BaseModel):
     rightLng: float  # 우하단 경도
 
 class DataSaveRouteRequestDto(BaseModel):
-    routeId: int
     positionList: List[Position]
 
 class ResponseDto(BaseModel):
@@ -34,9 +33,9 @@ class DataSaveRouteResponseDto(BaseModel):
     centerLng: float
     distance: int
 
+# Route 모델에서 positionList를 List[dict]로 변경
 class Route(Model):
-    routeId: Optional[str]
-    positionList: List[Position]
+    positionList: List[dict]
 
 @api_router.post("/rootings/art", response_model=ResponseDto)
 async def create_art_route(request: ArtRouteRequest):
@@ -50,16 +49,21 @@ async def create_art_route(request: ArtRouteRequest):
     return response_data
 
 @api_router.post("/rootings", response_model=ResponseDto)
-async def create_art_route(request: DataSaveRouteRequestDto):
+async def save_route(request: DataSaveRouteRequestDto):
+    # Position 객체를 dict로 변환
+    position_list_dicts = [position.dict() for position in request.positionList]
 
-    route = Route(routeId=str(request.routeId), positionList=request.positionList)
+    # Route 모델에 positionList를 설정하여 생성
+    route = Route(positionList=position_list_dicts)
     await mongodb.engine.save(route)
-    print(f"{route.routeId}으로 생성되었습니다.")
+    print("생성되었습니다.")
 
+    # 저장된 route의 ID를 응답 데이터로 포함
     response_data = {
         "status": 200,
         "message": "루트를 성공적으로 저장했습니다.",
         "data": {
+            "routeId": str(route.id),  # route.id는 MongoDB에서 자동 생성된 ObjectId입니다.
             "centerLat": 0.0,
             "centerLng": 0.0,
             "distance": 0
