@@ -1,9 +1,12 @@
 package com.vincentrungogh.domain.user.service;
 
+import com.vincentrungogh.domain.drawing.entity.Drawing;
+import com.vincentrungogh.domain.drawing.repository.DrawingRepository;
 import com.vincentrungogh.domain.user.entity.User;
 import com.vincentrungogh.domain.user.repository.UserRepository;
 import com.vincentrungogh.domain.user.service.dto.request.UpdateUserProfileRequest;
 import com.vincentrungogh.domain.user.service.dto.response.UserProfileResponse;
+import com.vincentrungogh.domain.user.service.dto.response.WeekExerciseResponse;
 import com.vincentrungogh.global.auth.service.dto.response.UserPrincipal;
 import com.vincentrungogh.global.exception.CustomException;
 import com.vincentrungogh.global.exception.ErrorCode;
@@ -16,6 +19,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -24,6 +31,7 @@ import java.util.Optional;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final DrawingRepository drawingRepository;
     private final AwsService awsService;
 
     public UserProfileResponse getUserProfile(int userId){
@@ -70,6 +78,33 @@ public class UserService implements UserDetailsService {
         // 4. DB 저장
         user.updateProfileImage(url);
         userRepository.save(user);
+    }
+
+    public WeekExerciseResponse getWeekExercise(int userId){
+        // 0. 유저 찾기
+        User user = getUserById(userId);
+
+        // 1. 현재 날짜
+        LocalDate date = LocalDate.now();
+
+        // 2. 시작 날짜
+        LocalDate startDate = date.minusWeeks(1);
+
+        // 3. 드로잉 정보 가져오기
+        List<Drawing> weekDrawings = drawingRepository.findAllByUser(user);
+
+        // 5.일주일 정보 리스트 생성
+        List<Integer> week = new ArrayList<>();
+        for(int i = 0 ; i < 7; i++){
+            week.add(0);
+        }
+
+        // 6. 저장
+        for(Drawing drawing : weekDrawings){
+            int index = (int) ChronoUnit.DAYS.between(drawing.getCreated().toLocalDate(), date);
+            week.set(index, week.get(index) + drawing.getRoute());
+        }
+
     }
 
 

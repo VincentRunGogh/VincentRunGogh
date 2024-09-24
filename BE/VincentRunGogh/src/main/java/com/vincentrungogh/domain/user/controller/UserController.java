@@ -3,6 +3,7 @@ package com.vincentrungogh.domain.user.controller;
 import com.vincentrungogh.domain.user.service.UserService;
 import com.vincentrungogh.domain.user.service.dto.request.UpdateUserProfileRequest;
 import com.vincentrungogh.domain.user.service.dto.response.UserProfileResponse;
+import com.vincentrungogh.domain.user.service.dto.response.WeekExerciseResponse;
 import com.vincentrungogh.global.auth.service.dto.response.UserPrincipal;
 import com.vincentrungogh.global.util.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -103,6 +104,30 @@ public class UserController {
                 .status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(), "프로필 이미지 수정에 성공하였습니다."));
 
+    }
+
+    @Operation(summary = "일주일 운동 정보 조회", description = "일주일 운동 정보 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "일주일 운동 정보 조회에 성공하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 접근입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "일주일 운동 정보 조회에 실패하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @GetMapping("/week")
+    public ResponseEntity<?> getWeekExercise(@AuthenticationPrincipal UserPrincipal userPrincipal){
+
+        WeekExerciseResponse response = userService.getWeekExercise();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(), "일주일 운동 정보 조회에 성공하였습니다.", response));
     }
 
 }
