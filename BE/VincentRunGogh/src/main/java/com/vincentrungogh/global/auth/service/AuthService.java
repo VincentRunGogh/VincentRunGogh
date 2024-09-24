@@ -51,13 +51,19 @@ public class AuthService {
                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
        // 1. 유효성 확인
-       Authentication authentication = authorizationManager.authenticate(
-                // 아이디, 패스워드 입력
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
-                        loginRequest.getPassword()
-                )
-       );
+        Authentication authentication;
+        try{
+            authentication = authorizationManager.authenticate(
+                    // 아이디, 패스워드 입력
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getEmail(),
+                            loginRequest.getPassword()
+                    )
+            );
+        } catch (Exception e){
+            throw new CustomException(ErrorCode.NOT_MATCHED_PASSWORD);
+        }
+
 
         // 2. 유저 정보 가져오기
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
