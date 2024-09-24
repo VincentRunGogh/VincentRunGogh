@@ -57,15 +57,10 @@ public class UserController {
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "400", description = "몸무게와 키는 0 이상이어야 합니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "프로필 수정에 실패하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
+    @CommonSwaggerResponse.CommonResponses
     @PutMapping("")
     public ResponseEntity<?> updateUserProfile(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody @Valid UpdateUserProfileRequest request){
 
@@ -80,17 +75,10 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "프로필 이미지 수정에 성공하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 접근입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "프로필 이미지 수정에 실패하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
+    @CommonSwaggerResponse.CommonResponses
     @PutMapping(value = "/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateProfileImage(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam(name = "image", required = true) MultipartFile image){
 
@@ -105,17 +93,10 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "비밀번호 수정에 성공하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 접근입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "비밀번호 수정에 실패하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
+    @CommonSwaggerResponse.CommonResponses
     @PutMapping("/password")
     public ResponseEntity<?> updatePassword(@AuthenticationPrincipal UserPrincipal userPrincipal,@RequestBody @Valid UpdatePasswordRequest request
     ){
