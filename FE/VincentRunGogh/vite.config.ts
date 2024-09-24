@@ -59,4 +59,7 @@ export default defineConfig({
   optimizeDeps: {
     include: ['@fullcalendar/common'],
   },
+  server : {
+    port: 5173,
+  },
 });
