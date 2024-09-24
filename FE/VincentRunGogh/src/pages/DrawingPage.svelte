@@ -9,7 +9,7 @@
 
   import { MapToolbar, MapGUI } from '@/components/drawing';
   import { isLockScreen, isPause, elapsedTime, posList } from '@/stores/drawingStore';
-  import DrawingPauseModal from '@/components/modal/DrawingPauseModal.svelte';
+  import DrawingPauseModal from '@/components/modals/DrawingPauseModal.svelte';
   import Timer from '@/components/drawing/Timer.svelte';
   import { updateDistanceAndSpeed } from '@/utils/calculateFuc';
 
@@ -293,6 +293,7 @@ fill="#000000" stroke="none">
   onMount(() => {
     countdown = 3;
     //TODO - 루트의 좌표 값들을 url의 routeId 파람으로 조회
+    //이전에 한 드로잉은 다른 색으로 보여주기
   });
   onDestroy(() => {
     if (map) {
