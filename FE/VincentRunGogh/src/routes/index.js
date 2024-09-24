@@ -13,8 +13,8 @@ import {
   LoginPage,
   SignUpPage,
   MyHealthPage,
-  ProgressPage
-} from '../pages';
+  ProgressPage,
+} from '@/pages';
 export default {
   // 링크 : 컴포넌트
   // :param, *any
@@ -30,5 +30,5 @@ export default {
   '/login': LoginPage,
   '/signup': SignUpPage,
   '/myhealth': MyHealthPage,
-  '/progress': ProgressPage
+  '/progress': ProgressPage,
 };
