@@ -291,12 +291,4 @@
   #controls {
     margin: 10px;
   }
-  button {
-    margin: 5px;
-  }
-  #final {
-    /* width: 100%; */
-    /* height: 100%; */
-    object-fit: cover;
-  }
 </style>

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { successAlert } from '@/util/notificationAlert';
+import { successAlert } from '@/utils/notificationAlert';
 
 function Axios() {
   const instance = axios.create({
