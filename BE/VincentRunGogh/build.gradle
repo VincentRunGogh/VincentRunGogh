@@ -78,6 +78,9 @@ dependencies {
 	// Hibernate Validator (Reference Implementation)
 	implementation 'org.hibernate.validator:hibernate-validator:7.0.4.Final'
 
+	// Socket
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
 	// Test dependencies
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
