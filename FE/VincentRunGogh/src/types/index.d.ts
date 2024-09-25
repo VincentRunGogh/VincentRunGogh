@@ -23,3 +23,13 @@ declare module 'leaflet-hotline' {
 }
 declare module 'svelte-spa-router';
 declare module 'svelte-fullcalendar';
+
+interface UserAuth {
+  id: string | null;
+  nickname: string | null;
+}
+interface User extends UserAuth {
+  height: number | null;
+  weight: number | null;
+  profileImage: string | null;
+}

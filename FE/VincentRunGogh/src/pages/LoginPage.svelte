@@ -1,21 +1,35 @@
 <script lang="ts">
-  import { userStore } from '../stores/userStore';
   import { replace, link } from 'svelte-spa-router';
-
   import { Button, Modal, Label, Input, Checkbox } from 'flowbite-svelte';
+
+  import { userStore } from '../stores/userStore';
+  import { login } from '@/api/authApi';
+  import { errorAlert } from '@/utils/notificationAlert';
 
   let id = '';
   let password = '';
 
   const handleLogin = async (event: SubmitEvent) => {
-    event.preventDefault();
-    // const isSuccess = await login(id,password); // performLogin은 예시 함수입니다.
-    // if (isSuccess) {
-    //   userStore.set({ id: '123', nickname: 'User' }); // 사용자 정보 설정 예시
-    //   push('/'); // 홈페이지로 이동
-    // } else {
-    //   console.error('로그인 실패');
-    // }
+    login(
+      id,
+      password,
+      async (response: Promise<Response>) => {
+        if (response.data.status === 200) {
+          localStorage.setItem('accessToken', response.data.data.accessToken);
+          await userStore.login({ nickname: response.data.data.nickname }); // 로그인 상태 업데이트
+          if (response.data.data.isChanged) {
+            replace('/changepassword');
+          } else {
+            console.log('로그인 성공');
+            // replace('/'); // 여기서 페이지 변경
+            window.location.href = '/'; // 홈으로 이동
+          }
+        }
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
   };
 </script>
 
@@ -40,10 +54,10 @@
     <div class="text-sm font-medium text-gray-500 dark:text-gray-300">
       계정이 없으신가요? <a
         use:link
-        href="/"
+        href="/signup"
         class="text-primary-700 hover:underline dark:text-primary-500"
       >
-        Create account
+        회원가입
       </a>
     </div>
   </div>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import './app.css';
-  import Router from 'svelte-spa-router';
+  import Router, { replace } from 'svelte-spa-router';
   import { userStore } from '@/stores/userStore';
   import {
     DrawingDetailPage,
@@ -21,27 +21,31 @@
   userStore.initialize();
 
   let isAuthenticated = false;
+
   userStore.subscribe(($user) => {
     isAuthenticated = $user !== null;
+    if (isAuthenticated) {
+      replace('/'); // 로그인 상태면 홈 페이지로 이동
+    } else {
+      replace('/login'); // 비로그인 상태면 로그인 페이지로 이동
+    }
   });
 
-  const routes = {
-    // 링크 : 컴포넌트
-    // :param, *any
-    '/makeroute': MakeRoutePage,
-    '/drawingmap': DrawingPage,
-    '/drawingcapture': DrawingCapturePage,
-    '/calendar': CalendarPage,
-    '/drawingdetail': DrawingDetailPage,
-    '/': HomePage,
-    '/routelist': RouteListPage,
-    '/community': CommunityPage,
-    '/community/mystorage': MyStoragePage,
-    '/login': LoginPage,
-    '/signup': SignUpPage,
-    '/myhealth': MyHealthPage,
-    '/progress': ProgressPage,
+  $: routes = {
+    '/makeroute': !isAuthenticated ? LoginPage : MakeRoutePage,
+    '/drawingmap': !isAuthenticated ? LoginPage : DrawingPage,
+    '/drawingcapture': !isAuthenticated ? LoginPage : DrawingCapturePage,
+    '/calendar': !isAuthenticated ? LoginPage : CalendarPage,
+    '/drawingdetail': !isAuthenticated ? LoginPage : DrawingDetailPage,
+    '/': !isAuthenticated ? LoginPage : HomePage,
+    '/routelist': !isAuthenticated ? LoginPage : RouteListPage,
+    '/community': !isAuthenticated ? LoginPage : CommunityPage,
+    '/community/mystorage': !isAuthenticated ? LoginPage : MyStoragePage,
+    '/myhealth': !isAuthenticated ? LoginPage : MyHealthPage,
+    '/progress': !isAuthenticated ? LoginPage : ProgressPage,
 
+    '/signup': isAuthenticated ? LoginPage : SignUpPage,
+    '/login': isAuthenticated ? LoginPage : LoginPage,
     '*': isAuthenticated ? HomePage : LoginPage,
   };
 </script>
