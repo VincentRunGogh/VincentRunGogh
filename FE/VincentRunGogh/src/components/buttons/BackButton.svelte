@@ -26,8 +26,9 @@
 
 <style>
   #backbutton {
-    position: relative;
-    top: 10px;
-    right: 10px;
+    position: fixed;
+    top: 4%;
+    left: 4%;
+    z-index: 1000;
   }
 </style>
