@@ -2,7 +2,7 @@ import { loginAxios } from '@/api/http-commons';
 const http = loginAxios();
 
 async function getProfile(success, fail) {
-  await http.put('/users', { image: image }).then(success).catch(fail);
+  await http.get('/users').then(success).catch(fail);
 }
 async function updateProfileImg(image, success, fail) {
   await http.put('/users/profile-image', { image: image }).then(success).catch(fail);

@@ -124,7 +124,7 @@
     >
   </div>
 {/if}
-{#if $allValid && sendEmailCode && isVerifyEmail}
+{#if $allValid}
   <div class="mt-4">
     <Button
       type="submit"
