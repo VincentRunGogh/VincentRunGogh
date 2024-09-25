@@ -1,4 +1,4 @@
-package com.vincentrungogh.domain.drawing.handler;
+package com.vincentrungogh.domain.running.handler;
 
 import com.vincentrungogh.global.auth.service.JwtService;
 import com.vincentrungogh.global.exception.CustomException;
@@ -42,7 +42,7 @@ public class StompHandler implements ChannelInterceptor {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
 
-        accessor.getSessionAttributes().put("id", jwtService.getUserId(accessToken));
+        accessor.getSessionAttributes().put("userId", jwtService.getUserId(accessToken));
     }
 
 }
