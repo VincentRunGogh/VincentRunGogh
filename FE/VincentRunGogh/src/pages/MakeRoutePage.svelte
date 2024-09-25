@@ -336,10 +336,10 @@
   // 이름 확인 -> 사진찍고 저장하고 마무리
   async function nameConfirm() {
     // 캡쳐하기
-    isSubmit = true;
     mapCapture('#map')
       .then(async () => {
         console.log(finalImage);
+        isSubmit = true;
         await submitRoute();
       })
       .catch((error) => {
