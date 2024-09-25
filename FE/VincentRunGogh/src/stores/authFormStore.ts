@@ -13,12 +13,20 @@ interface HelperMessage {
 }
 
 function createAuthFormStore() {
-  const values = writable<AuthFormValues>({ email: '', password: '', confirmPassword: '' });
-  const helpers = writable({
+  const initialValues: AuthFormValues = { email: '', password: '', confirmPassword: '' };
+  const initialHelpers = {
     email: { message: '이메일을 입력하세요', color: 'gray' },
     password: { message: '비밀번호를 입력하세요', color: 'gray' },
     confirmPassword: { message: '비밀번호를 다시 입력해주세요', color: 'gray' },
-  });
+  };
+
+  const values = writable<AuthFormValues>(initialValues);
+  const helpers = writable<{ [key in keyof AuthFormValues]: HelperMessage }>(initialHelpers);
+
+  function reset() {
+    values.set(initialValues);
+    helpers.set(initialHelpers);
+  }
 
   function validateEmail(value: string) {
     const emailRegex = /^\S+@\S+\.\S+$/;
@@ -60,6 +68,7 @@ function createAuthFormStore() {
       }));
     }
   }
+
   function validateConfirmPassword(value: string, password: string) {
     if (value !== password) {
       helpers.update((h) => ({
@@ -79,13 +88,16 @@ function createAuthFormStore() {
       }));
     }
   }
+
   const allValid = derived(helpers, ($helpers) => {
+    console.log($helpers);
     return (
-      $helpers.email.message === '' &&
-      $helpers.password.message === '' &&
-      $helpers.confirmPassword.message === ''
+      $helpers.email.color === 'green' &&
+      $helpers.password.color === 'green' &&
+      $helpers.confirmPassword.color === 'green'
     );
   });
+
   return {
     values,
     helpers,
@@ -93,6 +105,7 @@ function createAuthFormStore() {
     validatePassword,
     validateConfirmPassword,
     allValid,
+    reset,
   };
 }
 

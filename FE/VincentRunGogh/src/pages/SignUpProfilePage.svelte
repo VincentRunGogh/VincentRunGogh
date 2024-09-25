@@ -1,18 +1,59 @@
 <script lang="ts">
-  import { Input, Label, Checkbox } from 'flowbite-svelte';
+  import { Input, Label, Radio, Button } from 'flowbite-svelte';
 
   import ProfileForm from '@/components/forms/ProfileForm.svelte';
   import { signup } from '@/api/authApi';
   import { profileFormStore } from '@/stores/profileFormStore';
-  const {values} =profileFormStore;
+  import { authFormStore } from '@/stores/authFormStore';
+  import { errorAlert, successAlert } from '@/utils/notificationAlert';
+  import { replace } from 'svelte-spa-router';
+
+  const { values: profileValues, helpers, reset: resetProfile } = profileFormStore;
+  const { values: authValues, reset: resetAuth } = authFormStore;
+
   let birth: Date | null;
   let gender: 0 | 1 | null;
 
-  const submit = () => {
-    const data={
-      brith,gender,$values.email
+  const handleGenderChange = (selectedGender: 0 | 1) => {
+    gender = selectedGender;
+  };
+
+  const handleSubmit = () => {
+    if (
+      !$authValues.email ||
+      !$authValues.password ||
+      birth === null ||
+      gender === null ||
+      $helpers.nickname.message !== '' ||
+      $helpers.weight.message !== '' ||
+      $helpers.height.message !== ''
+    ) {
+      errorAlert('입력을 확인해주세요');
+      return;
     }
-    signup(data)
+    const data = {
+      email: $authValues.email,
+      password: $authValues.password,
+      birth: birth,
+      gender,
+      nickname: $profileValues.nickname,
+      height: $profileValues.height,
+      weight: $profileValues.weight,
+    };
+    console.log(data);
+    signup(
+      data,
+      (response) => {
+        if (response.status === 200) {
+          successAlert('가입이 완료되었습니다!', (result) => {
+            replace('/login');
+            resetProfile(); // 프로필 폼 스토어를 리셋
+            resetAuth(); // 인증 폼 스토어를 리셋
+          });
+        }
+      },
+      (error) => {}
+    );
   };
 </script>
 
@@ -25,6 +66,13 @@
 <ul
   class="items-center w-full rounded-lg border border-gray-200 sm:flex dark:bg-gray-800 dark:border-gray-600 divide-x rtl:divide-x-reverse divide-gray-200 dark:divide-gray-600"
 >
-  <li class="w-full"><Checkbox checked color="yellow" class="p-3">여자</Checkbox></li>
-  <li class="w-full"><Checkbox color="yellow" class="p-3">남자</Checkbox></li>
+  <li class="w-full">
+    <Radio name="gender" checked={gender === 1} on:change={() => handleGenderChange(1)}>남자</Radio>
+  </li>
+  <li class="w-full">
+    <Radio name="gender" checked={gender === 0} on:change={() => handleGenderChange(0)}>여자</Radio>
+  </li>
 </ul>
+<div class="mt-4">
+  <Button type="submit" class="w-full" on:click={handleSubmit}>회원가입</Button>
+</div>

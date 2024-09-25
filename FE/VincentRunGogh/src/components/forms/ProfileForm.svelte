@@ -1,11 +1,10 @@
 <script lang="ts">
   import { Input, Fileupload, Label, Button, Helper, ButtonGroup } from 'flowbite-svelte';
 
-  import { onMount } from 'svelte';
+  import { onMount, SvelteComponent } from 'svelte';
   import { profileFormStore } from '@/stores/profileFormStore';
   import { userStore } from '@/stores/userStore';
 
-  export let submitAttempt = false;
   export let isSignup;
   const {
     values,
@@ -18,11 +17,13 @@
   } = profileFormStore;
 
   async function handleCheckNickname() {
-    await checkNicknameAvailability($values.nickname);
+    if ($values.nickname.length > 0) {
+      await checkNicknameAvailability($values.nickname);
+    }
   }
   // 이미지 업로드 핸들러
-  function handleImageUpload(event) {
-    const file = event.target.files[0];
+  function handleImageUpload(event: Event & { currentTarget: HTMLInputElement }) {
+    const file = event.target?.files[0];
     if (file) {
       validateProfileImage(file);
       values.update((v) => ({ ...v, profileImage: file }));
@@ -35,8 +36,8 @@
         values.update((v) => ({
           ...v,
           nickname: $user.nickname,
-          height: $user.height.toString(),
-          weight: $user.weight.toString(),
+          height: $user.height,
+          weight: $user.weight,
         }));
       }
     });

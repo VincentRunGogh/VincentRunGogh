@@ -124,7 +124,7 @@
   </div>
 </div>
 <Modal title="프로필 변경" bind:open={editFormModal} autoclose={false}>
-  <ProfileForm bind:submitAttempt />
+  <ProfileForm isSignup={false} />
   <!-- Modal 하단 버튼 -->
 
   <svelte:fragment slot="footer">

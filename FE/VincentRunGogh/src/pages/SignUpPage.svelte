@@ -41,6 +41,8 @@
             (response) => {
               sendEmailCode = true;
               loading = false;
+              $helpers.email.color = 'green';
+              $helpers.email.message = '사용 가능한 이메일입니다';
             },
             (error) => {}
           );
@@ -122,7 +124,7 @@
     >
   </div>
 {/if}
-{#if $allValid}
+{#if $allValid && sendEmailCode && isVerifyEmail}
   <div class="mt-4">
     <Button
       type="submit"
