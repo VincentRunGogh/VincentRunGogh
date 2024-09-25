@@ -5,17 +5,20 @@
   import 'leaflet-draw';
   import 'leaflet-draw/dist/leaflet.draw.css';
   import Swal from 'sweetalert2';
-  import MakeLoadingAlert from '@components/makeroute/MakeLoadingAlert.svelte';
   import { push } from 'svelte-spa-router';
+  import BackButton from '@/components/buttons/BackButton.svelte';
+  import { Button, Input } from 'flowbite-svelte';
   // Chapter 2
   import html2canvas from 'html2canvas';
-  import { Canvg } from 'canvg';
+  import { Canvg, SVGElement } from 'canvg';
+  import { sendArtLine } from '@/api/makeRouteApi';
 
   //진행 상태 변수
   let isChapterOne = true;
 
   let map: L.Map;
   let currentPolyline: L.Polyline | null = null;
+  let routePolyline: L.Polyline | null = null;
   let currentLatLngs: L.LatLng[] = [];
   let isDrawing: boolean = false;
   let isMouseDown: boolean = false;
@@ -69,7 +72,7 @@
   }
 
   //지도 잠금 풀기
-  function unlockMap(condition) {
+  function unlockMap(condition: boolean) {
     isLocked = false;
     isDrawing = false;
 
@@ -122,8 +125,6 @@
 
   // 그리기 종료 시 저장
   function stopAndSavePolyline() {
-    currentPolyline.setLatLngs(currentLatLngs);
-    currentPolyline.redraw();
     stopDrawing();
     isFixed = false;
     unlockMap(false);
@@ -181,6 +182,10 @@
       map.removeLayer(currentPolyline);
       currentPolyline = null;
     }
+    if (routePolyline) {
+      map.removeLayer(routePolyline);
+      routePolyline = null;
+    }
     currentLatLngs = [];
     latLngMessage = latLngMessageList[0];
     showControls = true;
@@ -190,7 +195,7 @@
   }
 
   //다음 - 결과물 객체
-  function next() {
+  async function next() {
     drawForm = {
       positionList: shortenLatLngs,
       leftLat: northWest.lat,
@@ -198,21 +203,25 @@
       rightLat: southEast.lat,
       rightLng: southEast.lng,
     };
-    console.log('결과 객체:', drawForm);
     Swal.fire({
-      title: '아트를 생성중입니다...',
-      html: '<div id="making-alert"></div>',
+      title: '루트를 생성중입니다...',
       showConfirmButton: false,
-      didOpen: () => {
-        // 'svelte-component'라는 ID를 가진 div에 Svelte 컴포넌트 렌더링
-        new MakeLoadingAlert({
-          target: document.getElementById('making-alert'),
-        });
-        setTimeout(() => {
+      didOpen: async () => {
+        // 루트생성 API 요청
+        try {
+          let routeResponse = await sendArtLine(drawForm);
+          routePolyline = new L.Polyline(routeResponse.data.positionList, {
+            color: 'red',
+          }).addTo(map);
           Swal.close();
-        }, 1000);
+        } catch (error) {
+          {
+            throw error;
+          }
+        }
       },
     }).then((result) => {
+      // 지도에 받은거 그리기
       isChapterOne = false;
     });
   }
@@ -226,15 +235,10 @@
     map.getContainer().addEventListener('touchend', onTouchEnd, { passive: false });
   });
 
-  function testing() {
-    currentPolyline.setLatLngs(shortenLatLngs);
-    currentPolyline.redraw();
-  }
-
   // Chapter 2 -----------------------------------------------/
 
-  let isConfirm = false;
-  let isSubmit = false;
+  let isConfirm: boolean = false;
+  let isSubmit: boolean = false;
   let inputName = '';
   // 루트 확인후 진행
   function routeConfirm() {
@@ -244,9 +248,9 @@
   //캡쳐 함수
 
   //백 전송용 이미지정보 변수
-  let finalImage = null;
+  let finalImage: string | null = null;
 
-  async function mapCapture(target, result) {
+  async function mapCapture(target: string) {
     map.invalidateSize();
     // 사용 변수 지정
     let svgData = null;
@@ -255,7 +259,7 @@
     let svgSizeY = null;
 
     // SVG 캡쳐
-    const svg = document.querySelector('svg'); // SVG를 선택합니다.
+    const svg: any = document.querySelector('svg'); // SVG를 선택합니다.
     // SVG 사이즈
     svgSizeX = svg.width.baseVal.value;
     svgSizeY = svg.height.baseVal.value;
@@ -264,7 +268,7 @@
 
     // canvas 및 context 생성
     const svgCanvas = document.createElement('canvas');
-    const svgCtx = svgCanvas.getContext('2d');
+    const svgCtx: any = svgCanvas.getContext('2d');
 
     // Canvg를 이용해 SVG를 캔버스에 그립니다
     const canvg = await Canvg.fromString(svgCtx, svgString);
@@ -314,16 +318,18 @@
 
         //결과
         finalImage = finalCanvas.toDataURL('image/png');
-        document.querySelector(result).src = finalImage;
+        document.querySelector('#final').src = finalImage;
       };
     };
   }
 
   // 이름 확인 -> 사진찍고 저장하고 마무리
   async function nameConfirm() {
-    isSubmit = true;
     // 캡쳐하기
-    await mapCapture('#map', '#final');
+    await mapCapture('#map');
+
+    isSubmit = true;
+
     // 저장하기
     const makeRouteForm = {
       title: inputName,
@@ -333,86 +339,110 @@
   }
 </script>
 
-<div class="make-route">
-  <div id="map"></div>
+<div id="makeroute-header" class="flex justify-center items-center">
+  <BackButton />
+  <h2>루트 생성</h2>
+</div>
+<div id="make-route">
+  {#if !isSubmit}
+    <div id="map"></div>
+  {:else}
+    <img id="final" src="" alt="" class="" />
+  {/if}
   <!-- 첫 제출 전까지 -->
-  {#if isChapterOne}
-    {#if isFixed}
-      <p>지도가 고정되었습니다.</p>
+  <div id="makeroute-footer" class="flex flex-col items-center justify-center">
+    {#if isChapterOne}
+      {#if isFixed}
+        <div
+          class="fixed left-1/2 transform -translate-x-1/2 text-red-500 font-bold bg-yellow-300 px-2 py-1"
+          style="top: 12vh;"
+        >
+          지도가 고정되었습니다.
+        </div>
+      {/if}
+      <div>
+        <p>{latLngMessage}</p>
+      </div>
+
+      <div id="controls">
+        {#if showControls && !isFixed}
+          <Button on:click={startDrawing}>고정하기</Button>
+        {/if}
+        {#if showControls && isFixed}
+          <Button on:click={returnMap}>고정해제</Button>
+        {/if}
+
+        {#if !showControls}
+          <Button on:click={redraw}>다시그리기</Button>
+          <Button on:click={next}>다음</Button>
+        {/if}
+      </div>
     {/if}
-    <div>
-      <p>{latLngMessage}</p>
-    </div>
-
-    <div id="controls">
-      {#if showControls && !isFixed}
-        <button on:click={startDrawing}>고정하기</button>
+    <!-- 제출 후 -->
+    {#if !isChapterOne}
+      <div>
+        {#if !isConfirm && !isSubmit}
+          <p>위 루트로 진행하시겠습니까?</p>
+          <Button on:click={redraw}>다시만들기</Button>
+          <Button on:click={routeConfirm}>다음</Button>
+        {/if}
+        {#if isConfirm && !isSubmit}
+          <label for="route-name">루트의 이름을 지어주세요!</label><br />
+          <Input bind:value={inputName} type="text" name="route-name" id="route-name" />
+          <Button on:click={nameConfirm}>다음</Button>
+        {/if}
+      </div>
+      {#if isSubmit}
+        <p>끝!</p>
+        <Button on:click={() => push('/')}>홈으로</Button>
       {/if}
-      {#if showControls && isFixed}
-        <button on:click={returnMap}>고정해제</button>
-      {/if}
-
-      {#if !showControls}
-        <button on:click={redraw}>다시그리기</button>
-        <button on:click={next}>다음</button>
-      {/if}
-
-      <button on:click={testing}>테스트</button>
-    </div>
-  {/if}
-  <!-- 제출 후 -->
-  {#if !isChapterOne}
-    <div>
-      {#if !isConfirm && !isSubmit}
-        <p>위 루트로 진행하시겠습니까?</p>
-        <button on:click={redraw}>다시만들기</button>
-        <button on:click={routeConfirm}>다음</button>
-      {/if}
-      {#if isConfirm && !isSubmit}
-        <label for="route-name">루트의 이름을 지어주세요!</label><br />
-        <input bind:value={inputName} type="text" name="route-name" id="route-name" />
-        <button on:click={nameConfirm}>다음</button>
-      {/if}
-    </div>
-    {#if isSubmit}
-      <!-- <div id="test"></div> -->
-      <img id="final" src="" alt="" />
-      <p>끝!</p>
-      <button on:click={() => push('/')}>홈으로</button>
-      <img src="" alt="" id="resultImage" />
     {/if}
-  {/if}
+  </div>
 </div>
 
 <style>
-  .make-route {
+  #makeroute-header {
+    z-index: 3000;
+    position: fixed;
+    height: 10vh;
+    width: 100%;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 1) 80%,
+      rgba(255, 255, 255, 0.6) 90%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+
+  #make-route {
     display: flex;
     flex-direction: column;
     place-items: center;
   }
 
   #map {
-    height: 60vh;
+    height: 100vh;
     width: 100vw;
     max-width: 100%;
     pointer-events: auto;
     touch-action: auto;
   }
+
   #controls {
     margin: 10px;
   }
-  button {
-    margin: 5px;
-  }
-  #test {
-    width: 500px;
-    height: 500px;
-    position: relative;
-  }
-  #test img {
-    position: absolute;
+
+  #makeroute-footer {
+    z-index: 3000;
+    position: fixed;
+    bottom: 0px;
+    height: 20vh;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    background: linear-gradient(
+      to top,
+      rgba(255, 255, 255, 1) 80%,
+      rgba(255, 255, 255, 0.6) 90%,
+      rgba(255, 255, 255, 0) 100%
+    );
   }
 </style>

@@ -33,7 +33,7 @@
     '/drawingcapture': DrawingCapturePage,
     '/calendar': CalendarPage,
     '/drawingdetail': DrawingDetailPage,
-    '/': isAuthenticated ? HomePage : LoginPage,
+    '/': HomePage,
     '/routelist': RouteListPage,
     '/community': CommunityPage,
     '/community/mystorage': MyStoragePage,

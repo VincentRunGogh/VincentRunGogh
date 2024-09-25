@@ -102,12 +102,6 @@
     margin: 0 auto 2rem;
   }
 
-  div {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
   @supports (display: grid) {
     div {
       display: grid;
