@@ -1,15 +1,12 @@
 package com.vincentrungogh.global.service;
 
+import com.vincentrungogh.domain.drawing.service.dto.request.DrawingRealTimeRequest;
 import com.vincentrungogh.domain.route.service.dto.common.Position;
-import com.vincentrungogh.global.config.RedisConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +44,7 @@ public class RedisService {
         return (String) redisTemplate.opsForValue().get(key);
     }
 
+    //
     public void saveRefreshToken(int userId, String refreshToken){
         String key = "refreshToken:" + userId;
         redisTemplate.opsForValue().set(key, refreshToken);
@@ -60,5 +58,21 @@ public class RedisService {
     public void removeRefreshToken(int userId){
         String key = "refreshToken:" + userId;
         redisTemplate.delete(key);
+    }
+
+    // 드로잉 정보 저장
+    public void createDrawingRealTime(int userId){
+        String key = "drawing:" + userId;
+        redisTemplate.delete(key);
+    }
+
+    public void saveDrawingRealTime(int userId, DrawingRealTimeRequest request){
+        String key = "drawing:" + userId;
+        redisTemplate.opsForList().rightPush(key, request);
+    }
+
+    public List<Object> getDrawingRealTime(int userId){
+        String key = "drawing:" + userId;
+        return redisTemplate.opsForList().range(key, 0, -1);
     }
 }
