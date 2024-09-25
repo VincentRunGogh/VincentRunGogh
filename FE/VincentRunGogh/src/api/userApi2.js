@@ -2,10 +2,10 @@ import { Axios, loginAxios } from '@/api/http-commons';
 
 const http = Axios();
 
-// 아트 루트화
-export function sendArtLine(drawForm) {
+// 일주일 운동 정보 조회
+export function getWeeklyInfo() {
   return http
-    .post('/routes', drawForm, {
+    .get('/users/week', {
       headers: {
         'Content-Type': 'application/json',
         Authorization:
