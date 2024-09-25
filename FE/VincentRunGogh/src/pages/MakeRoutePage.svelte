@@ -11,7 +11,7 @@
   // Chapter 2
   import html2canvas from 'html2canvas';
   import { Canvg, SVGElement } from 'canvg';
-  import { sendArtLine } from '@/api/makeRouteApi';
+  import { makeRoute, sendArtLine } from '@/api/makeRouteApi';
 
   //진행 상태 변수
   let isChapterOne = true;
@@ -41,7 +41,7 @@
   //초기 렌더링
   onMount(() => {
     //지도 생성
-    map = L.map('map').setView([36.3593, 127.3416], 16);
+    map = L.map('map', { zoomControl: false }).setView([36.3593, 127.3416], 16);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap',
@@ -240,6 +240,12 @@
   let isConfirm: boolean = false;
   let isSubmit: boolean = false;
   let inputName = '';
+  let routeInfo: {
+    routeId: number;
+    artImage: string;
+    distance: number;
+    predictTime: number;
+  } | null = null;
   // 루트 확인후 진행
   function routeConfirm() {
     isConfirm = true;
@@ -250,93 +256,116 @@
   //백 전송용 이미지정보 변수
   let finalImage: string | null = null;
 
-  async function mapCapture(target: string) {
+  function mapCapture(target: string) {
     map.invalidateSize();
-    // 사용 변수 지정
-    let svgData = null;
-    let mapData = null;
-    let svgSizeX = null;
-    let svgSizeY = null;
+    return new Promise(async (resolve, reject) => {
+      // 사용 변수 지정
+      let svgData = null;
+      let mapData = null;
+      let svgSizeX = null;
+      let svgSizeY = null;
 
-    // SVG 캡쳐
-    const svg: any = document.querySelector('svg'); // SVG를 선택합니다.
-    // SVG 사이즈
-    svgSizeX = svg.width.baseVal.value;
-    svgSizeY = svg.height.baseVal.value;
+      // SVG 캡쳐
+      const svg: any = document.querySelector(`${target} svg`); // SVG를 선택합니다.
+      // SVG 사이즈
+      svgSizeX = svg.width.baseVal.value;
+      svgSizeY = svg.height.baseVal.value;
 
-    const svgString = new XMLSerializer().serializeToString(svg);
+      const svgString = new XMLSerializer().serializeToString(svg);
 
-    // canvas 및 context 생성
-    const svgCanvas = document.createElement('canvas');
-    const svgCtx: any = svgCanvas.getContext('2d');
+      // canvas 및 context 생성
+      const svgCanvas = document.createElement('canvas');
+      const svgCtx: any = svgCanvas.getContext('2d');
 
-    // Canvg를 이용해 SVG를 캔버스에 그립니다
-    const canvg = await Canvg.fromString(svgCtx, svgString);
-    await canvg.render(); // 렌더링 완료될 때까지 기다림
+      // Canvg를 이용해 SVG를 캔버스에 그립니다
+      const canvg = await Canvg.fromString(svgCtx, svgString);
+      await canvg.render(); // 렌더링 완료될 때까지 기다림
 
-    // 캔버스의 데이터를 base64로 변환
-    svgData = svgCanvas.toDataURL('image/png');
+      // 캔버스의 데이터를 base64로 변환
+      svgData = svgCanvas.toDataURL('image/png');
 
-    // svg 숨기기
-    svg.style.display = 'none';
+      // svg 숨기기
+      svg.style.display = 'none';
 
-    // 지도 캡쳐
-    const mapCanvas = await html2canvas(document.querySelector(target), {
-      useCORS: true,
-    });
-    mapData = mapCanvas.toDataURL('image/png');
+      // 지도 캡쳐
+      const mapCanvas = await html2canvas(document.querySelector(target), {
+        useCORS: true,
+        scale: 1,
+      });
+      mapData = mapCanvas.toDataURL('image/png');
 
-    // svg 다시보이기
-    if (svg) {
-      svg.style.display = '';
-    }
+      // svg 다시보이기
+      if (svg) {
+        svg.style.display = '';
+      }
 
-    const finalCanvas = document.createElement('canvas');
-    finalCanvas.width = 500;
-    finalCanvas.height = 500;
+      const finalCanvas = document.createElement('canvas');
+      finalCanvas.width = 350;
+      finalCanvas.height = 350;
 
-    const ctx = finalCanvas.getContext('2d');
+      const ctx = finalCanvas.getContext('2d');
 
-    // 지도, svg 모두 불러오기
+      // 지도, svg 모두 불러오기
 
-    const mapImg = new Image();
-    const svgImg = new Image();
-    mapImg.src = mapData;
-    svgImg.src = svgData;
+      const mapImg = new Image();
+      const svgImg = new Image();
+      mapImg.src = mapData;
+      svgImg.src = svgData;
 
-    mapImg.onload = () => {
-      svgImg.onload = () => {
-        //중심 기준 자르기
-        const cropX = (mapCanvas.width - 500) / 2;
-        const cropY = (mapCanvas.height - 500) / 2;
-        const svgCropX = (svgSizeX - 500) / 2;
-        const svgCropY = (svgSizeY - 500) / 2;
+      mapImg.onload = () => {
+        svgImg.onload = () => {
+          //중심 기준 자르기
+          const cropX = (mapCanvas.width - 350) / 2;
+          const cropY = (mapCanvas.height - 350) / 2;
+          const svgCropX = (svgSizeX - 350) / 2;
+          const svgCropY = (svgSizeY - 350) / 2;
 
-        //지도 그리기
-        ctx.drawImage(mapImg, cropX, cropY, 500, 500, 0, 0, 500, 500);
-        ctx.drawImage(svgImg, svgCropX, svgCropY, 500, 500, 0, 0, 500, 500);
+          //지도 그리기
+          ctx.drawImage(mapImg, cropX, cropY, 350, 350, 0, 0, 350, 350);
+          ctx.drawImage(svgImg, svgCropX, svgCropY, 350, 350, 0, 0, 350, 350);
 
-        //결과
-        finalImage = finalCanvas.toDataURL('image/png');
-        document.querySelector('#final').src = finalImage;
+          //결과
+          finalImage = finalCanvas.toDataURL('image/png');
+          document.querySelector('#final').src = finalImage;
+        };
       };
-    };
+      resolve(finalImage);
+    });
   }
 
   // 이름 확인 -> 사진찍고 저장하고 마무리
   async function nameConfirm() {
     // 캡쳐하기
-    await mapCapture('#map');
-
     isSubmit = true;
-
-    // 저장하기
-    const makeRouteForm = {
-      title: inputName,
-      artImage: '',
-    };
-    // 마무리하기
+    mapCapture('#map')
+      .then(async () => {
+        console.log(finalImage);
+        await submitRoute();
+      })
+      .catch((error) => {
+        {
+          throw error;
+        }
+      });
   }
+  // 저장하기
+
+  async function submitRoute() {
+    let makeRouteForm = {
+      title: inputName,
+      artImage: finalImage.split(',')[1],
+    };
+
+    try {
+      let responseRoute = await makeRoute(makeRouteForm);
+      routeInfo = responseRoute.data;
+    } catch (error) {
+      {
+        throw error;
+      }
+    }
+  }
+  // 마무리하기
 </script>
 
 <div id="makeroute-header" class="flex justify-center items-center">
@@ -347,7 +376,7 @@
   {#if !isSubmit}
     <div id="map"></div>
   {:else}
-    <img id="final" src="" alt="" class="" />
+    <img id="final" src="" alt="" />
   {/if}
   <!-- 첫 제출 전까지 -->
   <div id="makeroute-footer" class="flex flex-col items-center justify-center">
@@ -392,8 +421,9 @@
           <Button on:click={nameConfirm}>다음</Button>
         {/if}
       </div>
-      {#if isSubmit}
-        <p>끝!</p>
+      {#if isSubmit && routeInfo}
+        <h3>{inputName}</h3>
+        <p>{routeInfo.distance} / {routeInfo.predictTime}</p>
         <Button on:click={() => push('/')}>홈으로</Button>
       {/if}
     {/if}
@@ -444,5 +474,9 @@
       rgba(255, 255, 255, 0.6) 90%,
       rgba(255, 255, 255, 0) 100%
     );
+  }
+
+  #final {
+    padding-top: 20vh;
   }
 </style>
