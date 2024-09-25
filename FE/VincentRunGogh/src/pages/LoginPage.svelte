@@ -10,19 +10,19 @@
   let password = '';
 
   const handleLogin = async (event: SubmitEvent) => {
-    event.preventDefault();
     login(
       id,
       password,
-      (response: Promise<Response>) => {
+      async (response: Promise<Response>) => {
         if (response.data.status === 200) {
           localStorage.setItem('accessToken', response.data.data.accessToken);
-          userStore.login({ nickname: response.data.data.nickname });
-          if (response.data.data.isChang) {
+          await userStore.login({ nickname: response.data.data.nickname }); // 로그인 상태 업데이트
+          if (response.data.data.isChanged) {
             replace('/changepassword');
           } else {
             console.log('로그인 성공');
-            replace('/');
+            // replace('/'); // 여기서 페이지 변경
+            window.location.href = '/'; // 홈으로 이동
           }
         }
       },

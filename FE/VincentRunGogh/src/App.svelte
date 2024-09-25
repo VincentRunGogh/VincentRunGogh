@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { wrap } from 'svelte-spa-router/wrap';
-  import Router from 'svelte-spa-router';
-
+  import './app.css';
+  import Router, { replace } from 'svelte-spa-router';
   import { userStore } from '@/stores/userStore';
   import {
     DrawingDetailPage,
@@ -21,43 +20,33 @@
 
   userStore.initialize();
 
-  // Check if the user is authenticated
-  function isAuthenticated() {
-    let auth = false;
-    userStore.subscribe(($user) => {
-      auth = $user !== null;
-    });
-    return auth;
-  }
+  let isAuthenticated = false;
 
-  // Redirect if not authenticated
-  function requireAuth() {
-    if (isAuthenticated()) {
-      return wrap({
-        component: HomePage,
-      });
+  userStore.subscribe(($user) => {
+    isAuthenticated = $user !== null;
+    if (isAuthenticated) {
+      replace('/'); // 로그인 상태면 홈 페이지로 이동
     } else {
-      return wrap({
-        component: LoginPage,
-      });
+      replace('/login'); // 비로그인 상태면 로그인 페이지로 이동
     }
-  }
+  });
 
-  const routes = {
-    '/': requireAuth(),
-    '/makeroute': requireAuth(),
-    '/drawingmap': requireAuth(),
-    '/drawingcapture': requireAuth(),
-    '/calendar': requireAuth(),
-    '/drawingdetail': requireAuth(),
-    '/routelist': requireAuth(),
-    '/community': requireAuth(),
-    '/community/mystorage': requireAuth(),
-    '/login': LoginPage,
-    '/signup': SignUpPage,
-    '/myhealth': requireAuth(),
-    '/progress': requireAuth(),
-    '*': requireAuth(), // Fallback route
+  $: routes = {
+    '/makeroute': !isAuthenticated ? LoginPage : MakeRoutePage,
+    '/drawingmap': !isAuthenticated ? LoginPage : DrawingPage,
+    '/drawingcapture': !isAuthenticated ? LoginPage : DrawingCapturePage,
+    '/calendar': !isAuthenticated ? LoginPage : CalendarPage,
+    '/drawingdetail': !isAuthenticated ? LoginPage : DrawingDetailPage,
+    '/': !isAuthenticated ? LoginPage : HomePage,
+    '/routelist': !isAuthenticated ? LoginPage : RouteListPage,
+    '/community': !isAuthenticated ? LoginPage : CommunityPage,
+    '/community/mystorage': !isAuthenticated ? LoginPage : MyStoragePage,
+    '/myhealth': !isAuthenticated ? LoginPage : MyHealthPage,
+    '/progress': !isAuthenticated ? LoginPage : ProgressPage,
+
+    '/signup': isAuthenticated ? LoginPage : SignUpPage,
+    '/login': isAuthenticated ? LoginPage : LoginPage,
+    '*': isAuthenticated ? HomePage : LoginPage,
   };
 </script>
 
