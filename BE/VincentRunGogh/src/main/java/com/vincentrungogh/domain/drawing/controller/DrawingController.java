@@ -30,8 +30,6 @@ public class DrawingController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "실시간 드로잉 저장에 성공했습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "204", description = "저장된 드로잉이 없습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "실시간 드로잉 저장에 실패했습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
