@@ -61,7 +61,7 @@ public class AuthService {
                     )
             );
         } catch (Exception e){
-            throw new CustomException(ErrorCode.NOT_MATCHED_PASSWORD);
+            throw new CustomException(ErrorCode.INVALID_LOGIN);
         }
 
 

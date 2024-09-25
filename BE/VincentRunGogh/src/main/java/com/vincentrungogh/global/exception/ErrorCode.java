@@ -25,7 +25,7 @@ public enum ErrorCode {
     INVALID_WEIGHT_AND_HEIGHT("몸무게와 키는 0 이상이어야 합니다.", HttpStatus.BAD_REQUEST),
     FAILED_UPDATE_PROFILE("프로필 수정에 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_PASSWORD_LENGTH("20자 이하의 비밀번호만 가능합니다. ", HttpStatus.BAD_REQUEST),
-    NOT_MATCHED_PASSWORD("비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_LOGIN("회원정보가 일치하지 않습니다.", HttpStatus.UNAUTHORIZED),
     ;
 
 
