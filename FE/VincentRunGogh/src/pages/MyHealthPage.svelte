@@ -8,26 +8,19 @@
   import {
     ChartLineUpOutline,
     ClockOutline,
-    UserCircleSolid,
     LockOutline,
     ArrowRightToBracketOutline,
+    CalendarMonthOutline,
   } from 'flowbite-svelte-icons';
   import BMIChart from '@/components/myhealth/BMIChart.svelte';
   import ProfileForm from '@/components/forms/ProfileForm.svelte';
-  import { formStore } from '@/stores/formStore';
-
-  let userInfo;
-
-  let profileImage = writable<string>('');
-  let nickname = writable<string>('');
-  let birth = writable<string>('');
-  let gender = writable<number>(0);
-  let height = writable<number>(0);
-  let weight = writable<number>(0);
-
+  import { profileFormStore } from '@/stores/profileFormStore';
+  import { userStore } from '@/stores/userStore';
+  import { getProfile, updateProfileImg, updateProfile } from '@/api/userApi';
   function getGenderSymbol(gender: number): string {
     return gender === 0 ? '♂' : '♀';
   }
+  //TODO - bmi 스토어 정보로 다시 바꾸기
   const bmi = derived([height, weight], ([$height, $weight]) => {
     if ($height > 0 && $weight > 0) {
       let heightInMeters = $height / 100;
@@ -44,23 +37,14 @@
     return '';
   }
   onMount(async () => {
-    // const response = await fetch('api/profiles'); // 실제 API 주소로 대체
-    // const result = await response.json();
-
-    // if (result.status === 200) {
-    //   nickname.set(result.data.nickname);
-    //   birth.set(result.data.birth);
-    //   gender.set(result.data.gender);
-    //   profileImage.set(result.data.profile);
-    //   height.set(result.data.height);
-    //   weight.set(result.data.weight);
-    // }
-    nickname.set('김싸피');
-    birth.set('1999-10-04');
-    gender.set(1);
-    profileImage.set('./default.png');
-    height.set(155);
-    weight.set(44);
+    getProfile(
+      (response) => {
+        if (response.data.status == 200) {
+          userStore.setProfile(response.data.data);
+        }
+      },
+      (error) => {}
+    );
   });
   interface MenuItem {
     name: string;
@@ -68,6 +52,7 @@
     url: any;
   }
   let dataMenuIcons: MenuItem[] = [
+    { name: '캘린더', icon: CalendarMonthOutline, url: '/calendar' },
     { name: '기록', icon: ClockOutline, url: '/history' },
     { name: '통계', icon: ChartLineUpOutline, url: '/progress' },
   ];
@@ -88,13 +73,12 @@
     editFormModal = true;
   };
   // 폼 제출 함수
-  const { values, helpers } = formStore;
+  const { values, helpers } = profileFormStore;
   async function submitForm() {
     submitAttempt = true;
     const allValid = Object.values($helpers).every((helper) => helper.color === 'green');
 
     if (allValid) {
-      // Perform API submission
       const response = await fetch('/api/update-profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -124,7 +108,7 @@
   </div>
 </div>
 <Modal title="프로필 변경" bind:open={editFormModal} autoclose={false}>
-  <ProfileForm bind:submitAttempt />
+  <ProfileForm isSignup={false} />
   <!-- Modal 하단 버튼 -->
 
   <svelte:fragment slot="footer">

@@ -16,6 +16,7 @@
     SignUpPage,
     MyHealthPage,
     ProgressPage,
+    SignUpProfilePage,
   } from '@/pages';
 
   userStore.initialize();
@@ -44,8 +45,9 @@
     '/myhealth': !isAuthenticated ? LoginPage : MyHealthPage,
     '/progress': !isAuthenticated ? LoginPage : ProgressPage,
 
-    '/signup': isAuthenticated ? LoginPage : SignUpPage,
-    '/login': isAuthenticated ? LoginPage : LoginPage,
+    '/signup': isAuthenticated ? HomePage : SignUpPage,
+    '/signup/profile': isAuthenticated ? HomePage : SignUpProfilePage,
+    '/login': isAuthenticated ? HomePage : LoginPage,
     '*': isAuthenticated ? HomePage : LoginPage,
   };
 </script>

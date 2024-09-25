@@ -1,5 +1,5 @@
 import { writable, derived, get } from 'svelte/store';
-
+import { checkNickNameDuplication } from '@/api/authApi';
 interface FormValues {
   nickname: string;
   height: string;
@@ -11,16 +11,22 @@ interface HelperMessage {
   message: string;
   color: string;
 }
-
 function createFormStore() {
-  const values = writable<FormValues>({ nickname: '', height: '', weight: '', profileImage: null });
-  const helpers = writable({
+  const initialValues: FormValues = { nickname: '', height: '', weight: '', profileImage: null };
+  const values = writable<FormValues>(initialValues);
+
+  const initialHelpers = {
     nickname: { message: '영문, 한글, 숫자 10자 이하', color: 'gray' },
     height: { message: '키를 숫자로 입력해주세요.', color: 'gray' },
     weight: { message: '몸무게를 숫자로 입력해주세요.', color: 'gray' },
     profileImage: { message: 'SVG, PNG, JPG', color: 'green' },
-  });
+  };
+  const helpers = writable<{ [K in keyof FormValues]: HelperMessage }>(initialHelpers);
 
+  function reset() {
+    values.set(initialValues);
+    helpers.set(initialHelpers);
+  }
   function validateNickname(value: string) {
     const regex = /^[A-Za-z가-힣0-9]{1,10}$/;
     if (!regex.test(value)) {
@@ -43,43 +49,47 @@ function createFormStore() {
   }
 
   async function checkNicknameAvailability(value: string) {
-    // try {
-    //   const response = await fetch(`/api/v1/auth/find-nickname?nickname=${value}`);
-    //   const result = await response.json();
-    //   if (result.isAvailable) {
-    helpers.set({
-      ...get(helpers),
-      nickname: {
-        message: '사용 가능한 닉네임입니다.',
-        color: 'green',
+    checkNickNameDuplication(
+      value,
+      (response) => {
+        if (response.data.status === 200) {
+          if (response.data.data.isDuplicated) {
+            helpers.set({
+              ...get(helpers),
+              nickname: {
+                message: '이미 사용 중인 닉네임입니다.',
+                color: 'red',
+              },
+            });
+          } else {
+            helpers.set({
+              ...get(helpers),
+              nickname: {
+                message: '',
+                color: 'green',
+              },
+            });
+          }
+        }
       },
-    });
-    //   } else {
-    //     helpers.set({
-    //       ...get(helpers),
-    //       nickname: {
-    //         message: '이미 사용 중인 닉네임입니다.',
-    //         color: 'red',
-    //       },
-    //     });
-    //   }
-    // } catch (error) {
-    //   console.error('에러', error);
-    //   helpers.set({
-    //     ...get(helpers),
-    //     nickname: {
-    //       message: '닉네임 검사 중 오류가 발생했습니다.',
-    //       color: 'red',
-    //     },
-    //   });
-    // }
+      (error) => {
+        console.error('에러', error);
+        helpers.set({
+          ...get(helpers),
+          nickname: {
+            message: '닉네임 검사 중 오류가 발생했습니다.',
+            color: 'red',
+          },
+        });
+      }
+    );
   }
   function validateHeight(value: string) {
     const regex = /^\d+$/;
     helpers.update((h) => ({
       ...h,
       height: {
-        message: regex.test(value) ? 'Well done!' : '키는 숫자만 입력 가능합니다.',
+        message: regex.test(value) ? '' : '키는 숫자만 입력 가능합니다.',
         color: regex.test(value) ? 'green' : 'red',
       },
     }));
@@ -90,7 +100,7 @@ function createFormStore() {
     helpers.update((h) => ({
       ...h,
       weight: {
-        message: regex.test(value) ? 'Well done!' : '몸무게는 숫자만 입력 가능합니다.',
+        message: regex.test(value) ? '' : '몸무게는 숫자만 입력 가능합니다.',
         color: regex.test(value) ? 'green' : 'red',
       },
     }));
@@ -102,7 +112,7 @@ function createFormStore() {
     helpers.update((h) => ({
       ...h,
       profileImage: {
-        message: isValidType ? '파일이 유효합니다.' : '지원하지 않는 파일 형식입니다.',
+        message: isValidType ? '' : '지원하지 않는 파일 형식입니다.',
         color: isValidType ? 'green' : 'red',
       },
     }));
@@ -111,6 +121,7 @@ function createFormStore() {
   return {
     values,
     helpers,
+    reset,
     validateNickname,
     validateHeight,
     validateWeight,
@@ -119,4 +130,4 @@ function createFormStore() {
   };
 }
 
-export const formStore = createFormStore();
+export const profileFormStore = createFormStore();

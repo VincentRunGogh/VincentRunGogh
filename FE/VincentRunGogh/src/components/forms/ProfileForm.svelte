@@ -1,14 +1,11 @@
 <script lang="ts">
-  import { writable, derived } from 'svelte/store';
   import { Input, Fileupload, Label, Button, Helper, ButtonGroup } from 'flowbite-svelte';
-  import { link } from 'svelte-spa-router';
 
-  import { onMount } from 'svelte';
-  import { formStore } from '@/stores/formStore';
+  import { onMount, SvelteComponent } from 'svelte';
+  import { profileFormStore } from '@/stores/profileFormStore';
   import { userStore } from '@/stores/userStore';
 
-  export let submitAttempt = false;
-
+  export let isSignup;
   const {
     values,
     helpers,
@@ -17,27 +14,32 @@
     validateWeight,
     validateProfileImage,
     checkNicknameAvailability,
-  } = formStore;
+  } = profileFormStore;
 
   async function handleCheckNickname() {
-    await checkNicknameAvailability($values.nickname);
+    if ($values.nickname.length > 0) {
+      await checkNicknameAvailability($values.nickname);
+    }
   }
   // 이미지 업로드 핸들러
-  function handleImageUpload(event) {
-    const file = event.target.files[0];
+  function handleImageUpload(event: Event & { currentTarget: HTMLInputElement }) {
+    const file = event.target?.files[0];
     if (file) {
       validateProfileImage(file);
       values.update((v) => ({ ...v, profileImage: file }));
     }
   }
   onMount(() => {
-    userStore.subscribe(({ nickname, height, weight }) => {
-      values.update((v) => ({
-        ...v,
-        nickname: nickname.toString(),
-        height: height.toString(),
-        weight: weight.toString(),
-      }));
+    userStore.subscribe(($user) => {
+      if ($user) {
+        // $user가 null이 아닐 때만 값 할당
+        values.update((v) => ({
+          ...v,
+          nickname: $user.nickname,
+          height: $user.height,
+          weight: $user.weight,
+        }));
+      }
     });
   });
 </script>
@@ -80,9 +82,10 @@
   />
   <Helper style="color: {$helpers.weight.color};">{$helpers.weight.message}</Helper>
 </div>
-
-<div class="mb-6">
-  <Label for="profileImg" class="pb-2">프로필 이미지 변경</Label>
-  <input type="file" id="profileImg" on:change={handleImageUpload} />
-  <Helper style="color: {$helpers.profileImage.color};">{$helpers.profileImage.message}</Helper>
-</div>
+{#if !isSignup}
+  <div class="mb-6">
+    <Label for="profileImg" class="pb-2">프로필 이미지</Label>
+    <input type="file" id="profileImg" on:change={handleImageUpload} />
+    <Helper style="color: {$helpers.profileImage.color};">{$helpers.profileImage.message}</Helper>
+  </div>
+{/if}

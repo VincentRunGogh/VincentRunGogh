@@ -1,37 +1,62 @@
 import { writable } from 'svelte/store';
 
+// Assuming UserAuth is defined somewhere if you're using it
 interface UserAuth {
-  nickname: string | null;
+  id: string;
+  email: string;
 }
+
 interface User extends UserAuth {
-  height: number | null;
-  weight: number | null;
-  profileImage: string | null;
+  nickname: string;
+  birth: string;
+  gender: number;
+  profileImage: string;
+  height: number;
+  weight: number;
 }
 
 function createUserStore() {
-  const { subscribe, set, update } = writable<User | UserAuth | null>(null);
+  const { subscribe, set, update } = writable<User | null>(null);
 
-  function login(user: UserAuth) {
-    localStorage.setItem('user', JSON.stringify(user));
-    set(user);
+  function login(userData: User) {
+    try {
+      localStorage.setItem('user', JSON.stringify(userData));
+      set(userData);
+    } catch (error) {
+      console.error('Failed to save user to localStorage:', error);
+    }
   }
 
   function logout() {
-    localStorage.removeItem('user');
-    set(null);
+    try {
+      localStorage.removeItem('user');
+      set(null);
+    } catch (error) {
+      console.error('Failed to remove user from localStorage:', error);
+    }
   }
-  function updateUser(user: User) {
-    update((prevUser) => ({
-      ...prevUser,
-      ...user,
-    }));
-    localStorage.setItem('user', JSON.stringify(user));
+
+  function updateUser(partialData: Partial<User>) {
+    update((current) => {
+      const updatedUser = { ...current, ...partialData };
+      try {
+        console.log(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      } catch (error) {
+        console.error('Failed to update user in localStorage:', error);
+      }
+      return updatedUser;
+    });
   }
+
   function initialize() {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      set(JSON.parse(storedUser));
+    try {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        set(JSON.parse(storedUser));
+      }
+    } catch (error) {
+      console.error('Failed to parse user from localStorage:', error);
     }
   }
 
@@ -39,7 +64,10 @@ function createUserStore() {
     subscribe,
     login,
     logout,
+    updateUser,
     initialize,
+    setProfile: (userData: User) => login(userData),
+    clearProfile: logout,
   };
 }
 
