@@ -14,7 +14,7 @@
   } from 'flowbite-svelte-icons';
   import BMIChart from '@/components/myhealth/BMIChart.svelte';
   import ProfileForm from '@/components/forms/ProfileForm.svelte';
-  import { formStore } from '@/stores/formStore';
+  import { profileFormStore } from '@/stores/profileFormStore';
 
   let userInfo;
 
@@ -88,7 +88,7 @@
     editFormModal = true;
   };
   // 폼 제출 함수
-  const { values, helpers } = formStore;
+  const { values, helpers } = profileFormStore;
   async function submitForm() {
     submitAttempt = true;
     const allValid = Object.values($helpers).every((helper) => helper.color === 'green');

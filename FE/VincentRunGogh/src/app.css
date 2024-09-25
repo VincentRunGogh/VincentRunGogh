@@ -174,28 +174,12 @@ html {
   width: 100%;
   height: 100%;
 }
-img {
-  width: 100%;
-  height: 100%;
-}
+
 a {
   text-decoration: none;
   color: inherit;
 }
-button {
-  /* border-radius: 8px; */
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #ffffff;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  /* border-color: #646cff; */
-}
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
@@ -208,9 +192,6 @@ button:focus-visible {
   }
   a:hover {
     color: #747bff;
-  }
-  button {
-    background-color: #ffffff;
   }
 }
 

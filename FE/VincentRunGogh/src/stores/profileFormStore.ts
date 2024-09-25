@@ -119,4 +119,4 @@ function createFormStore() {
   };
 }
 
-export const formStore = createFormStore();
+export const profileFormStore = createFormStore();
