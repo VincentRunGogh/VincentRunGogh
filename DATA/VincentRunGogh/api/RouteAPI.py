@@ -23,6 +23,9 @@ class ArtRouteRequest(BaseModel):
 class DataSaveRouteRequestDto(BaseModel):
     positionList: List[Position]
 
+class DataSaveDrawingDetailRequestDto(BaseModel):
+    positionList: List[Position]
+
 class ResponseDto(BaseModel):
     status: int
     message: str
@@ -33,8 +36,12 @@ class DataSaveRouteResponseDto(BaseModel):
     centerLng: float
     distance: int
 
-# Route 모델에서 positionList를 List[dict]로 변경
+# Route 모델
 class Route(Model):
+    positionList: List[dict]
+
+# DrawingDetail 모델
+class DrawingDetail(Model):
     positionList: List[dict]
 
 @api_router.post("/rootings/art", response_model=ResponseDto)
@@ -64,6 +71,29 @@ async def save_route(request: DataSaveRouteRequestDto):
         "message": "루트를 성공적으로 저장했습니다.",
         "data": {
             "routeId": str(route.id),  # route.id는 MongoDB에서 자동 생성된 ObjectId입니다.
+            "centerLat": 0.0,
+            "centerLng": 0.0,
+            "distance": 0
+        }
+    }
+    return response_data
+
+@api_router.post("/rootings/drawings", response_model=ResponseDto)
+async def save_route(request: DataSaveDrawingDetailRequestDto):
+    # Position 객체를 dict로 변환
+    position_list_dicts = [position.dict() for position in request.positionList]
+
+    # Route 모델에 positionList를 설정하여 생성
+    drawingDetail = DrawingDetail(positionList=position_list_dicts)
+    await mongodb.engine.save(drawingDetail)
+    print("생성되었습니다.")
+
+    # 저장된 route의 ID를 응답 데이터로 포함
+    response_data = {
+        "status": 200,
+        "message": "루트를 성공적으로 저장했습니다.",
+        "data": {
+            "routeId": str(drawingDetail.id),  # drawingDetail.id는 MongoDB에서 자동 생성된 ObjectId입니다.
             "centerLat": 0.0,
             "centerLng": 0.0,
             "distance": 0
