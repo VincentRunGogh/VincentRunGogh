@@ -26,7 +26,7 @@ public class DrawingResponseDto {
         return DrawingResponseDto.builder()
                 .title(drawing.getTitle())
                 .drawingImage(drawing.getAccumulatedDrawingImage())
-                .avgSpeed(avgSpeed)
+                .avgSpeed(Math.round(avgSpeed*(3.6) * 100.0) / 100.0)
                 .distance(distance)
                 .build();
     }
