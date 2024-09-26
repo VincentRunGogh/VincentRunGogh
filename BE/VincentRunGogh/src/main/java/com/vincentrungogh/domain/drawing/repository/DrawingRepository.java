@@ -10,4 +10,8 @@ import java.util.Optional;
 public interface DrawingRepository extends JpaRepository<Drawing, Integer> {
 
     List<Drawing> findAllByUser(User user);
+
+    List<Drawing> findAllByUserAndIsCompleted(User user, Boolean isCompleted);
+
+    List<Drawing> findAllByUserAndIsCreatedBoard(User user, Boolean isCreatedBoard);
 }
