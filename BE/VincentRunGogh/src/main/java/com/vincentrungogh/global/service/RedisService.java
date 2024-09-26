@@ -1,7 +1,7 @@
 package com.vincentrungogh.global.service;
 
-import com.vincentrungogh.domain.drawing.service.dto.request.DrawingRealTimeRequest;
 import com.vincentrungogh.domain.route.service.dto.common.Position;
+import com.vincentrungogh.domain.running.service.dto.common.RunningPosition;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -61,18 +61,18 @@ public class RedisService {
     }
 
     // 드로잉 정보 저장
-    public void createDrawingRealTime(int userId){
-        String key = "drawing:" + userId;
+    public void removeRunning(int userId){
+        String key = "running:" + userId;
         redisTemplate.delete(key);
     }
 
-    public void saveDrawingRealTime(int userId, DrawingRealTimeRequest request){
-        String key = "drawing:" + userId;
-        redisTemplate.opsForList().rightPush(key, request);
+    public void saveRunning(int userId, RunningPosition position){
+        String key = "running:" + userId;
+        redisTemplate.opsForList().rightPush(key, position);
     }
 
-    public List<Object> getDrawingRealTime(int userId){
-        String key = "drawing:" + userId;
+    public List<Object> getRunning(int userId){
+        String key = "running:" + userId;
         return redisTemplate.opsForList().range(key, 0, -1);
     }
 }
