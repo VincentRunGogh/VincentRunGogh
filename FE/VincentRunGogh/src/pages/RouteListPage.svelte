@@ -1,31 +1,27 @@
 <script lang="ts">
+  import { getRouteList } from '@/api/routeApi';
   import BackButton from '@/components/buttons/BackButton.svelte';
   import RouteDetail from '@/components/modals/RouteDetail.svelte';
   import { Tabs, TabItem, Card, Button } from 'flowbite-svelte';
-  import { PaletteOutline, HeartSolid, MapPinSolid } from 'flowbite-svelte-icons';
+  import {
+    PaletteOutline,
+    HeartSolid,
+    MapPinSolid,
+    ChevronDoubleUpOutline,
+  } from 'flowbite-svelte-icons';
+  import { onMount } from 'svelte';
   import Swal from 'sweetalert2';
 
-  let dummyRouteList: { id: number; name: string; near: number; length: number; time: number }[] = [
-    { id: 1, name: '내루트1', near: 1.2, length: 2.3, time: 1234 },
-    { id: 2, name: '내루트2', near: 1.3, length: 3.4, time: 1345 },
-    { id: 3, name: '내루트3', near: 1.4, length: 4.5, time: 1456 },
-    { id: 4, name: '내루트4', near: 1.5, length: 5.6, time: 1567 },
-  ];
-  let dummyRouteList2: { id: number; name: string; near: number; length: number; time: number }[] =
-    [
-      { id: 5, name: '찜루트1', near: 1.2, length: 2.3, time: 1234 },
-      { id: 6, name: '찜루트2', near: 1.3, length: 3.4, time: 1345 },
-      { id: 7, name: '찜루트3', near: 1.4, length: 4.5, time: 1456 },
-      { id: 8, name: '찜루트4', near: 1.5, length: 5.6, time: 1567 },
-    ];
-  let dummyRouteList3: { id: number; name: string; near: number; length: number; time: number }[] =
-    [
-      { id: 9, name: '루트1', near: 1.2, length: 2.3, time: 1234 },
-      { id: 10, name: '루트2', near: 1.3, length: 3.4, time: 1345 },
-      { id: 11, name: '루트3', near: 1.4, length: 4.5, time: 1456 },
-      { id: 12, name: '루트4', near: 1.5, length: 5.6, time: 1567 },
-    ];
+  let routeList: {
+    routeId: string;
+    title: string;
+    artImage: string;
+    distance: number;
+    predictTime: number;
+    distanceFromUser: number;
+  }[] = [];
 
+  // 루트 클릭 시 모달
   function showRouteDetail(route: object) {
     Swal.fire({
       html: '<div id="route-detail"></div>',
@@ -35,6 +31,7 @@
         new RouteDetail({
           target: document.getElementById('route-detail'),
           props: {
+            route,
             onClose: () => {
               Swal.close(); // 모달 닫기
             },
@@ -43,95 +40,272 @@
       },
     });
   }
+
+  // 검색범위 설정
+  let range: number = 5;
+
+  function searchCondition() {
+    Swal.fire({
+      title: '검색 범위를 조절해주세요!',
+      html: `
+    <input type="range" min="1" max="10" step="1" class="w-full h-2 bg-gray-200 rounded-lg cursor-pointer" id="range-input" value="${range}">
+    <div id="range-value">반경 ${range}km 까지 검색합니다.</div>
+  `,
+      showCancelButton: true,
+      confirmButtonText: '확인',
+      cancelButtonText: '취소',
+      preConfirm: () => {
+        return range; // 범위 값을 반환
+      },
+      didOpen: () => {
+        const input = document.getElementById('range-input') as HTMLInputElement;
+        const rangeValue = document.getElementById('range-value');
+
+        // 범위 값 업데이트 이벤트 리스너
+        input.addEventListener('input', () => {
+          range = Number(input.value); // 범위 값 업데이트
+          if (rangeValue) {
+            rangeValue.innerText = `반경 ${range}km 까지 검색합니다.`; // 문구 업데이트
+          }
+        });
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        console.log(`선택된 범위: ${range}`); // 확인 시 범위 값 출력
+        // 여기서 range 변수를 사용하여 추가 로직을 구현
+      }
+    });
+  }
+
+  // 내 위치 가져오기
+  let currentLat: number = 0;
+  let currentLng: number = 0;
+
+  function handlePosition(position: GeolocationPosition) {
+    currentLat = position.coords.latitude;
+    currentLng = position.coords.longitude;
+    getMyRoute();
+  }
+
+  function failPosition() {
+    console.log('geolocation api error');
+  }
+
+  const positionOption = {
+    enableHighAccuracy: true,
+    timeout: 5000, // 5 seconds
+    maximumAge: 60000, // 1 minute
+  };
+
+  onMount(async () => {
+    await window.navigator.geolocation.getCurrentPosition(
+      handlePosition,
+      failPosition,
+      positionOption
+    );
+  });
+
+  // 탭별 api 요청 로직
+  let routeListParams: {
+    type: string;
+    lat: number;
+    lng: number;
+  } = {
+    type: '',
+    lat: 0,
+    lng: 0,
+  };
+
+  async function getMyRoute() {
+    routeListParams = {
+      type: 'mine',
+      lat: currentLat,
+      lng: currentLng,
+    };
+    let routeListResponse = await getRouteList(routeListParams);
+    routeList = routeListResponse.data.routeList;
+    console.log('Position :', currentLat, ',', currentLng);
+  }
+
+  async function getOtherRoute() {
+    routeListParams = {
+      type: 'others',
+      lat: currentLat,
+      lng: currentLng,
+    };
+    let routeListResponse = await getRouteList(routeListParams);
+    routeList = routeListResponse.data.routeList;
+    console.log('Position :', currentLat, ',', currentLng);
+  }
+
+  async function getLikedRoute() {
+    routeListParams = {
+      type: 'like',
+      lat: currentLat,
+      lng: currentLng,
+    };
+    let routeListResponse = await getRouteList(routeListParams);
+    routeList = routeListResponse.data.routeList;
+    console.log('Position :', currentLat, ',', currentLng);
+  }
+
+  //맨 위로 스크롤
+  function scrollToTop(target: string) {
+    let targetDiv = document.querySelector(target);
+    targetDiv.scrollTo({
+      top: 0,
+      behavior: 'smooth', // 부드럽게 스크롤
+    });
+  }
 </script>
 
-<BackButton />
-<Tabs tabStyle="underline">
-  <TabItem open>
-    <div slot="title" class="flex items-center gap-2">
-      <PaletteOutline size="md" />
-      내가 만든 루트
+<div id="routelist-header" class="flex justify-center items-center">
+  <BackButton />
+  <h2>루트 조회</h2>
+</div>
+<div id="search-control">
+  <Button size="sm" on:click={searchCondition}>검색 반경 설정</Button>
+  <p class="my-3 font-bold">반경 {range}km내의 루트만 표시됩니다.</p>
+</div>
+<div id="routelist-body">
+  <Tabs id="tabs" defaultClass="flex justify-between" tabStyle="underline">
+    <div id="tab-item">
+      <TabItem defaultClass="tab-item font-bold text-xs gap-2" on:click={getMyRoute} open>
+        <div slot="title" class="flex items-center gap-1">
+          <PaletteOutline size="sm" />
+          <p>만든 루트</p>
+        </div>
+        <div id="routelist-content" class="space-y-4" on:touchmove>
+          {#each routeList as route}
+            {#if route.distanceFromUser <= range * 1000}
+              <Card on:click={() => showRouteDetail(route)} horizontal size="sm" class="grow">
+                <img src={route.artImage} alt="" />
+                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
+                  나와의 거리 {parseFloat((route.distanceFromUser / 1000).toFixed(2))}km
+                </p>
+                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                  {route.title}
+                </h5>
+                <div class="flex justify-around">
+                  <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
+                    <span class="text-sm">총 길이</span>
+                    {route.distance}km
+                  </p>
+                  <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
+                    <span class="text-sm">예상 소요 시간</span>
+                    {route.predictTime}
+                  </p>
+                </div>
+              </Card>
+            {/if}
+          {/each}
+        </div>
+      </TabItem>
     </div>
-    <div class="space-y-4">
-      {#each dummyRouteList as route}
-        <Card img="/4.png" on:click={() => showRouteDetail(route)} horizontal size="sm">
-          <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
-            나와의 거리 {route.near}km
-          </p>
-          <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            {route.name}
-          </h5>
-          <div class="flex justify-around">
-            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
-              <span class="text-sm">총 길이</span>
-              {route.length}km
-            </p>
-            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
-              <span class="text-sm">예상 소요 시간</span>
-              {route.time}
-            </p>
-          </div>
-        </Card>
-      {/each}
+    <div id="tab-item">
+      <TabItem defaultClass="tab-item font-bold text-xs gap-2" on:click={getLikedRoute}>
+        <div slot="title" class="flex items-center gap-1">
+          <HeartSolid size="sm" />
+          찜한 루트
+        </div>
+        <div id="routelist-content" class="space-y-4" on:touchmove>
+          {#each routeList as route}
+            <Card on:click={() => showRouteDetail(route)} horizontal size="sm" class="grow">
+              <img src={route.artImage} alt="" />
+              <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
+                나와의 거리 {parseFloat((route.distanceFromUser / 1000).toFixed(2))}km
+              </p>
+              <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                {route.title}
+              </h5>
+              <div class="flex justify-around">
+                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
+                  <span class="text-sm">총 길이</span>
+                  {route.distance}km
+                </p>
+                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
+                  <span class="text-sm">예상 소요 시간</span>
+                  {route.predictTime}
+                </p>
+              </div>
+            </Card>
+          {/each}
+        </div>
+      </TabItem>
     </div>
-  </TabItem>
-  <TabItem>
-    <div slot="title" class="flex items-center gap-2">
-      <HeartSolid size="md" />
-      찜한 루트
+    <div id="tab-item">
+      <TabItem defaultClass="tab-item font-bold text-xs gap-2" on:click={getOtherRoute}>
+        <div slot="title" class="flex items-center gap-1">
+          <MapPinSolid size="sm" />
+          주변 루트
+        </div>
+        <div id="routelist-content" class="space-y-4" on:touchmove>
+          {#each routeList as route}
+            <Card on:click={() => showRouteDetail(route)} horizontal size="sm" class="grow">
+              <img src={route.artImage} alt="" />
+              <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
+                나와의 거리 {parseFloat((route.distanceFromUser / 1000).toFixed(2))}km
+              </p>
+              <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                {route.title}
+              </h5>
+              <div class="flex justify-around">
+                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
+                  <span class="text-sm">총 길이</span>
+                  {route.distance}km
+                </p>
+                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
+                  <span class="text-sm">예상 소요 시간</span>
+                  {route.predictTime}
+                </p>
+              </div>
+            </Card>
+          {/each}
+        </div>
+      </TabItem>
     </div>
-    <div class="space-y-4">
-      {#each dummyRouteList2 as route}
-        <Card img="/4.png" on:click={() => showRouteDetail(route)} horizontal size="sm">
-          <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
-            나와의 거리 {route.near}km
-          </p>
-          <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            {route.name}
-          </h5>
-          <div class="flex justify-around">
-            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
-              <span class="text-sm">총 길이</span>
-              {route.length}km
-            </p>
-            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
-              <span class="text-sm">예상 소요 시간</span>
-              {route.time}
-            </p>
-          </div>
-        </Card>
-      {/each}
-    </div>
-  </TabItem>
-  <TabItem>
-    <div slot="title" class="flex items-center gap-2">
-      <MapPinSolid size="md" />
-      주변 루트
-    </div>
-    <div class="space-y-4">
-      {#each dummyRouteList3 as route}
-        <Card img="/4.png" on:click={() => showRouteDetail(route)} horizontal size="sm">
-          <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
-            나와의 거리 {route.near}km
-          </p>
-          <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            {route.name}
-          </h5>
-          <div class="flex justify-around">
-            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
-              <span class="text-sm">총 길이</span>
-              {route.length}km
-            </p>
-            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
-              <span class="text-sm">예상 소요 시간</span>
-              {route.time}
-            </p>
-          </div>
-        </Card>
-      {/each}
-    </div>
-  </TabItem>
-</Tabs>
+  </Tabs>
+</div>
+<div class="absolute bottom-3 right-3">
+  <Button on:click={() => scrollToTop('#routelist-body')} size="sm">
+    <ChevronDoubleUpOutline />
+  </Button>
+</div>
 
 <style>
+  #routelist-header {
+    height: 10vh;
+    width: 100%;
+  }
+
+  #search-control {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 10vh;
+  }
+
+  #routelist-content {
+    height: auto;
+    flex-grow: 1;
+    overflow-y: scroll;
+  }
+
+  #routelist-body {
+    width: 100%;
+    height: 80%;
+    padding-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: scroll;
+  }
+
+  #routelist-body::-webkit-scrollbar {
+    display: none;
+  }
+
+  #tab-item {
+    width: 35%;
+  }
 </style>

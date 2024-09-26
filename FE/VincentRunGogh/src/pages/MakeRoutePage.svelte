@@ -11,7 +11,7 @@
   // Chapter 2
   import html2canvas from 'html2canvas';
   import { Canvg, SVGElement } from 'canvg';
-  import { makeRoute, sendArtLine } from '@/api/makeRouteApi';
+  import { makeRoute, sendArtLine } from '@/api/routeApi';
 
   //진행 상태 변수
   let isChapterOne = true;
@@ -257,79 +257,79 @@
   let finalImage: string = '';
 
   function mapCapture(target: string) {
-  map.invalidateSize();
-  
-  return new Promise(async (resolve, reject) => {
-    try {
-      // 사용 변수 지정
-      let svgData = null;
-      let mapData = null;
-      let svgSizeX = null;
-      let svgSizeY = null;
+    map.invalidateSize();
 
-      // SVG 캡쳐
-      const svg: any = document.querySelector(`${target} svg`); // SVG를 선택
-      svgSizeX = svg.width.baseVal.value;
-      svgSizeY = svg.height.baseVal.value;
+    return new Promise(async (resolve, reject) => {
+      try {
+        // 사용 변수 지정
+        let svgData = null;
+        let mapData = null;
+        let svgSizeX = null;
+        let svgSizeY = null;
 
-      const svgString = new XMLSerializer().serializeToString(svg);
+        // SVG 캡쳐
+        const svg: any = document.querySelector(`${target} svg`); // SVG를 선택
+        svgSizeX = svg.width.baseVal.value;
+        svgSizeY = svg.height.baseVal.value;
 
-      // Canvg를 이용해 SVG를 캔버스에 그립니다
-      const svgCanvas = document.createElement('canvas');
-      const svgCtx: any = svgCanvas.getContext('2d');
-      const canvg = await Canvg.fromString(svgCtx, svgString);
-      await canvg.render();
+        const svgString = new XMLSerializer().serializeToString(svg);
 
-      // SVG를 Base64로 변환
-      svgData = svgCanvas.toDataURL('image/png');
-      svg.style.display = 'none';
+        // Canvg를 이용해 SVG를 캔버스에 그립니다
+        const svgCanvas = document.createElement('canvas');
+        const svgCtx: any = svgCanvas.getContext('2d');
+        const canvg = await Canvg.fromString(svgCtx, svgString);
+        await canvg.render();
 
-      // 지도 캡쳐
-      const mapCanvas = await html2canvas(document.querySelector(target), {
-        useCORS: true,
-        scale: 1,
-      });
-      mapData = mapCanvas.toDataURL('image/png');
-      svg.style.display = '';
+        // SVG를 Base64로 변환
+        svgData = svgCanvas.toDataURL('image/png');
+        svg.style.display = 'none';
 
-      // 캔버스 및 그리기 작업
-      const finalCanvas = document.createElement('canvas');
-      finalCanvas.width = 350;
-      finalCanvas.height = 350;
-      const ctx = finalCanvas.getContext('2d');
-
-      const loadImage = (src) => {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.src = src;
-          img.onload = () => resolve(img);
-          img.onerror = reject;
+        // 지도 캡쳐
+        const mapCanvas = await html2canvas(document.querySelector(target), {
+          useCORS: true,
+          scale: 1,
         });
-      };
+        mapData = mapCanvas.toDataURL('image/png');
+        svg.style.display = '';
 
-      // 이미지 로드 및 캔버스 그리기
-      const mapImg = await loadImage(mapData);
-      const svgImg = await loadImage(svgData);
+        // 캔버스 및 그리기 작업
+        const finalCanvas = document.createElement('canvas');
+        finalCanvas.width = 350;
+        finalCanvas.height = 350;
+        const ctx = finalCanvas.getContext('2d');
 
-      const cropX = (mapCanvas.width - 350) / 2;
-      const cropY = (mapCanvas.height - 350) / 2;
-      const svgCropX = (svgSizeX - 350) / 2;
-      const svgCropY = (svgSizeY - 350) / 2;
+        const loadImage = (src) => {
+          return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = src;
+            img.onload = () => resolve(img);
+            img.onerror = reject;
+          });
+        };
 
-      // 지도 그리기
-      ctx.drawImage(mapImg, cropX, cropY, 350, 350, 0, 0, 350, 350);
-      // SVG 그리기
-      ctx.drawImage(svgImg, svgCropX, svgCropY, 350, 350, 0, 0, 350, 350);
+        // 이미지 로드 및 캔버스 그리기
+        const mapImg = await loadImage(mapData);
+        const svgImg = await loadImage(svgData);
 
-      // 결과 이미지를 Base64로 변환하여 반환
-      finalImage = finalCanvas.toDataURL('image/png');
-      
-      resolve(finalImage);
-    } catch (error) {
-      reject(error);
-    }
-  });
-}
+        const cropX = (mapCanvas.width - 350) / 2;
+        const cropY = (mapCanvas.height - 350) / 2;
+        const svgCropX = (svgSizeX - 350) / 2;
+        const svgCropY = (svgSizeY - 350) / 2;
+
+        // 지도 그리기
+        ctx.drawImage(mapImg, cropX, cropY, 350, 350, 0, 0, 350, 350);
+        // SVG 그리기
+        ctx.drawImage(svgImg, svgCropX, svgCropY, 350, 350, 0, 0, 350, 350);
+
+        // 결과 이미지를 Base64로 변환하여 반환
+        finalImage = finalCanvas.toDataURL('image/png');
+
+        resolve(finalImage);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
   // 이름 확인 -> 사진찍고 저장하고 마무리
   async function nameConfirm() {
     // 캡쳐하기
