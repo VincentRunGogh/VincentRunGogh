@@ -5,6 +5,9 @@ from typing import List
 from db import mongodb
 from bson import ObjectId
 
+from DATA.VincentRunGogh.pySpark.KdTreeMatchingRoute import matching_user_path_to_roads
+from DATA.VincentRunGogh.pySpark.PedestrianRoad import road_data_processing
+from DATA.VincentRunGogh.pySpark.RouteTotalDistance import calculate_total_distance
 api_router = APIRouter()
 
 # Position 모델 정의
@@ -47,13 +50,41 @@ class Route(Model):
 class DrawingDetail(Model):
     positionList: List[dict]
 
+## 루트 값 추출: 공통 함수(추후 리팩토링 진행)
+def generate_route(user_drawn_path,leftLat, leftLng, rightLat, rightLng):
+    nearest_roads_df = road_data_processing(leftLat,leftLng,rightLat,rightLng,  "Daejeon")
+    route_coords = matching_user_path_to_roads(user_drawn_path, nearest_roads_df)
+    position_list = [Position(lat=coord[0], lng=coord[1]) for coord in route_coords]
+    return position_list
+
+def calculate_center_and_distance(route):
+    # route가 객체가 아닌 dict 형태이므로 each["lat"]으로 접근
+    lats = [each["lat"] for each in route.positionList]
+    lngs = [each["lng"] for each in route.positionList]
+
+
+    center_lat = sum(lats)/len(lats)
+    center_lng = sum(lngs)/len(lngs)
+
+    route_list = []
+    for i in range(len(lats)):
+        route_list.append((lats[i],lngs[i]))
+
+    distance = calculate_total_distance(route_list)
+    return center_lat, center_lng, distance
+
 @api_router.post("/rootings/art", response_model=ResponseDto)
 async def create_art_route(request: ArtRouteRequest):
+    # 요청에서 position_list 받기
+    # print(ArtRouteRequest.leftLat)
+    user_drawn_path = [(each.lat, each.lng) for each in request.positionList]
+    position_list = generate_route(user_drawn_path,request.leftLat,request.leftLng,request.rightLat,request.rightLng)
+
     response_data = {
         "status": 200,
         "message": "루트화에 성공했습니다.",
         "data": {
-            "positionList": request.positionList
+            "positionList": position_list
         }
     }
     return response_data
@@ -67,6 +98,8 @@ async def save_route(request: DataSaveRouteRequestDto):
     route = Route(positionList=position_list_dicts)
     await mongodb.engine.save(route)
     print("생성되었습니다.")
+    # route의 정보를 계산한 값 넣기
+    center_lat, center_lng, distance = calculate_center_and_distance(route)
 
     # 저장된 route의 ID를 응답 데이터로 포함
     response_data = {
@@ -74,9 +107,9 @@ async def save_route(request: DataSaveRouteRequestDto):
         "message": "루트를 성공적으로 저장했습니다.",
         "data": {
             "routeId": str(route.id),  # route.id는 MongoDB에서 자동 생성된 ObjectId입니다.
-            "centerLat": 0.0,
-            "centerLng": 0.0,
-            "distance": 0
+            "centerLat": center_lat,
+            "centerLng": center_lng,
+            "distance": distance
         }
     }
     return response_data
