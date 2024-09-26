@@ -48,7 +48,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/logout").authenticated()
                         //모두 접근 허용
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**",
-                                            "/auth/**").permitAll()
+                                            "/auth/**", "/ws/**").permitAll()
                         //유저만 접근 허용
                         .anyRequest().authenticated())
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
