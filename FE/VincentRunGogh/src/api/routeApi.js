@@ -22,3 +22,15 @@ export function makeRoute(makeRouteForm) {
       throw error;
     });
 }
+
+// 루트 조회(타입별)
+export function getRouteList(routeListParams) {
+  return loginHttp
+    .get(
+      `/routes?type=${routeListParams.type}&lng=${routeListParams.lng}&lat=${routeListParams.lat}`
+    )
+    .then((response) => response.data)
+    .catch((error) => {
+      throw error;
+    });
+}
