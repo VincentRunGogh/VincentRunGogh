@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getWeeklyInfo } from '@/api/userApi2';
+  import { getWeeklyInfo } from '@/api/userApi';
   import Tabbar from '@/components/tabbar/Tabbar.svelte';
   import { Chart, Card, A, Button, Dropdown, DropdownItem } from 'flowbite-svelte';
   import { onMount } from 'svelte';
