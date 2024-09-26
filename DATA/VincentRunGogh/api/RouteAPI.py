@@ -5,9 +5,9 @@ from typing import List
 from db import mongodb
 from bson import ObjectId
 
-from DATA.VincentRunGogh.pySpark.KdTreeMatchingRoute import matching_user_path_to_roads
-from DATA.VincentRunGogh.pySpark.PedestrianRoad import road_data_processing
-from DATA.VincentRunGogh.pySpark.RouteTotalDistance import calculate_total_distance
+from pySpark.KdTreeMatchingRoute import matching_user_path_to_roads
+from pySpark.PedestrianRoad import road_data_processing
+from pySpark.RouteTotalDistance import calculate_total_distance
 api_router = APIRouter()
 
 # Position 모델 정의
