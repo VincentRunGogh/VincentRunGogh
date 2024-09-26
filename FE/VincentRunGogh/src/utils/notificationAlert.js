@@ -39,6 +39,17 @@ export const confirmAlert = (title, confirmButtonText, confirmFuc, text) => {
     cancelButtonColor: '#FFCC70',
   }).then(confirmFuc);
 };
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 2000,
+  width: '30%',
+  didOpen: (toast) => {
+    toast.onmouseenter = Swal.stopTimer;
+    toast.onmouseleave = Swal.resumeTimer;
+  },
+});
 
 export const toastAlert = (title, width, isSuccess = true) => {
   Toast.fire({

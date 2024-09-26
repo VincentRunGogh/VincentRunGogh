@@ -10,6 +10,7 @@
   let password = '';
 
   const handleLogin = async (event: SubmitEvent) => {
+    event.preventDefault();
     login(
       id,
       password,
@@ -33,7 +34,7 @@
   };
 </script>
 
-<form on:submit|preventDefault={handleLogin} class="flex flex-col space-y-6">
+<form on:submit={handleLogin} class="flex flex-col space-y-6">
   <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">로그인</h3>
   <Label class="space-y-2">
     <span>아이디</span>

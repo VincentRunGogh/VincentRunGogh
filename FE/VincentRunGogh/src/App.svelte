@@ -19,36 +19,54 @@
     SignUpProfilePage,
   } from '@/pages';
 
-  userStore.initialize();
+  // userStore.initialize();
 
-  let isAuthenticated = false;
+  // let isAuthenticated = false;
 
-  userStore.subscribe(($user) => {
-    isAuthenticated = $user !== null;
-    if (isAuthenticated) {
-      replace('/'); // 로그인 상태면 홈 페이지로 이동
-    } else {
-      replace('/login'); // 비로그인 상태면 로그인 페이지로 이동
-    }
-  });
+  // userStore.subscribe(($user) => {
+  //   isAuthenticated = $user !== null;
+  //   if (isAuthenticated) {
+  //     replace('/'); // 로그인 상태면 홈 페이지로 이동
+  //   } else {
+  //     replace('/login'); // 비로그인 상태면 로그인 페이지로 이동
+  //   }
+  // });
 
-  $: routes = {
-    '/makeroute': !isAuthenticated ? LoginPage : MakeRoutePage,
-    '/drawingmap': !isAuthenticated ? LoginPage : DrawingPage,
-    '/drawingcapture': !isAuthenticated ? LoginPage : DrawingCapturePage,
-    '/calendar': !isAuthenticated ? LoginPage : CalendarPage,
-    '/drawingdetail': !isAuthenticated ? LoginPage : DrawingDetailPage,
-    '/': !isAuthenticated ? LoginPage : HomePage,
-    '/routelist': !isAuthenticated ? LoginPage : RouteListPage,
-    '/community': !isAuthenticated ? LoginPage : CommunityPage,
-    '/community/mystorage': !isAuthenticated ? LoginPage : MyStoragePage,
-    '/myhealth': !isAuthenticated ? LoginPage : MyHealthPage,
-    '/progress': !isAuthenticated ? LoginPage : ProgressPage,
+  // $: routes = {
+  //   '/makeroute': !isAuthenticated ? LoginPage : MakeRoutePage,
+  //   '/drawingmap': !isAuthenticated ? LoginPage : DrawingPage,
+  //   '/drawingcapture': !isAuthenticated ? LoginPage : DrawingCapturePage,
+  //   '/calendar': !isAuthenticated ? LoginPage : CalendarPage,
+  //   '/drawingdetail': !isAuthenticated ? LoginPage : DrawingDetailPage,
+  //   '/': !isAuthenticated ? LoginPage : HomePage,
+  //   '/routelist': !isAuthenticated ? LoginPage : RouteListPage,
+  //   '/community': !isAuthenticated ? LoginPage : CommunityPage,
+  //   '/community/mystorage': !isAuthenticated ? LoginPage : MyStoragePage,
+  //   '/myhealth': !isAuthenticated ? LoginPage : MyHealthPage,
+  //   '/progress': !isAuthenticated ? LoginPage : ProgressPage,
 
-    '/signup': isAuthenticated ? HomePage : SignUpPage,
-    '/signup/profile': isAuthenticated ? HomePage : SignUpProfilePage,
-    '/login': isAuthenticated ? HomePage : LoginPage,
-    '*': isAuthenticated ? HomePage : LoginPage,
+  //   '/signup': isAuthenticated ? HomePage : SignUpPage,
+  //   '/signup/profile': isAuthenticated ? HomePage : SignUpProfilePage,
+  //   '/login': isAuthenticated ? HomePage : LoginPage,
+  //   '*': isAuthenticated ? HomePage : LoginPage,
+  // };
+  let routes = {
+    '/makeroute': MakeRoutePage,
+    '/drawingmap': DrawingPage,
+    '/drawingcapture': DrawingCapturePage,
+    '/calendar': CalendarPage,
+    '/drawingdetail': DrawingDetailPage,
+    '/': HomePage,
+    '/routelist': RouteListPage,
+    '/community': CommunityPage,
+    '/community/mystorage': MyStoragePage,
+    '/myhealth': MyHealthPage,
+    '/progress': ProgressPage,
+
+    '/signup': SignUpPage,
+    '/signup/profile': SignUpProfilePage,
+    '/login': LoginPage,
+    '*': LoginPage,
   };
 </script>
 

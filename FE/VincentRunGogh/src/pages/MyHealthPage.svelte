@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { writable, derived } from 'svelte/store';
+  import { writable, derived, get } from 'svelte/store';
   import { Card, Modal, Listgroup, Button } from 'flowbite-svelte';
   import { link } from 'svelte-spa-router';
 
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { EditOutline } from 'flowbite-svelte-icons';
   import {
     ChartLineUpOutline,
@@ -14,13 +14,41 @@
   } from 'flowbite-svelte-icons';
   import BMIChart from '@/components/myhealth/BMIChart.svelte';
   import ProfileForm from '@/components/forms/ProfileForm.svelte';
+  import ImageForm from '@/components/forms/ImageForm.svelte';
   import { profileFormStore } from '@/stores/profileFormStore';
   import { userStore } from '@/stores/userStore';
   import { getProfile, updateProfileImg, updateProfile } from '@/api/userApi';
+  import { toastAlert } from '@/utils/notificationAlert';
+
+  let profile = writable('');
+  let nickname = writable('');
+  let birth = writable('');
+  let gender = writable(0);
+  let height = writable(0);
+  let weight = writable(0);
+  let unsubscribe;
+  let userInitialized: boolean = false;
+  // userStore를 구독하여 사용자 데이터로 초기화
+  userStore.subscribe((user) => {
+    if (user) {
+      profile.set(user.profile);
+      nickname.set(user.nickname);
+      birth.set(user.birth);
+      gender.set(user.gender);
+      height.set(user.height);
+      weight.set(user.weight);
+    } else {
+      profile.set('');
+      nickname.set('');
+      birth.set('');
+      gender.set(0);
+      height.set(0);
+      weight.set(0);
+    }
+  });
   function getGenderSymbol(gender: number): string {
     return gender === 0 ? '♂' : '♀';
   }
-  //TODO - bmi 스토어 정보로 다시 바꾸기
   const bmi = derived([height, weight], ([$height, $weight]) => {
     if ($height > 0 && $weight > 0) {
       let heightInMeters = $height / 100;
@@ -36,83 +64,152 @@
     else return '저체중';
     return '';
   }
-  onMount(async () => {
-    getProfile(
-      (response) => {
-        if (response.data.status == 200) {
-          userStore.setProfile(response.data.data);
-        }
-      },
-      (error) => {}
-    );
-  });
+
   interface MenuItem {
     name: string;
     icon: any; // any 대신 적절한 타입 지정
-    url: any;
+    href: any;
   }
   let dataMenuIcons: MenuItem[] = [
-    { name: '캘린더', icon: CalendarMonthOutline, url: '/calendar' },
-    { name: '기록', icon: ClockOutline, url: '/history' },
-    { name: '통계', icon: ChartLineUpOutline, url: '/progress' },
+    { name: '캘린더', icon: CalendarMonthOutline, href: '/calendar' },
+    { name: '기록', icon: ClockOutline, href: '/history' },
+    { name: '통계', icon: ChartLineUpOutline, href: '/progress' },
   ];
 
   let accountMenuIcons: MenuItem[] = [
-    { name: '비밀번호 변경', icon: LockOutline, url: '/changepassword' },
-    { name: '로그아웃', icon: ArrowRightToBracketOutline, url: '/logout' },
+    { name: '비밀번호 변경', icon: LockOutline, href: '/changepassword' },
+    { name: '로그아웃', icon: ArrowRightToBracketOutline, href: '/logout' },
   ];
 
   let editFormModal: boolean = false;
+  let editImageFormModal: boolean = false;
   let submitAttempt: boolean = false;
+
   function closeForm() {
     editFormModal = false;
+    editImageFormModal = false;
     submitAttempt = false;
+    profileFormStore.reset();
   }
 
   const onClickEditBtn = () => {
     editFormModal = true;
   };
+  const onClickEditImageBtn = () => {
+    editImageFormModal = true;
+  };
+  const setProfile = async () => {
+    if (userInitialized) {
+      return;
+    }
+    await getProfile(
+      async (response) => {
+        if (response.data.status == 200) {
+          await userStore.updateUser(response.data.data);
+          userInitialized = true;
+        }
+      },
+      (error) => {}
+    );
+  };
   // 폼 제출 함수
-  const { values, helpers } = profileFormStore;
-  async function submitForm() {
+  function handleSubmitProfileForm() {
     submitAttempt = true;
-    const allValid = Object.values($helpers).every((helper) => helper.color === 'green');
+    const currentUser = get(userStore);
+    let data = {};
+    let allUnChanged = true;
+    const allValid = Object.entries(get(profileFormStore.helpers)).every(([key, helper]) => {
+      if (key === 'profileImage') return true;
+      const currentValue = get(profileFormStore.values)[key];
+      const valueIsChanged = currentUser && currentUser[key] !== currentValue;
+      data[key] = currentValue;
+      if (valueIsChanged) allUnChanged = false;
+      return helper.color !== 'red';
+    });
 
-    if (allValid) {
-      const response = await fetch('/api/update-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify($values),
-      });
-
-      if (response.ok) {
-        closeForm();
-      } else {
-        alert('Failed to update profile.');
-      }
-    } else {
-      alert('Please correct the errors before submitting.');
+    if (Object.keys(data).length !== 0 && allValid && !allUnChanged) {
+      updateProfile(
+        data,
+        (response) => {
+          if (response.data.status === 200) {
+            closeForm();
+            toastAlert('프로필이 성공적으로 업데이트 되었습니다.!');
+            setProfile();
+          }
+        },
+        (error) => {}
+      );
     }
   }
+  const handleSubmitImageForm = async () => {
+    const imgData = get(profileFormStore.values).profileImage;
+    if (imgData && get(profileFormStore.helpers)['profileImage'].color === 'green') {
+      // helpers 접근 수정 및 imgData 존재 확인
+      updateProfileImg(
+        imgData,
+        (response) => {
+          if (response.status === 200) {
+            closeForm();
+            toastAlert('프로필 이미지가 성공적으로 업데이트 되었습니다.');
+            setProfile();
+          }
+        },
+        (error) => {
+          console.error('이미지 업데이트 실패:', error);
+        }
+      );
+    }
+  };
+  onMount(async () => {
+    await setProfile();
+    unsubscribe = userStore.subscribe((user) => {
+      if (user) {
+        if (!userInitialized) {
+          userInitialized = true;
+        }
+        profile.set(user.profile);
+        nickname.set(user.nickname);
+        birth.set(user.birth);
+        gender.set(user.gender);
+        height.set(user.height);
+        weight.set(user.weight);
+      } else {
+        profile.set('');
+        nickname.set('');
+        birth.set('');
+        gender.set(0);
+        height.set(0);
+        weight.set(0);
+      }
+    });
+  });
+  //FIXME - Uncaught (in promise) TypeError: fn is not a function
+  onDestroy(unsubscribe);
 </script>
 
 <!-- // SECTION - profile -->
 <div class="flex items-center space-x-4 rtl:space-x-reverse">
   <div class="wrap">
-    <img src={$profileImage} alt="프로필 이미지" class="main-profile-img" />
-    <span class="icon" on:click={onClickEditBtn}><EditOutline /></span>
+    <img src={$profile} alt="프로필 이미지" class="main-profile-img" />
+    <span class="icon" on:click={onClickEditImageBtn}><EditOutline /></span>
   </div>
   <div class="space-y-1 font-medium dark:text-white">
     <div>{$nickname}</div>
     <div class="text-sm text-gray-500 dark:text-gray-400">{$birth} {getGenderSymbol($gender)}</div>
+    <span class="icon" on:click={onClickEditBtn}><EditOutline /></span>
   </div>
 </div>
-<Modal title="프로필 변경" bind:open={editFormModal} autoclose={false}>
-  <ProfileForm isSignup={false} />
-  <!-- Modal 하단 버튼 -->
-
+<Modal title="프로필 변경" bind:open={editFormModal}>
+  <ProfileForm />
   <svelte:fragment slot="footer">
-    <Button on:click={submitForm}>수정</Button>
+    <Button on:click={handleSubmitProfileForm}>수정</Button>
+    <Button color="alternative" on:click={closeForm}>취소</Button>
+  </svelte:fragment>
+</Modal>
+<Modal title="프로필 이미지 변경" bind:open={editImageFormModal}>
+  <ImageForm />
+  <svelte:fragment slot="footer">
+    <Button on:click={handleSubmitImageForm}>수정</Button>
     <Button color="alternative" on:click={closeForm}>취소</Button>
   </svelte:fragment>
 </Modal>
@@ -130,25 +227,21 @@
 </Card>
 <!-- //!SECTION - menu -->
 <Listgroup active items={dataMenuIcons} let:item>
-  <a use:link href={item.url}>
+  <a use:link href={item.href}>
     <svelte:component this={item.icon} class="w-4 h-4 me-2.5" />
     {item.name}
   </a>
 </Listgroup>
 
 <Listgroup active items={accountMenuIcons} let:item>
-  <a use:link href={item.url}>
-    <svelte:component this={item.icon} class="w-4 h-4 me-2.5" />
-    {item.name}
-  </a>
+  <svelte:component this={item.icon} class="w-4 h-4 me-2.5" />
+  {item.name}
 </Listgroup>
 
 <style>
-  /* canvas {
-    display: block;
-    max-width: 100%;
-    height: auto;
-  } */
+  .modal-header {
+    visibility: hidden;
+  }
   .main-profile-img {
     width: 20vw;
     height: 20vw;

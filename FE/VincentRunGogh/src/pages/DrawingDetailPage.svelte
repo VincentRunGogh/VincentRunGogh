@@ -3,7 +3,7 @@
   import { location, querystring } from 'svelte-spa-router';
 
   import DrawingInfoBox from '@/components/calendar/DrawingInfoBox.svelte';
-
+  import { getDrawingDetail } from '@/api/myhealthApi';
   interface DrawingInfo {
     title: string;
     routeImage: string;
@@ -23,8 +23,14 @@
   let drawingDetail: DrawingInfo;
 
   onMount(() => {
-    console.log(drawingDetail, date);
-    //TODO - 드로잉 상세 조회 api 연결
+    console.log(drawingId, date);
+    //FIXME - 드로잉 상세 조회 api 연결
+    getDrawingDetail(
+      drawingId,
+      date,
+      (response) => {},
+      (error) => {}
+    );
     drawingDetail = {
       title: '마루는 강쥐',
       routeImage: 'https:~',

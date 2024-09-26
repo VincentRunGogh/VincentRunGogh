@@ -24,9 +24,9 @@
       !$authValues.password ||
       birth === null ||
       gender === null ||
-      $helpers.nickname.message !== '' ||
-      $helpers.weight.message !== '' ||
-      $helpers.height.message !== ''
+      $helpers.nickname.color !== 'green' ||
+      $helpers.weight.color !== 'green' ||
+      $helpers.height.color !== 'green'
     ) {
       errorAlert('입력을 확인해주세요');
       return;
@@ -57,7 +57,7 @@
   };
 </script>
 
-<ProfileForm isSignup={true} />
+<ProfileForm />
 
 <div class="mb-6">
   <Label for="birth" class="pb-2">생년월일</Label>

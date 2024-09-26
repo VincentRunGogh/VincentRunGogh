@@ -42,27 +42,29 @@ async function tokenRegeneration() {
   const response = await Axios().post('/auth/token/reissue');
   return response;
 }
-
-function loginAxios() {
+function loginAxios(isMultipart) {
   const refreshToken = localStorage.getItem('refreshToken');
 
   const instance = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
     headers: {
-      'Content-Type': 'application/json;charset=utf-8',
+      // 'Content-Type': 'application/json;charset=utf-8',
     },
     withCredentials: true,
   });
 
   instance.defaults.headers.post['Content-Type'] = 'application/json';
-  instance.defaults.headers.put['Content-Type'] = 'application/json';
 
   instance.interceptors.request.use(
     (config) => {
       const accessToken = localStorage.getItem('accessToken');
       config.headers['Content-Type'] = 'application/json';
       config.headers['Authorization'] = `Bearer ${accessToken}`;
-
+      if (isMultipart && (config.method === 'post' || config.method === 'put')) {
+        config.headers['Content-Type'] = 'multipart/form-data';
+      } else {
+        config.headers['Content-Type'] = 'application/json';
+      }
       return config;
     },
     (error) => {
@@ -89,7 +91,7 @@ function loginAxios() {
           successAlert('다시 로그인 해주세요', () => {
             window.location.replace('/app/login');
             localStorage.removeItem('userStore');
-            return new Promise(() => { });
+            return new Promise(() => {});
           });
         }
       } else return Promise.reject(error);
