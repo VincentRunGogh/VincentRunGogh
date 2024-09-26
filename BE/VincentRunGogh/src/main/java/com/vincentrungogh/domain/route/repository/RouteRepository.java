@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface RouteRepository extends JpaRepository<Route, Integer> {
+public interface RouteRepository extends JpaRepository<Route, String> {
     List<Route> findAllByUser(User user);
 
     //유저가 아닌 것들 모두 조회

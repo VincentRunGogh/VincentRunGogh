@@ -19,7 +19,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -52,11 +51,11 @@ public class AuthService {
 
        // 1. 유효성 확인
        Authentication authentication = authorizationManager.authenticate(
-                // 아이디, 패스워드 입력
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
-                        loginRequest.getPassword()
-                )
+           // 아이디, 패스워드 입력
+           new UsernamePasswordAuthenticationToken(
+                   loginRequest.getEmail(),
+                   loginRequest.getPassword()
+           )
        );
 
         // 2. 유저 정보 가져오기

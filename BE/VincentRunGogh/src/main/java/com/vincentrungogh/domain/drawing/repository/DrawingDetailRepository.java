@@ -8,6 +8,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface DrawingDetailRepository extends JpaRepository<DrawingDetail, Integer> {
+public interface DrawingDetailRepository extends JpaRepository<DrawingDetail, Integer>, DrawingDetailRepositoryCustom {
     List<DrawingDetail> findAllByDrawingAndCreatedBetween(Drawing drawing, LocalDateTime start, LocalDateTime end);
+
+    @Override
+    double findByDrawingAverageSpeed(Drawing drawing);
+
+    @Override
+    int findByDrawingSumDistance(Drawing drawing);
 }

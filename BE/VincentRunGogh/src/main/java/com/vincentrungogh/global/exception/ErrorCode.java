@@ -25,7 +25,8 @@ public enum ErrorCode {
     INVALID_WEIGHT_AND_HEIGHT("몸무게와 키는 0 이상이어야 합니다.", HttpStatus.BAD_REQUEST),
     FAILED_UPDATE_PROFILE("프로필 수정에 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_PASSWORD_LENGTH("20자 이하의 비밀번호만 가능합니다. ", HttpStatus.BAD_REQUEST),
-    ROUTE_NOT_FOUND("존재하지 않은 루트입니다", HttpStatus.NOT_FOUND)
+    ROUTE_NOT_FOUND("존재하지 않은 루트입니다", HttpStatus.NOT_FOUND),
+    DRAWING_NOT_FOUND("드로잉 정보가 없습니다. ", HttpStatus.NOT_FOUND),
     ;
 
 
