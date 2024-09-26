@@ -18,4 +18,14 @@ async function logout(success, fail) {
   await http.post(`/auth/logout/${loginId}`).then(success).catch(fail);
 }
 
+// 일주일 운동 정보 조회
+export function getWeeklyInfo() {
+  return http
+    .get('/users/week')
+    .then((response) => response.data)
+    .catch((error) => {
+      throw error;
+    });
+}
+
 export { getProfile, updateProfileImg, updateProfile, updatePw, logout };
