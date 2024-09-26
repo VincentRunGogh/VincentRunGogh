@@ -4,8 +4,8 @@
   import { onMount, SvelteComponent } from 'svelte';
   import { profileFormStore } from '@/stores/profileFormStore';
   import { userStore } from '@/stores/userStore';
+  import { get } from 'svelte/store';
 
-  export let isSignup;
   const {
     values,
     helpers,
@@ -17,18 +17,13 @@
   } = profileFormStore;
 
   async function handleCheckNickname() {
-    if ($values.nickname.length > 0) {
+    const currentUser = get(userStore);
+
+    if ($values.nickname.length > 0 && $values.nickname !== currentUser['nickname']) {
       await checkNicknameAvailability($values.nickname);
     }
   }
-  // 이미지 업로드 핸들러
-  function handleImageUpload(event: Event & { currentTarget: HTMLInputElement }) {
-    const file = event.target?.files[0];
-    if (file) {
-      validateProfileImage(file);
-      values.update((v) => ({ ...v, profileImage: file }));
-    }
-  }
+
   onMount(() => {
     userStore.subscribe(($user) => {
       if ($user) {
@@ -82,10 +77,3 @@
   />
   <Helper style="color: {$helpers.weight.color};">{$helpers.weight.message}</Helper>
 </div>
-{#if !isSignup}
-  <div class="mb-6">
-    <Label for="profileImg" class="pb-2">프로필 이미지</Label>
-    <input type="file" id="profileImg" on:change={handleImageUpload} />
-    <Helper style="color: {$helpers.profileImage.color};">{$helpers.profileImage.message}</Helper>
-  </div>
-{/if}

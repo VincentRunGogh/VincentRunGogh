@@ -1,11 +1,11 @@
 import { loginAxios } from '@/api/http-commons';
-const http = loginAxios();
-
+const http = loginAxios(false);
+const multipartHttp = loginAxios(true);
 async function getProfile(success, fail) {
   await http.get('/users').then(success).catch(fail);
 }
 async function updateProfileImg(image, success, fail) {
-  await http.put('/users/profile-image', { image: image }).then(success).catch(fail);
+  await multipartHttp.put('/users/profile-image', { image: image }).then(success).catch(fail);
 }
 async function updateProfile(data, success, fail) {
   await http.put('/users', data).then(success).catch(fail);

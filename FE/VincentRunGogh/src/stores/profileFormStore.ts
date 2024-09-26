@@ -19,7 +19,7 @@ function createFormStore() {
     nickname: { message: '영문, 한글, 숫자 10자 이하', color: 'gray' },
     height: { message: '키를 숫자로 입력해주세요.', color: 'gray' },
     weight: { message: '몸무게를 숫자로 입력해주세요.', color: 'gray' },
-    profileImage: { message: 'SVG, PNG, JPG', color: 'green' },
+    profileImage: { message: 'SVG, PNG, JPG', color: 'gray' },
   };
   const helpers = writable<{ [K in keyof FormValues]: HelperMessage }>(initialHelpers);
 
@@ -42,7 +42,7 @@ function createFormStore() {
         ...h,
         nickname: {
           message: '중복 확인이 필요합니다.',
-          color: 'gray',
+          color: 'red',
         },
       }));
     }
@@ -65,7 +65,7 @@ function createFormStore() {
             helpers.set({
               ...get(helpers),
               nickname: {
-                message: '',
+                message: '사용 가능한 닉네임입니다',
                 color: 'green',
               },
             });

@@ -10,7 +10,7 @@ interface User extends UserAuth {
   nickname: string;
   birth: string;
   gender: number;
-  profileImage: string;
+  profile: string;
   height: number;
   weight: number;
 }
@@ -35,12 +35,22 @@ function createUserStore() {
       console.error('Failed to remove user from localStorage:', error);
     }
   }
-
-  function updateUser(partialData: Partial<User>) {
+  async function updateUser(partialData: Partial<User>) {
     update((current) => {
+      if (!current) {
+        current = {
+          id: '',
+          email: '',
+          nickname: '',
+          birth: '',
+          gender: 0,
+          profile: '',
+          height: 0,
+          weight: 0,
+        };
+      }
       const updatedUser = { ...current, ...partialData };
       try {
-        console.log(updatedUser);
         localStorage.setItem('user', JSON.stringify(updatedUser));
       } catch (error) {
         console.error('Failed to update user in localStorage:', error);
@@ -66,7 +76,6 @@ function createUserStore() {
     logout,
     updateUser,
     initialize,
-    setProfile: (userData: User) => login(userData),
     clearProfile: logout,
   };
 }
