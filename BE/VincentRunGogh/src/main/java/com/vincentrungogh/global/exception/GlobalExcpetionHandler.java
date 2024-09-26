@@ -4,6 +4,7 @@ import com.vincentrungogh.global.util.ResultDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
@@ -22,6 +23,18 @@ public class GlobalExcpetionHandler {
         return new ResponseEntity<>(response, ex.getErrorCode().getHttpStatus());
     }
 
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<?> handleBadCredentialsException(final BadCredentialsException ex) {
+        ResultDto<Object> response = ResultDto.res(
+                HttpStatus.UNAUTHORIZED.value(),
+                "회원정보가 일치하지 않습니다."
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
+
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntimeException(final RuntimeException ex) {
         ResultDto<Object> response = ResultDto.res(
@@ -34,6 +47,7 @@ public class GlobalExcpetionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(final Exception ex) {
+        log.info(ex.getMessage());
         ResultDto<Object> response = ResultDto.res(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."

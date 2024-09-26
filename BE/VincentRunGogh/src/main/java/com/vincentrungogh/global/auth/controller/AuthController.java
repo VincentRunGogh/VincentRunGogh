@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -34,6 +33,8 @@ public class AuthController {
     @Operation(summary = "로그인", description = "사용자 로그인하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그인에 성공하셨습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "401", description = "회원정보가 일치하지 않습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "로그인에 실패하셨습니다.",
                     content = @Content(schema = @Schema(implementation = LoginResponse.class))),
