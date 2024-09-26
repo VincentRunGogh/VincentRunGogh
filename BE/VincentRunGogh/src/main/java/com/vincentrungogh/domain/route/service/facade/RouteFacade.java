@@ -1,11 +1,10 @@
-package com.vincentrungogh.domain.route.service.Facade;
+package com.vincentrungogh.domain.route.service.facade;
 
 import com.vincentrungogh.domain.myhealth.entity.MyHealth;
 import com.vincentrungogh.domain.myhealth.service.MyHealthService;
 import com.vincentrungogh.domain.route.entity.Route;
 import com.vincentrungogh.domain.route.entity.RouteType;
 import com.vincentrungogh.domain.route.service.RouteContext;
-import com.vincentrungogh.domain.route.service.dto.common.FindRoute;
 import com.vincentrungogh.domain.route.service.dto.response.*;
 import com.vincentrungogh.global.exception.CustomException;
 import com.vincentrungogh.global.exception.ErrorCode;
