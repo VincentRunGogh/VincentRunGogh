@@ -4,7 +4,7 @@
   import { replace } from 'svelte-spa-router';
   import Swal from 'sweetalert2';
   import { HeartOutline, HeartSolid } from 'flowbite-svelte-icons';
-  import { Card, Button } from 'flowbite-svelte';
+  import { Card, Button, Avatar } from 'flowbite-svelte';
   import BackButton from '@/components/buttons/BackButton.svelte';
 
   let dummyArticleList: {
@@ -260,7 +260,7 @@
     class="absolute top-3 right-3"
     on:click={() => replace('/community/mystorage')}
   >
-    <img src="/66.png" alt="logo" style="height: 100%;" />
+    <Avatar dot={{ color: 'green' }} />
   </div>
   <div id="search-control">
     <Button size="sm" on:click={searchCondition}>검색 반경 설정</Button>
