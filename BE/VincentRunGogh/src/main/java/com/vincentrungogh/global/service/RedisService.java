@@ -1,7 +1,7 @@
 package com.vincentrungogh.global.service;
 
 import com.vincentrungogh.domain.route.service.dto.common.Position;
-import com.vincentrungogh.domain.running.service.dto.common.RunningPosition;
+import com.vincentrungogh.domain.running.service.dto.request.RunningRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -66,7 +66,7 @@ public class RedisService {
         redisTemplate.delete(key);
     }
 
-    public void saveRunning(int userId, RunningPosition position){
+    public void saveRunning(int userId, RunningRequest position){
         String key = "running:" + userId;
         redisTemplate.opsForList().rightPush(key, position);
     }
