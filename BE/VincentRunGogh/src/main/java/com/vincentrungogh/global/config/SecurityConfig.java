@@ -5,6 +5,7 @@ import com.vincentrungogh.global.auth.filter.JwtFilter;
 import com.vincentrungogh.global.auth.service.JwtService;
 import com.vincentrungogh.global.exception.ExceptionHandlerFilter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +23,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @RequiredArgsConstructor
 @EnableWebSecurity
 @Configuration
+@Slf4j
 public class SecurityConfig {
     private final JwtService jwtService;
     private final UserService userService;

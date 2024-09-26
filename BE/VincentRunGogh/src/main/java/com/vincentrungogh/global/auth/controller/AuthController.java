@@ -5,6 +5,7 @@ import com.vincentrungogh.global.auth.service.AuthService;
 import com.vincentrungogh.global.auth.service.dto.request.*;
 import com.vincentrungogh.global.auth.service.dto.response.*;
 import com.vincentrungogh.global.service.EmailService;
+import com.vincentrungogh.global.util.CommonSwaggerResponse;
 import com.vincentrungogh.global.util.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,7 +23,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -34,17 +34,12 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그인에 성공하셨습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "400", description = "비밀번호가 일치하지 않습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
+            @ApiResponse(responseCode = "401", description = "회원정보가 일치하지 않습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "로그인에 실패하셨습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+                    content = @Content(schema = @Schema(implementation = LoginResponse.class))),
     })
+    @CommonSwaggerResponse.CommonResponses
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletResponse httpServletResponse){
 
@@ -60,17 +55,10 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "회원가입에 성공하셨습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "회원가입에 실패하셨습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
+    @CommonSwaggerResponse.CommonResponses
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody @Valid SignupRequest signupRequest){
         authService.signup(signupRequest);
@@ -83,18 +71,11 @@ public class AuthController {
     @Operation(summary = "닉네임 중복 확인", description = "사용자 닉네임 중복 확인 ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "닉네임 중복 요청에 성공하였습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+                    content = @Content(schema = @Schema(implementation = FindDuplicatedResponse.class))),
             @ApiResponse(responseCode = "500", description = "닉네임 중복 요청에 실패하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
+    @CommonSwaggerResponse.CommonResponses
     @GetMapping("/find-nickname")
     public ResponseEntity<?> findNickname(@RequestParam("nickname") String nickname){
 
@@ -109,18 +90,11 @@ public class AuthController {
     @Operation(summary = "이메일 중복 확인", description = "사용자 이메일 중복 확인 ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "이메일 중복 요청에 성공하였습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+                    content = @Content(schema = @Schema(implementation = FindDuplicatedResponse.class))),
             @ApiResponse(responseCode = "500", description = "이메일 중복 요청에 실패하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
+    @CommonSwaggerResponse.CommonResponses
     @GetMapping("/find-email")
     public ResponseEntity<?> findEmail(@RequestParam("email") String email){
 
@@ -135,15 +109,10 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "인증 코드 전송 요청이 성공하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "인증 코드 전송 요청이 실패하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
+    @CommonSwaggerResponse.CommonResponses
     @PostMapping("/code/send")
     public ResponseEntity<?> sendCode(@RequestBody @Valid SendCodeRequest sendCodeRequest){
 
@@ -159,17 +128,10 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그아웃에 성공하셨습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "로그아웃에 실패하셨습니다. 다시 시도해주세요",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
+    @CommonSwaggerResponse.CommonResponses
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@AuthenticationPrincipal UserPrincipal userPrincipal){
 
@@ -182,18 +144,13 @@ public class AuthController {
     @Operation(summary = "이메일 인증 코드 확인", description = "이메일 인증 코드 전송")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "인증 코드 확인 요청이 성공하였습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+                    content = @Content(schema = @Schema(implementation = CodeCheckResponse.class))),
             @ApiResponse(responseCode = "410", description = "인증 코드가 만료되었습니다",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "인증 코드 확인 요청이 실패하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
+    @CommonSwaggerResponse.CommonResponses
     @PostMapping("/code/check")
     public ResponseEntity<?> codeCheck(@RequestBody @Valid CodeCheckRequest codeCheckRequest){
 
@@ -204,7 +161,6 @@ public class AuthController {
                 .body(ResultDto.res(HttpStatus.OK.value(), "인증 코드 확인 요청이 성공하였습니다.", response));
     }
 
-
     @Operation(summary = "비밀번호 재발급", description = "비밀번호 재발급 후 이메일로 전송")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Refresh Token 재발급 요청에 성공하였습니다",
@@ -213,11 +169,10 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "401", description = "만료된 리프레시 토큰입니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "비밀번호 재발급에 실패하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
+    @CommonSwaggerResponse.CommonResponses
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody @Valid ResetPasswordRequest request){
 
@@ -228,17 +183,14 @@ public class AuthController {
                 .body(ResultDto.res(HttpStatus.OK.value(), "비밀번호가 재발급되었습니다. 이메일을 확인해주세요."));
     }
 
-    @Operation(summary = "accessToken 재발급", description = "accessToken 재발급 후 이메일로 전송")
+    @Operation(summary = "accessToken 재발급", description = "accessToken 재발급")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Refresh Token 재발급 요청에 성공하였습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "400", description = "이메일과 생년월일이 일치하지 않습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "500", description = "accessToken이 재발급되었습니다.",
+                    content = @Content(schema = @Schema(implementation = ReissueTokenResponse.class))),
+            @ApiResponse(responseCode = "500", description = "accessToken 재발급에 실패했습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
+    @CommonSwaggerResponse.CommonResponses
     @PostMapping("/token/reissue")
     public ResponseEntity<?> reissueAccessToken(HttpServletRequest request){
 

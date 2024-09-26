@@ -15,9 +15,8 @@ import java.time.LocalDateTime;
 public class DrawingDetail {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private String id;
 
     // 완료 여부
     @Column(name = "is_completed", nullable = false)
