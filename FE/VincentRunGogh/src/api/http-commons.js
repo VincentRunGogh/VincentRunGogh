@@ -89,7 +89,7 @@ function loginAxios(isMultipart) {
           return axios(originalRequest);
         } catch (error) {
           successAlert('다시 로그인 해주세요', () => {
-            window.location.replace('/app/login');
+            window.location.replace('/#/login');
             localStorage.removeItem('userStore');
             return new Promise(() => {});
           });
