@@ -15,6 +15,11 @@ class Position(BaseModel):
     lat: float
     lng: float
 
+class PositionTime(BaseModel):
+    lat: float
+    lng: float
+    time: str
+
 # 전체 Request DTO 모델 정의
 class ArtRouteRequest(BaseModel):
     positionList: List[Position]
@@ -27,7 +32,8 @@ class DataSaveRouteRequestDto(BaseModel):
     positionList: List[Position]
 
 class DataSaveDrawingDetailRequestDto(BaseModel):
-    positionList: List[Position]
+    positionTimeList: List[PositionTime]
+
 
 class DataDrawingRouteRequestDto(BaseModel):
     drawingDetailList: List[str]
@@ -116,10 +122,15 @@ async def save_route(request: DataSaveRouteRequestDto):
 
 @api_router.post("/rootings/drawings", response_model=ResponseDto)
 async def save_drawing_detail(request: DataSaveDrawingDetailRequestDto):
-    # Position 객체를 dict로 변환
-    position_list_dicts = [position.dict() for position in request.positionList]
+    for positionTime in request.positionTimeList:
+        # 필요한 계산 수행
+        print(f"Using time: {positionTime.time} for calculations")
 
-    # Route 모델에 positionList를 설정하여 생성
+        # 최종적으로 lat과 lng만 추출하여 dict로 변환
+    position_list_dicts = [{"lat": positionTime.lat, "lng": positionTime.lng} for positionTime in
+                           request.positionTimeList]
+
+    # DrawingDetail 모델에 positionList를 설정하여 생성
     drawingDetail = DrawingDetail(positionList=position_list_dicts)
     await mongodb.engine.save(drawingDetail)
     print("생성되었습니다.")
