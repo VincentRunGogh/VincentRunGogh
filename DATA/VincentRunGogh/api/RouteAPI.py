@@ -140,7 +140,7 @@ async def save_drawing_detail(request: DataSaveDrawingDetailRequestDto):
         "status": 200,
         "message": "루트를 성공적으로 저장했습니다.",
         "data": {
-            "routeId": str(drawingDetail.id),  # drawingDetail.id는 MongoDB에서 자동 생성된 ObjectId입니다.
+            "drawingDetailId": str(drawingDetail.id),  # drawingDetail.id는 MongoDB에서 자동 생성된 ObjectId입니다.
             "centerLat": 0.0,
             "centerLng": 0.0,
             "distance": 0
