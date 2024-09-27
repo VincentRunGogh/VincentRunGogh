@@ -27,6 +27,7 @@ public enum ErrorCode {
     INVALID_PASSWORD_LENGTH("20자 이하의 비밀번호만 가능합니다. ", HttpStatus.BAD_REQUEST),
     ROUTE_NOT_FOUND("존재하지 않은 루트입니다", HttpStatus.NOT_FOUND),
     DRAWING_NOT_FOUND("드로잉 정보가 없습니다. ", HttpStatus.NOT_FOUND),
+    DRAWINGDETAUL_NOT_FOUND("드로잉 디테일 정보가 없습니다.", HttpStatus.NOT_FOUND),
     ;
 
 

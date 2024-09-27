@@ -1,5 +1,9 @@
 package com.vincentrungogh.domain.drawing.service;
 
+import com.vincentrungogh.domain.drawing.entity.DrawingDetail;
+import com.vincentrungogh.domain.drawing.entity.MongoDrawingDetail;
+import com.vincentrungogh.domain.drawing.repository.MongoDrawingRepository;
+import com.vincentrungogh.domain.drawing.service.dto.response.RestartDrawingResponse;
 import com.vincentrungogh.domain.drawing.service.dto.response.StartDrawingResponse;
 import com.vincentrungogh.domain.route.entity.MongoRoute;
 import com.vincentrungogh.domain.route.entity.Route;
@@ -21,6 +25,9 @@ import com.vincentrungogh.global.exception.ErrorCode;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -31,6 +38,7 @@ public class DrawingService {
     private final DrawingRepository drawingRepository;
     private final UserRepository userRepository;
     private final RouteRepository routeRepository;
+    private final MongoDrawingRepository mongoDrawingRepository;
     private final MongoRouteRepository mongoRouteRepository;
     private final UserService userService;
 
@@ -98,5 +106,32 @@ public class DrawingService {
                 .createStartDrawingResponse(drawing.getTitle(),
                         drawing.getId(), mongoRoute.getPositionList());
 
+    }
+
+    public RestartDrawingResponse restartDrawing(int drawingId){
+        // 0. 드로잉 찾기
+        Drawing drawing = drawingRepository.findById(drawingId)
+                .orElseThrow(() -> new CustomException(ErrorCode.DRAWING_NOT_FOUND));
+
+        // 1. 드로잉디테일 찾기
+        List<String> drawingDetailIds = drawingDetailRepository.findAllIdsByDrawing(drawing);
+
+        // 2. 드로잉 디테일 정보 찾기
+        List<MongoDrawingDetail> mongoDrawingPositionList = mongoDrawingRepository.findAllByIdIn(drawingDetailIds);
+
+        // 3.
+        List<Position> drawingPositionList = mongoDrawingPositionList.stream()
+                .flatMap(mongoDrawing -> mongoDrawing.getPositionList().stream())
+                .toList();
+
+        // 4. 루트 정보
+        List<Position> routePositionList = mongoRouteRepository.findById(drawing.getRoute().getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.ROUTE_NOT_FOUND)).getPositionList();
+
+        return RestartDrawingResponse.createRestartDrawingResponse(
+                drawing.getTitle(),
+                drawingPositionList,
+                routePositionList
+        );
     }
 }

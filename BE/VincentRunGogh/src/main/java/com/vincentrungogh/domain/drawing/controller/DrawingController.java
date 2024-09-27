@@ -1,6 +1,7 @@
 package com.vincentrungogh.domain.drawing.controller;
 
 import com.vincentrungogh.domain.drawing.service.dto.request.StartDrawingRequest;
+import com.vincentrungogh.domain.drawing.service.dto.response.RestartDrawingResponse;
 import com.vincentrungogh.domain.drawing.service.dto.response.StartDrawingResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -88,6 +89,23 @@ public class DrawingController {
     public ResponseEntity<?> startDrawing(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody StartDrawingRequest request){
 
         StartDrawingResponse response = drawingService.startDrawing(userPrincipal.getId(), request.getRouteId());
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(), "드로잉이 시작되었습니다.", response));
+    }
+
+    @Operation(summary = "드로잉 재시작", description = "드로잉 재시작")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "드로잉이 재시작되었습니다.",
+                    content = @Content(schema = @Schema(implementation = RestartDrawingResponse.class))),
+            @ApiResponse(responseCode = "500", description = "드로잉을 재시작하는데 실패했습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @PostMapping("/start/{drawingId}")
+    public ResponseEntity<?> restartDrawing(@PathVariable int drawingId){
+
+        RestartDrawingResponse response = drawingService.restartDrawing(drawingId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(), "드로잉이 시작되었습니다.", response));
