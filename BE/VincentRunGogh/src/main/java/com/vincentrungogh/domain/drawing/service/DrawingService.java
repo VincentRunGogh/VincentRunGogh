@@ -1,5 +1,8 @@
 package com.vincentrungogh.domain.drawing.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import com.vincentrungogh.domain.drawing.entity.Drawing;
 import com.vincentrungogh.domain.drawing.repository.DrawingDetailRepository;
 import com.vincentrungogh.domain.drawing.repository.DrawingRepository;
@@ -8,10 +11,9 @@ import com.vincentrungogh.domain.user.entity.User;
 import com.vincentrungogh.domain.user.repository.UserRepository;
 import com.vincentrungogh.global.exception.CustomException;
 import com.vincentrungogh.global.exception.ErrorCode;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class DrawingService {

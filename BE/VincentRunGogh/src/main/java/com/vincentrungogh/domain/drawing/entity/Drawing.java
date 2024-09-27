@@ -21,7 +21,7 @@ public class Drawing {
     private int id;
 
     // 드로잉 이름
-    @Column(name = "title", nullable = false)
+    @Column(name = "title")
     private String title;
 
     // 드로잉 완성 여부
@@ -33,7 +33,7 @@ public class Drawing {
     private Boolean isCreatedBoard;
 
     // 누적 드로잉 이미지
-    @Column(name = "accumulated_drawing_image", nullable = false)
+    @Column(name = "accumulated_drawing_image")
     private String accumulatedDrawingImage;
 
     // 생성 날짜
@@ -45,7 +45,7 @@ public class Drawing {
     private LocalDateTime updated;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
