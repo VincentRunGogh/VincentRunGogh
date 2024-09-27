@@ -1,6 +1,7 @@
 package com.vincentrungogh.domain.drawing.service;
 
 import com.vincentrungogh.domain.drawing.entity.DrawingDetail;
+import com.vincentrungogh.domain.drawing.entity.MongoDrawingDetail;
 import com.vincentrungogh.domain.drawing.repository.MongoDrawingRepository;
 import com.vincentrungogh.domain.drawing.service.dto.response.RestartDrawingResponse;
 import com.vincentrungogh.domain.drawing.service.dto.response.StartDrawingResponse;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -115,9 +117,14 @@ public class DrawingService {
         List<String> drawingDetailIds = drawingDetailRepository.findAllIdsByDrawing(drawing);
 
         // 2. 드로잉 디테일 정보 찾기
-        List<Position> drawingPositionList = mongoDrawingRepository.findAllByIdIn(drawingDetailIds);
+        List<MongoDrawingDetail> mongoDrawingPositionList = mongoDrawingRepository.findAllByIdIn(drawingDetailIds);
 
-        // 3. 루트 정보
+        // 3.
+        List<Position> drawingPositionList = mongoDrawingPositionList.stream()
+                .flatMap(mongoDrawing -> mongoDrawing.getPositionList().stream())
+                .toList();
+
+        // 4. 루트 정보
         List<Position> routePositionList = mongoRouteRepository.findById(drawing.getRoute().getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.ROUTE_NOT_FOUND)).getPositionList();
 
