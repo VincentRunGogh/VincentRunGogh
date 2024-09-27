@@ -2,16 +2,24 @@
   import { onDestroy, onMount } from 'svelte';
   import L, { Map as LeafletMap, Marker, Polyline } from 'leaflet';
   import type { LatLng, LatLngExpression, Control } from 'leaflet';
-  import { push, pop, replace } from 'svelte-spa-router';
-
+  import { replace, querystring } from 'svelte-spa-router';
   import Swal from 'sweetalert2';
   import { get } from 'svelte/store';
 
-  import { MapToolbar, MapGUI } from '@/components/drawing';
-  import { isLockScreen, isPause, elapsedTime, posList } from '@/stores/drawingStore';
+  import { MapToolbar, MapGUI, Timer } from '@/components/drawing';
+  import {
+    isLockScreen,
+    isPause,
+    elapsedTime,
+    posList,
+    updateDrawingInfo,
+  } from '@/stores/drawingStore';
   import DrawingPauseModal from '@/components/modals/DrawingPauseModal.svelte';
-  import Timer from '@/components/drawing/Timer.svelte';
+  import { userStore } from '@/stores/userStore';
+
   import { updateDistanceAndSpeed } from '@/utils/calculateFuc';
+  import { startDrawing } from '@/api/drawingApi';
+  import { connectWebSocket, disconnectWebSocket, sendRealTimePosition } from '@/api/websocket';
 
   $: $isLockScreen = $isLockScreen;
   $: $isPause = $isPause;
@@ -238,7 +246,10 @@ fill="#000000" stroke="none">
           startPos = new L.LatLng(lat, lng);
         }
         addPosition(lat, lng);
-
+        //!SECTION - 소켓에 위치 전송
+        const nickname = $userStore?.nickname;
+        console.log(nickname);
+        sendRealTimePosition({ lat, lng }, nickname);
         if (map !== null) {
           // 마커가 이미 존재하면 업데이트하고, 없으면 새로 추가
           if (marker.has('current')) {
@@ -289,8 +300,36 @@ fill="#000000" stroke="none">
   function clickLockScreen() {
     $isLockScreen = !$isLockScreen;
   }
-
+  function handleTimerComplete() {
+    countdown = null;
+    !map && mapAction();
+    toggleTracking();
+    connectWebSocket();
+  }
   onMount(() => {
+    const params = querystring.parse(window.location.search);
+    const routeId = params.routeId;
+    const drawingId = params.drawingId;
+    console.log(drawingId, routeId);
+    const options: any = {};
+
+    if (drawingId) {
+      options.drawingId = drawingId;
+    }
+
+    if (routeId) {
+      options.rootId = routeId;
+    }
+    startDrawing(
+      options,
+      (response) => {
+        console.log('Drawing started successfully:', response);
+        updateDrawingInfo(response.data.data); // 스토어를 업데이트
+      },
+      (error) => {
+        console.error('Failed to start drawing:', error);
+      }
+    );
     countdown = 3;
     //TODO - 루트의 좌표 값들을 url의 routeId 파람으로 조회
     //이전에 한 드로잉은 다른 색으로 보여주기
@@ -301,20 +340,14 @@ fill="#000000" stroke="none">
       // clearInterval(timerIntervalId);
       // clearInterval(trackingIntervalId);
     }
+    disconnectWebSocket();
   });
 </script>
 
 <svelte:window on:resize={resizeMap} />
 
 {#if countdown}
-  <Timer
-    on:clearTimer={() => {
-      countdown = null;
-      !map && mapAction();
-      toggleTracking();
-    }}
-    {countdown}
-  />
+  <Timer on:clearTimer={handleTimerComplete} {countdown} />
 {/if}
 
 <div class="map-container" style="height:100vh; width:100%;">
