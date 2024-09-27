@@ -13,10 +13,11 @@ public class RunningService {
 
     private final RedisService redisService;
 
-
     public void running(RunningRequest request, int userId){
         // 레디스 저장
+        log.info(String.valueOf(request));
         redisService.saveRunning(userId, request);
+
     }
 
 

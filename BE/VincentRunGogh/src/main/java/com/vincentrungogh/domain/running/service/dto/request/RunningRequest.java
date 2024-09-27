@@ -1,5 +1,6 @@
 package com.vincentrungogh.domain.running.service.dto.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,8 +10,10 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RunningRequest {
-    private double lat;
-    private double lng;
-    private double speed;
-    private double time;
+    @NotNull
+    private Double lat;
+    @NotNull
+    private Double lng;
+    @NotNull
+    private String time;
 }
