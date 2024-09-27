@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 import uvicorn
 from api.RouteAPI import api_router  # routeAPI 파일에서 라우터를 가져옵니다.
@@ -5,15 +6,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from db import mongodb
 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # 애플리케이션 시작 시 실행
+    mongodb.connect()
+    yield  # 애플리케이션의 수명 동안 실행됨
+    # 애플리케이션 종료 시 실행
+    await mongodb.close()
 
-@app.on_event("startup")
-def on_app_start():
-	mongodb.connect()
-
-@app.on_event("shutdown")
-async def on_app_shutdown():
-	mongodb.close()
+app = FastAPI(lifespan=lifespan)
 
 # CORS 설정
 app.add_middleware(
