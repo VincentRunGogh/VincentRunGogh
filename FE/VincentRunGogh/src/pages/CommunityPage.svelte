@@ -4,7 +4,8 @@
   import { replace } from 'svelte-spa-router';
   import Swal from 'sweetalert2';
   import { HeartOutline, HeartSolid } from 'flowbite-svelte-icons';
-  import { Card, Button } from 'flowbite-svelte';
+  import { Card, Button, Avatar } from 'flowbite-svelte';
+  import BackButton from '@/components/buttons/BackButton.svelte';
 
   let dummyArticleList: {
     boardId: number;
@@ -247,22 +248,25 @@
 </script>
 
 <div id="community-body">
-  <div id="community-header">
-    <div id="community-logo">
-      <img src="/4.png" alt="logo" style="height: 100%;" />
-    </div>
-    <div id="community-title">
-      <h1 style="font-size: 20px; font-weight: bold;">커뮤니티</h1>
-    </div>
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <!-- svelte-ignore a11y-interactive-supports-focus -->
-    <div id="community-mystorage" role="button" on:click={() => replace('/community/mystorage')}>
-      <img src="/66.png" alt="logo" style="height: 100%;" />
-    </div>
+  <div id="community-header" class="flex justify-center items-center">
+    <BackButton />
+    <h2>커뮤니티</h2>
+  </div>
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-interactive-supports-focus -->
+  <div
+    id="community-mystorage"
+    role="button"
+    class="absolute top-3 right-3"
+    on:click={() => replace('/community/mystorage')}
+  >
+    <Avatar dot={{ color: 'green' }} />
+  </div>
+  <div id="search-control">
+    <Button size="sm" on:click={searchCondition}>검색 반경 설정</Button>
+    <p class="my-3 font-bold">반경 {range}km내의 루트만 표시됩니다.</p>
   </div>
   <div id="community-content">
-    <Button on:click={searchCondition}>검색 반경 설정</Button>
-    <p class="my-5 font-bold">반경 {range}km내의 루트만 표시됩니다.</p>
     {#each dummyArticleList as article}
       {#if article.distanceFromUser <= range * 1000}
         <Card class="mb-5">
@@ -319,19 +323,7 @@
 
   #community-header {
     height: 10vh;
-    display: flex;
-    justify-content: space-between;
-  }
-
-  #community-logo {
-    width: 15%;
-  }
-
-  #community-title {
-    width: 40%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 100%;
   }
 
   #community-mystorage {

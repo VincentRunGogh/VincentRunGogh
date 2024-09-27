@@ -25,6 +25,7 @@
     </div>
   </div>
   <Carousel
+    class="w-full"
     images={[
       { src: article.drawingImage, alt: 'drawingImage' },
       { src: article.artImage, alt: 'artImage' },
