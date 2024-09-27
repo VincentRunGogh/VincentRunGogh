@@ -92,6 +92,7 @@ public class Drawing {
 
     public void changeAccumulatedDrawingImage(String accumulatedDrawingImage){
         this.accumulatedDrawingImage = accumulatedDrawingImage;
+        this.updated = LocalDateTime.now();
     }
 
 

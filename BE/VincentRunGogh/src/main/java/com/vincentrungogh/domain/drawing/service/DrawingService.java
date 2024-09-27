@@ -3,6 +3,7 @@ package com.vincentrungogh.domain.drawing.service;
 import com.vincentrungogh.domain.drawing.entity.DrawingDetail;
 import com.vincentrungogh.domain.drawing.entity.MongoDrawingDetail;
 import com.vincentrungogh.domain.drawing.repository.MongoDrawingRepository;
+import com.vincentrungogh.domain.drawing.service.dto.request.CompleteDrawingRequest;
 import com.vincentrungogh.domain.drawing.service.dto.request.DataSaveDrawingDetailRequset;
 import com.vincentrungogh.domain.drawing.service.dto.request.SaveDrawingRequest;
 import com.vincentrungogh.domain.drawing.service.dto.response.DataSaveDrawingDetailResponse;
@@ -145,34 +146,58 @@ public class DrawingService {
     }
 
     @Transactional
-    public void saveDrawing(int userId, int drawingId, SaveDrawingRequest request){
+    public void saveDrawing(int userId, int drawingId, SaveDrawingRequest request) {
+        // 1. 파이썬 호출
+        DataSaveDrawingDetailResponse response = processDrawing(userId);
 
+        // 2. 드로잉
+        Drawing drawing = drawingRepository.findById(drawingId)
+                .orElseThrow(() -> new CustomException(ErrorCode.DRAWING_NOT_FOUND));
+
+        // 3. 드로잉 업데이트
+        drawing.changeAccumulatedDrawingImage(request.getDrawingImage());
+        drawingRepository.save(drawing);
+
+        // 4. 드로잉 디테일 저장
+        DrawingDetail drawingDetail = DrawingDetail
+                .createDrawingDetail(response, request.getDrawingDetailImage(),
+                        drawing);
+        drawingDetailRepository.save(drawingDetail);
+    }
+
+    @Transactional
+    public void completeDrawing(int userId, int drawingId, CompleteDrawingRequest request) {
+        // 1. 파이썬 호출
+        DataSaveDrawingDetailResponse response = processDrawing(userId);
+
+        // 2. 드로잉
+        Drawing drawing = drawingRepository.findById(drawingId)
+                .orElseThrow(() -> new CustomException(ErrorCode.DRAWING_NOT_FOUND));
+
+        // 3. 드로잉 업데이트
+        drawing.completeDrawing(request.getTitle(), request.getDrawingDetailImage());
+
+        // 4. 드로잉 디테일 저장
+        DrawingDetail drawingDetail = DrawingDetail
+                .completeDrawingDetail(response, request.getDrawingDetailImage(),
+                        drawing);
+        drawingDetailRepository.save(drawingDetail);
+    }
+
+    private DataSaveDrawingDetailResponse processDrawing(int userId) {
         // 1. redis에서 정보 가져오기
         List<RunningRequest> redisPositionList = redisService.getRunning(userId);
-        log.info(redisPositionList.toString());
 
         // 2. python 연결
-        DataSaveDrawingDetailResponse response =  pythonApiService.saveDrawingDetail(
+        DataSaveDrawingDetailResponse response = pythonApiService.saveDrawingDetail(
                 DataSaveDrawingDetailRequset.createDataSaveDrawingDetailRequset(redisPositionList)
         );
 
         log.info("saveDrawing : " + response);
 
-        // 3. 드로잉
-        Drawing drawing = drawingRepository.findById(drawingId).orElseThrow(()->
-                new CustomException(ErrorCode.DRAWING_NOT_FOUND));
-
-        drawing.changeAccumulatedDrawingImage(request.getDrawingImage());
-        drawing = drawingRepository.save(drawing);
-
-        // 4. 드로잉 디테일 저장
-        DrawingDetail drawingDetail = DrawingDetail
-                .createDrawingDetail(response, request.getDrawingDetailImage(), drawing);
-        drawingDetailRepository.save(drawingDetail);
-
-        // 5. 레디스 삭제
+        // 3. 레디스 삭제
         redisService.removeRunning(userId);
+
+        return response;
     }
-
-
 }
