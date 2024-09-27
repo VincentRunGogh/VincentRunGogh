@@ -103,7 +103,7 @@ public class DrawingController {
     })
     @CommonSwaggerResponse.CommonResponses
     @PostMapping("/start/{drawingId}")
-    public ResponseEntity<?> restartDrawing(@RequestParam int drawingId){
+    public ResponseEntity<?> restartDrawing(@PathVariable int drawingId){
 
         RestartDrawingResponse response = drawingService.restartDrawing(drawingId);
         return ResponseEntity

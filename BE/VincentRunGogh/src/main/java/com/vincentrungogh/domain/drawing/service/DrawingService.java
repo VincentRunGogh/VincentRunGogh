@@ -1,6 +1,7 @@
 package com.vincentrungogh.domain.drawing.service;
 
 import com.vincentrungogh.domain.drawing.entity.DrawingDetail;
+import com.vincentrungogh.domain.drawing.repository.MongoDrawingRepository;
 import com.vincentrungogh.domain.drawing.service.dto.response.RestartDrawingResponse;
 import com.vincentrungogh.domain.drawing.service.dto.response.StartDrawingResponse;
 import com.vincentrungogh.domain.route.entity.MongoRoute;
@@ -35,6 +36,7 @@ public class DrawingService {
     private final DrawingRepository drawingRepository;
     private final UserRepository userRepository;
     private final RouteRepository routeRepository;
+    private final MongoDrawingRepository mongoDrawingRepository;
     private final MongoRouteRepository mongoRouteRepository;
     private final UserService userService;
 
@@ -110,17 +112,10 @@ public class DrawingService {
                 .orElseThrow(() -> new CustomException(ErrorCode.DRAWING_NOT_FOUND));
 
         // 1. 드로잉디테일 찾기
-        List<DrawingDetail> drawingDetailList = drawingDetailRepository.findAllByDrawing(drawing);
+        List<String> drawingDetailIds = drawingDetailRepository.findAllIdsByDrawing(drawing);
 
         // 2. 드로잉 디테일 정보 찾기
-        List<Position> drawingPositionList = new ArrayList<>();
-        for(DrawingDetail detail : drawingDetailList) {
-            List<Position> mongoList = mongoRouteRepository.findById(detail.getId())
-                    .orElseThrow(() -> new CustomException(ErrorCode.DRAWINGDETAUL_NOT_FOUND))
-                    .getPositionList();
-
-            drawingPositionList.addAll(mongoList);
-        }
+        List<Position> drawingPositionList = mongoDrawingRepository.findAllByIdIn(drawingDetailIds);
 
         // 3. 루트 정보
         List<Position> routePositionList = mongoRouteRepository.findById(drawing.getRoute().getId())

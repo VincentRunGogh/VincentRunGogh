@@ -6,6 +6,7 @@ import com.vincentrungogh.domain.drawing.entity.QDrawingDetail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -34,5 +35,14 @@ public class DrawingDetailRepositoryImpl implements DrawingDetailRepositoryCusto
                 .fetchOne();
 
         return Optional.ofNullable(distance).orElse(0);
+    }
+
+    @Override
+    public List<String> findAllIdsByDrawing(Drawing drawing) {
+        return queryFactory
+                .select(drawingDetail.id)
+                .from(drawingDetail)
+                .where(drawingDetail.drawing.eq(drawing))
+                .fetch();
     }
 }
