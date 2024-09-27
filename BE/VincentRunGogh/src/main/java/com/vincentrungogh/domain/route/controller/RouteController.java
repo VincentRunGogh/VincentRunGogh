@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -83,8 +84,8 @@ public class RouteController {
     })
     @CommonSwaggerResponse.CommonResponses
     @PostMapping("/end")
-    public ResponseEntity<ResultDto> saveRoute(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody SaveRouteRequestDto requestDto) {
-        log.info("아트 저장: "+ requestDto.toString());
+    public ResponseEntity<ResultDto> saveRoute(@AuthenticationPrincipal UserPrincipal userPrincipal, @Valid @RequestBody SaveRouteRequestDto requestDto) {
+        log.info("루트 최종 저장: "+ requestDto.toString());
         SaveRouteResponseDto responseDto = routeFacade.saveRoute(userPrincipal, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "루트화를 성공적으로 저장했습니다.", responseDto));
     }
