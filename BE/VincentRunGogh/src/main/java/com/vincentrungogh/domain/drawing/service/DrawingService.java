@@ -169,6 +169,9 @@ public class DrawingService {
         DrawingDetail drawingDetail = DrawingDetail
                 .createDrawingDetail(response, request.getDrawingDetailImage(), drawing);
         drawingDetailRepository.save(drawingDetail);
+
+        // 5. 레디스 삭제
+        redisService.removeRunning(userId);
     }
 
 
