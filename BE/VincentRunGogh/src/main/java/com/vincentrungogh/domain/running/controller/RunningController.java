@@ -2,6 +2,7 @@ package com.vincentrungogh.domain.running.controller;
 
 import com.vincentrungogh.domain.running.service.RunningService;
 import com.vincentrungogh.domain.running.service.dto.request.RunningRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -22,7 +23,7 @@ public class RunningController {
     // 달리기 시작
     @MessageMapping("/running/{nickname}")
     public void running(@DestinationVariable String nickname,
-                             RunningRequest request,
+                             @Valid RunningRequest request,
                         SimpMessageHeaderAccessor accessor){
 
         log.info(nickname + " : 달리기");
