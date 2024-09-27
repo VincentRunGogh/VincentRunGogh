@@ -1,5 +1,8 @@
 package com.vincentrungogh.domain.drawing.controller;
 
+import com.vincentrungogh.domain.drawing.service.dto.request.StartDrawingRequest;
+import com.vincentrungogh.domain.drawing.service.dto.response.StartDrawingResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.vincentrungogh.domain.drawing.service.DrawingService;
@@ -71,5 +74,22 @@ public class DrawingController {
         DrawingResponseDto responseDto = drawingService.getDrawing(userPrincipal.getId(), drawingId);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "루트 조회에 성공했습니다.", responseDto));
+    }
+
+    @Operation(summary = "드로잉 시작", description = "드로잉 생성 후 시작")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "드로잉이 시작되었습니다.",
+                    content = @Content(schema = @Schema(implementation = StartDrawingResponse.class))),
+            @ApiResponse(responseCode = "500", description = "드로잉을 시작하는데 실패했습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @PostMapping("/start")
+    public ResponseEntity<?> startDrawing(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody StartDrawingRequest request){
+
+        StartDrawingResponse response = drawingService.startDrawing(userPrincipal.getId(), request.getRouteId());
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(), "드로잉이 시작되었습니다.", response));
     }
 }
