@@ -102,30 +102,30 @@ def matching_user_path_to_roads(user_drawn_path, pedestrian_df):
     # 후처리
     # 도로와 연결되었는지 검증하기
 
-    final_matched_nodes = []
-    i = 0
-    while i < len(matched_nodes)-1:
-        current_node = matched_nodes[i]
-        flag = False
-
-        for j in range(i+1, len(matched_nodes)):
-            next_node = matched_nodes[j]
-            # 디버깅
-            # if current_node in G.nodes() and next_node in G.nodes():
-            #
-            #     #print(f"노드 {current_node}와 {next_node}는 그래프에 존재합니다.")
-            # else:
-            #     #print(f"노드 {current_node} 또는 {next_node}는 그래프에 존재하지 않습니다.")
-
-            if G.has_edge(current_node, next_node):
-                final_matched_nodes.append(current_node)
-                i = j # 연결된 노드로 이동
-                flag = True
-                break
-
-        if not flag:
-            print(f"노드 {current_node}의 연결노드를 찾을 수 없다")
-            i += 1
+    # final_matched_nodes = []
+    # i = 0
+    # while i < len(matched_nodes)-1:
+    #     current_node = matched_nodes[i]
+    #     flag = False
+    #
+    #     for j in range(i+1, len(matched_nodes)):
+    #         next_node = matched_nodes[j]
+    #         # 디버깅
+    #         # if current_node in G.nodes() and next_node in G.nodes():
+    #         #
+    #         #     #print(f"노드 {current_node}와 {next_node}는 그래프에 존재합니다.")
+    #         # else:
+    #         #     #print(f"노드 {current_node} 또는 {next_node}는 그래프에 존재하지 않습니다.")
+    #
+    #         if G.has_edge(current_node, next_node):
+    #             final_matched_nodes.append(current_node)
+    #             i = j # 연결된 노드로 이동
+    #             flag = True
+    #             break
+    #
+    #     if not flag:
+    #         print(f"노드 {current_node}의 연결노드를 찾을 수 없다")
+    #         i += 1
 
     route_coords = [nodes[node_id] for node_id in final_matched_nodes]
     print("art, route node 개수 ",len(node_coords), len(matched_nodes),len(route_coords))
