@@ -40,12 +40,18 @@ public class PythonApiService {
         //제네릭 타입을 명확히 지정
         //제네릭타입은 런타임 시 LinkedHashMap와 같은 일반적인 타입으로 변경
         //이를 해결하기 위해 타입을 정확하게 지정
-        ResponseEntity<ResultDto<DataArtRouteResponseDto>> response = restTemplate.exchange(
-                uri,
-                HttpMethod.POST,
-                new HttpEntity<>(requestDto),
-                new ParameterizedTypeReference<ResultDto<DataArtRouteResponseDto>>() {}
-        );
+        ResponseEntity<ResultDto<DataArtRouteResponseDto>> response;
+        try {
+            response = restTemplate.exchange(
+                    uri,
+                    HttpMethod.POST,
+                    new HttpEntity<>(requestDto),
+                    new ParameterizedTypeReference<ResultDto<DataArtRouteResponseDto>>() {
+                    }
+            );
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.FAILED_CHANGE_ROOTING);
+        }
 
         log.info(response.toString());
 
@@ -67,12 +73,17 @@ public class PythonApiService {
         //제네릭 타입을 명확히 지정
         //제네릭타입은 런타임 시 LinkedHashMap와 같은 일반적인 타입으로 변경
         //이를 해결하기 위해 타입을 정확하게 지정
-        ResponseEntity<ResultDto<DataSaveRouteResponseDto>> response = restTemplate.exchange(
+        ResponseEntity<ResultDto<DataSaveRouteResponseDto>> response;
+        try {
+        response = restTemplate.exchange(
                 uri,
                 HttpMethod.POST,
                 new HttpEntity<>(requestDto),
                 new ParameterizedTypeReference<ResultDto<DataSaveRouteResponseDto>>() {}
         );
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.FAILED_CHANGE_ROOTING);
+        }
 
         if (response.getStatusCode() != HttpStatus.OK) {
             throw new CustomException(ErrorCode.FAILED_SAVE_ROOTING);
