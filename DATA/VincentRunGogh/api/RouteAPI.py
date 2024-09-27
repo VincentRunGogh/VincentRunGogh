@@ -135,15 +135,15 @@ async def save_drawing_detail(request: DataSaveDrawingDetailRequestDto):
     await mongodb.engine.save(drawingDetail)
     print("생성되었습니다.")
 
-    # 저장된 route의 ID를 응답 데이터로 포함
+    # 저장된 드로잉의 ID를 응답 데이터로 포함
     response_data = {
         "status": 200,
         "message": "루트를 성공적으로 저장했습니다.",
         "data": {
             "drawingDetailId": str(drawingDetail.id),  # drawingDetail.id는 MongoDB에서 자동 생성된 ObjectId입니다.
-            "centerLat": 0.0,
-            "centerLng": 0.0,
-            "distance": 0
+            "time": 1000,
+            "speed": 1000,
+            "distance": 1000
         }
     }
     return response_data
