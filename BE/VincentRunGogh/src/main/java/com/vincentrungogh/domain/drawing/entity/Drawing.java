@@ -64,18 +64,36 @@ public class Drawing {
         this.route = route;
     }
 
-    public static Drawing createDrawing(String title, String accumulatedDrawingImage, User user, Route route) {
+    public static Drawing createDrawing(String title, User user, Route route) {
         return Drawing.builder()
                 .title(title)
                 .isCompleted(false)
                 .isCreatedBoard(false)
-                .accumulatedDrawingImage(accumulatedDrawingImage)
+                .accumulatedDrawingImage(null)
                 .created(LocalDateTime.now())
                 .updated(LocalDateTime.now())
                 .user(user)
                 .route(route)
                 .build();
     }
+
+    public static Drawing createFreeRunning(User user) {
+        return Drawing.builder()
+                .title(null)
+                .isCompleted(false)
+                .isCreatedBoard(false)
+                .accumulatedDrawingImage(null)
+                .created(LocalDateTime.now())
+                .updated(LocalDateTime.now())
+                .user(user)
+                .route(null)
+                .build();
+    }
+
+    public void changeAccumulatedDrawingImage(String accumulatedDrawingImage){
+        this.accumulatedDrawingImage = accumulatedDrawingImage;
+    }
+
 
     // 드로잉이 완성되었을 때 사용
     public void completeDrawing(String title, String accumulatedDrawingImage) {

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -27,6 +28,14 @@ public class StartDrawingResponse {
                 .title(title)
                 .drawingId(drawingId)
                 .routePositionList(routePositionList)
+                .build();
+    }
+
+    public static StartDrawingResponse createStartFreeRunningResponse(int drawingId) {
+        return StartDrawingResponse.builder()
+                .title(null)
+                .drawingId(drawingId)
+                .routePositionList(new ArrayList<>())
                 .build();
     }
 }

@@ -70,11 +70,11 @@ public class DrawingService {
     private StartDrawingResponse freeRunning(User user) {
         // 1. 드로잉 생성
         Drawing drawing = Drawing
-                .createDrawing("", "", user, null);
+                .createFreeRunning(user);
 
         drawing = drawingRepository.save(drawing);
         return StartDrawingResponse
-                .createStartDrawingResponse(null, drawing.getId(), new ArrayList<Position>());
+                .createStartFreeRunningResponse(drawing.getId());
     }
 
 
@@ -86,7 +86,6 @@ public class DrawingService {
         // 2. 드로잉 생성
         Drawing drawing = Drawing
                 .createDrawing(route.getTitle(),
-                        null,
                         user,
                         route);
         drawing = drawingRepository.save(drawing);
