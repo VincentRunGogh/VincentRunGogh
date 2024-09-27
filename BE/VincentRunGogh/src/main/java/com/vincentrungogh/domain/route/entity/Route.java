@@ -25,7 +25,7 @@ public class Route {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title", nullable = false, length = 10)
     private String title;
 
     @Column(name = "center_lat")

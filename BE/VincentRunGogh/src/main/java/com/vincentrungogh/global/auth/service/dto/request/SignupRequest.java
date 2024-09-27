@@ -20,8 +20,10 @@ public class SignupRequest {
     @NotBlank
     private String email;
     @NotBlank
+    @Size(min = 1, max = 20, message = "패스워드는 1글자 이상 20글자 이하로 입력해주세요.")
     private String password;
     @NotBlank
+    @Size(min = 1, max = 10, message = "닉네임은 1글자 이상 10글자 이하로 입력해주세요.")
     private String nickname;
     @NotNull
     private int gender;
