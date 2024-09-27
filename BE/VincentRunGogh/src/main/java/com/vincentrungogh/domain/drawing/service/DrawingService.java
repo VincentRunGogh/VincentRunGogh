@@ -3,6 +3,9 @@ package com.vincentrungogh.domain.drawing.service;
 import com.vincentrungogh.domain.drawing.entity.DrawingDetail;
 import com.vincentrungogh.domain.drawing.entity.MongoDrawingDetail;
 import com.vincentrungogh.domain.drawing.repository.MongoDrawingRepository;
+import com.vincentrungogh.domain.drawing.service.dto.request.DataSaveDrawingDetailRequset;
+import com.vincentrungogh.domain.drawing.service.dto.request.SaveDrawingRequest;
+import com.vincentrungogh.domain.drawing.service.dto.response.DataSaveDrawingDetailResponse;
 import com.vincentrungogh.domain.drawing.service.dto.response.RestartDrawingResponse;
 import com.vincentrungogh.domain.drawing.service.dto.response.StartDrawingResponse;
 import com.vincentrungogh.domain.route.entity.MongoRoute;
@@ -10,9 +13,13 @@ import com.vincentrungogh.domain.route.entity.Route;
 import com.vincentrungogh.domain.route.repository.MongoRouteRepository;
 import com.vincentrungogh.domain.route.repository.RouteRepository;
 import com.vincentrungogh.domain.route.service.dto.common.Position;
+import com.vincentrungogh.domain.running.service.dto.request.RunningRequest;
 import com.vincentrungogh.domain.user.service.UserService;
+import com.vincentrungogh.global.service.PythonApiService;
+import com.vincentrungogh.global.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import com.vincentrungogh.domain.drawing.entity.Drawing;
 import com.vincentrungogh.domain.drawing.repository.DrawingDetailRepository;
@@ -41,6 +48,8 @@ public class DrawingService {
     private final MongoDrawingRepository mongoDrawingRepository;
     private final MongoRouteRepository mongoRouteRepository;
     private final UserService userService;
+    private final RedisService redisService;
+    private final PythonApiService pythonApiService;
 
     @Transactional
     public DrawingResponseDto getDrawing(int userId, int drawingId) {
@@ -134,4 +143,36 @@ public class DrawingService {
                 routePositionList
         );
     }
+
+    @Transactional
+    public void saveDrawing(int userId, int drawingId, SaveDrawingRequest request){
+
+        // 1. redis에서 정보 가져오기
+        List<RunningRequest> redisPositionList = redisService.getRunning(userId);
+        log.info(redisPositionList.toString());
+
+        // 2. python 연결
+        DataSaveDrawingDetailResponse response =  pythonApiService.saveDrawingDetail(
+                DataSaveDrawingDetailRequset.createDataSaveDrawingDetailRequset(redisPositionList)
+        );
+
+        log.info("saveDrawing : " + response);
+
+        // 3. 드로잉
+        Drawing drawing = drawingRepository.findById(drawingId).orElseThrow(()->
+                new CustomException(ErrorCode.DRAWING_NOT_FOUND));
+
+        drawing.changeAccumulatedDrawingImage(request.getDrawingImage());
+        drawing = drawingRepository.save(drawing);
+
+        // 4. 드로잉 디테일 저장
+        DrawingDetail drawingDetail = DrawingDetail
+                .createDrawingDetail(response, request.getDrawingDetailImage(), drawing);
+        drawingDetailRepository.save(drawingDetail);
+
+        // 5. 레디스 삭제
+        redisService.removeRunning(userId);
+    }
+
+
 }

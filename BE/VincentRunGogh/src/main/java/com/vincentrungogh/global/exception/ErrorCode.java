@@ -28,6 +28,7 @@ public enum ErrorCode {
     ROUTE_NOT_FOUND("존재하지 않은 루트입니다", HttpStatus.NOT_FOUND),
     DRAWING_NOT_FOUND("드로잉 정보가 없습니다. ", HttpStatus.NOT_FOUND),
     DRAWINGDETAUL_NOT_FOUND("드로잉 디테일 정보가 없습니다.", HttpStatus.NOT_FOUND),
+    FAILED_SAVE_DRAWINGDETAIL("드로잉 디테일을 저장하는데 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     ;
 
 

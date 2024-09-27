@@ -71,8 +71,8 @@ public class RedisService {
         redisTemplate.opsForList().rightPush(key, position);
     }
 
-    public List<Object> getRunning(int userId){
+    public List<RunningRequest> getRunning(int userId){
         String key = "running:" + userId;
-        return redisTemplate.opsForList().range(key, 0, -1);
+        return (List<RunningRequest>) (List<?>)redisTemplate.opsForList().range(key, 0, -1);
     }
 }

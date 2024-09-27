@@ -1,5 +1,6 @@
 package com.vincentrungogh.domain.drawing.controller;
 
+import com.vincentrungogh.domain.drawing.service.dto.request.SaveDrawingRequest;
 import com.vincentrungogh.domain.drawing.service.dto.request.StartDrawingRequest;
 import com.vincentrungogh.domain.drawing.service.dto.response.RestartDrawingResponse;
 import com.vincentrungogh.domain.drawing.service.dto.response.StartDrawingResponse;
@@ -109,5 +110,24 @@ public class DrawingController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(), "드로잉이 시작되었습니다.", response));
+    }
+
+    @Operation(summary = "드로잉 저장", description = "드로잉 저장")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "드로잉이 저장되었습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "드로잉을 저장하는데 실패했습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @PostMapping("/{drawingId}")
+    public ResponseEntity<?> saveDrawing(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable int drawingId, @RequestBody SaveDrawingRequest request){
+
+        drawingService.saveDrawing(userPrincipal.getId(), drawingId, request);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(), "드로잉이 저장되었습니다."));
+
     }
 }
