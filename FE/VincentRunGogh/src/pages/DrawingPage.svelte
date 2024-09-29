@@ -138,7 +138,7 @@
               // continue 이벤트 처리
               modalInstance.$on('continue', () => {
                 //TODO - 3초 보여주기
-                // countdown = 3;
+                countdown = 3;
                 Swal.close(); // SweetAlert 모달을 닫음
                 setTimeout(() => {
                   isPause.update((value) => !value);
@@ -196,7 +196,10 @@ fill="#000000" stroke="none">
   }
 
   function createLines(): Polyline {
-    return L.polyline($posList, { color: '#E4E', opacity: 0.5, smoothFactor: 1 });
+    return L.polyline(
+      $posList.map((p) => p.latlng),
+      { color: '#E4E', opacity: 0.5, smoothFactor: 1 }
+    );
   }
 
   let lineLayers: Polyline;
@@ -247,8 +250,9 @@ fill="#000000" stroke="none">
         }
         addPosition(lat, lng);
         //!SECTION - 소켓에 위치 전송
-        const nickname = $userStore?.nickname;
-        console.log(nickname);
+        const currentUser = get(userStore);
+        const nickname = currentUser ? currentUser.nickname : '';
+
         sendRealTimePosition({ lat, lng }, nickname);
         if (map !== null) {
           // 마커가 이미 존재하면 업데이트하고, 없으면 새로 추가
@@ -303,28 +307,40 @@ fill="#000000" stroke="none">
   function handleTimerComplete() {
     countdown = null;
     !map && mapAction();
+    console.log('트래킹 시작');
     toggleTracking();
-    connectWebSocket();
   }
-  onMount(() => {
-    const params = querystring.parse(window.location.search);
-    const routeId = params.routeId;
-    const drawingId = params.drawingId;
+  let routeId, drawingId;
+  let options = {};
+
+  // Reactive statement to update routeId and drawingId whenever querystring changes
+  $: if ($querystring) {
+    const params = new URLSearchParams($querystring);
+    routeId = params.get('routeId');
+    drawingId = params.get('drawingId');
     console.log(drawingId, routeId);
-    const options: any = {};
 
-    if (drawingId) {
-      options.drawingId = drawingId;
-    }
+    // Update options inside the reactive statement
+    options = {
+      ...(drawingId ? { drawingId } : {}),
+      ...(routeId ? { rootId: routeId } : {}),
+    };
+  }
 
-    if (routeId) {
-      options.rootId = routeId;
-    }
+  onMount(() => {
+    userStore.initialize(); // 스토어에서 사용자 정보 초기화
+
     startDrawing(
       options,
-      (response) => {
-        console.log('Drawing started successfully:', response);
+      async (response) => {
+        console.log('api 연결 후 드로잉 데이터:', response);
         updateDrawingInfo(response.data.data); // 스토어를 업데이트
+        try {
+          await connectWebSocket();
+          console.log('WebSocket connected successfully');
+        } catch (error) {
+          console.error('Failed to connect WebSocket:', error);
+        }
       },
       (error) => {
         console.error('Failed to start drawing:', error);

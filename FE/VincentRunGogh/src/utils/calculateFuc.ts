@@ -1,4 +1,5 @@
 import { totalDistance, averageSpeed, elapsedTime } from '@/stores/drawingStore';
+import L from 'leaflet';
 import type { LatLngExpression, LatLng } from 'leaflet';
 import { get } from 'svelte/store'; // Svelte store와 get 함수 가져오기
 
@@ -27,8 +28,9 @@ export function updateDistanceAndSpeed(
     if (posList.length > 1) {
       const lastPosData = posList[posList.length - 2]; // 이전 좌표 데이터
       const newPosData = posList[posList.length - 1]; // 새 좌표 데이터
-      const lastPos = lastPosData.latlng;
-      const newPos = newPosData.latlng;
+      // Leaflet의 LatLng 객체로 변환 확인
+      const lastPos = new L.LatLng(lastPosData.latlng.lat, lastPosData.latlng.lng);
+      const newPos = new L.LatLng(newPosData.latlng.lat, newPosData.latlng.lng);
 
       // Leaflet의 distanceTo 메서드를 사용하여 거리 계산 (미터 단위 반환)
       const distance = lastPos.distanceTo(newPos) / 1000; // km로 변환
