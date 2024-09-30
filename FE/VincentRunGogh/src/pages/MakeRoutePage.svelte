@@ -515,11 +515,6 @@
             다음 <ArrowRightOutline class="ms-2" size="sm" />
           </GradientButton>
         {/if}
-        {#if isSubmit}
-          <GradientButton color="redToYellow" size="sm" on:click={() => replace('/')} pill>
-            <RedoOutline class="me-2" size="sm" /> 홈으로
-          </GradientButton>
-        {/if}
       </div>
     {/if}
   </div>
