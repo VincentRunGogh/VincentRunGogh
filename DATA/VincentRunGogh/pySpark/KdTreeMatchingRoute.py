@@ -127,7 +127,7 @@ def matching_user_path_to_roads(user_drawn_path, pedestrian_df):
     #         print(f"노드 {current_node}의 연결노드를 찾을 수 없다")
     #         i += 1
 
-    route_coords = [nodes[node_id] for node_id in final_matched_nodes]
+    route_coords = [nodes[node_id] for node_id in matched_nodes]
     print("art, route node 개수 ",len(node_coords), len(matched_nodes),len(route_coords))
     #
     # distance_frechet = frdist(node_coords, route_coords)
