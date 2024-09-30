@@ -1,7 +1,18 @@
 <script lang="ts">
+  import { getDrawingList } from '@/api/drawingApi2';
   import { getWeeklyInfo } from '@/api/userApi';
   import Tabbar from '@/components/tabbar/Tabbar.svelte';
-  import { Chart, Card, A, Button, Dropdown, DropdownItem } from 'flowbite-svelte';
+  import {
+    Chart,
+    Card,
+    A,
+    Button,
+    Dropdown,
+    DropdownItem,
+    ImagePlaceholder,
+    CardPlaceholder,
+    TextPlaceholder,
+  } from 'flowbite-svelte';
   import { onMount } from 'svelte';
   import Swal from 'sweetalert2';
 
@@ -51,43 +62,36 @@
   console.log(randomNum);
 
   // 진행중 드로잉 더미
-  let dummyDrawingList: {
+
+  // 진행중 드로잉 리스트 받기
+  let ongoingDrawingList: {
     drawingId: number;
     title: string;
     artImage: string;
     drawingImage: string;
     updated: string;
-  }[] = [
-    {
-      drawingId: 1,
-      title: '런닝 제목1',
-      artImage: 'http://via.placeholder.com/150x150',
-      drawingImage: 'http://via.placeholder.com/150x150/FFFF00',
-      updated: '2024-07-15',
-    },
-    {
-      drawingId: 2,
-      title: '런닝 제목2',
-      artImage: 'http://via.placeholder.com/150x150',
-      drawingImage: 'http://via.placeholder.com/150x150/FFFF00',
-      updated: '2024-08-22',
-    },
-    {
-      drawingId: 3,
-      title: '런닝 제목3',
-      artImage: 'http://via.placeholder.com/150x150',
-      drawingImage: 'http://via.placeholder.com/150x150/FFFF00',
-      updated: '2024-06-30',
-    },
-  ];
+  }[] = [];
+
+  async function getDrawingInfo() {
+    try {
+      let responseOngoing = await getDrawingList('ongoing');
+      ongoingDrawingList = responseOngoing.data.findDrawingList;
+      console.log('in func', ongoingDrawingList);
+    } catch (error) {
+      {
+        throw error;
+      }
+    }
+  }
 
   // 진행중인 드로잉 클릭
   async function clickOngoingDrawing(drawingId: number) {
     // try {
-    //     let data = await fetchData(); // AJAX 요청 함수 호출
+    //     let responseOngoing = await getDrawingInfo(drawingId);
     //     // 요청 성공 후 모달 열기
     //     Swal.fire({
-    //         title: '모달 제목',
+    //         title: '진행중인 드로잉',
+    //         html:'<div id='
     //         text: data.message, // AJAX 요청으로 받은 데이터를 모달에 표시
     //         showCancelButton: true,
     //         confirmButtonText: '확인',
@@ -298,6 +302,8 @@
 
   onMount(async () => {
     await getWeekly();
+    await getDrawingInfo();
+    console.log(ongoingDrawingList);
     isLoad = true;
   });
 </script>
@@ -312,23 +318,34 @@
   <div id="homepage-drawing">
     <p>진행 중인 드로잉</p>
     <div id="drawing-list">
-      {#each dummyDrawingList as drawing}
+      {#if ongoingDrawingList}
+        {#each ongoingDrawingList as drawing}
+          <Card
+            class="m-2 mt-3 mb-3 text-xs p-0 w-c-30"
+            size="xs"
+            on:click={() => clickOngoingDrawing(drawing.drawingId)}
+          >
+            <img class="rounded-t-lg" src={drawing.artImage} alt="" />
+            <div class="p-1">
+              <h5 class="mb-2 font-bold tracking-tight text-gray-900 dark:text-white">
+                {drawing.title}
+              </h5>
+              <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
+                {drawing.updated.split('T')[0]}
+              </p>
+            </div>
+          </Card>
+        {/each}
+      {:else}
         <Card
-          class="m-2 mt-5 mb-5 text-xs p-0 "
+          class="m-2 mt-5 mb-5 text-xs p-0 h-40 gap-1 flex flex-row justify-around items-center"
           size="xs"
-          on:click={() => clickOngoingDrawing(drawing.drawingId)}
         >
-          <img class="rounded-t-lg" src="http://via.placeholder.com/100x100" alt="" />
-          <div class="p-1">
-            <h5 class="mb-2 font-bold tracking-tight text-gray-900 dark:text-white">
-              {drawing.title}
-            </h5>
-            <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
-              {drawing.updated}
-            </p>
-          </div>
+          <ImagePlaceholder imgOnly imgHeight="20" divClass="w-20 m-0 animate-pulse" />
+          <ImagePlaceholder imgOnly imgHeight="20" divClass="w-20 m-0 animate-pulse" />
+          <ImagePlaceholder imgOnly imgHeight="20" divClass="w-20 m-0 animate-pulse" />
         </Card>
-      {/each}
+      {/if}
     </div>
   </div>
   <div id="homepage-chart">
@@ -371,6 +388,7 @@
     height: 90%;
     justify-content: space-around;
     align-items: center;
+    overflow: hidden;
   }
 
   #homepage-chart {
