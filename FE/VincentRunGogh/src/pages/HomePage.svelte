@@ -2,17 +2,7 @@
   import { getDrawingList } from '@/api/drawingApi2';
   import { getWeeklyInfo } from '@/api/userApi';
   import Tabbar from '@/components/tabbar/Tabbar.svelte';
-  import {
-    Chart,
-    Card,
-    A,
-    Button,
-    Dropdown,
-    DropdownItem,
-    ImagePlaceholder,
-    CardPlaceholder,
-    TextPlaceholder,
-  } from 'flowbite-svelte';
+  import { Chart, Card, ImagePlaceholder } from 'flowbite-svelte';
   import { onMount } from 'svelte';
   import Swal from 'sweetalert2';
 
@@ -57,9 +47,8 @@
     `오늘은 ${Math.floor(dummyGroupInfo.myDayRuntime / 60)}분 뛰었군요!`,
     `오늘은 ${parseFloat((dummyGroupInfo.myDayDistance / 1000).toFixed(2))}km를 뛰었군요!`,
   ];
-
+  // 랜덤 문구 출력
   let randomNum: number = Math.floor(Math.random() * welcomeWordList.length);
-  console.log(randomNum);
 
   // 진행중 드로잉 더미
 
@@ -75,8 +64,16 @@
   async function getDrawingInfo() {
     try {
       let responseOngoing = await getDrawingList('ongoing');
-      ongoingDrawingList = responseOngoing.data.findDrawingList;
-      console.log('in func', ongoingDrawingList);
+      let ongoingLength: number = responseOngoing.data.findDrawingList.length;
+      if (ongoingLength > 3) {
+        for (let i = 0; i < 3; i++) {
+          ongoingDrawingList = [...ongoingDrawingList, responseOngoing.data.findDrawingList[i]];
+        }
+      } else {
+        for (let i = 0; i < ongoingLength; i++) {
+          ongoingDrawingList = [...ongoingDrawingList, responseOngoing.data.findDrawingList[i]];
+        }
+      }
     } catch (error) {
       {
         throw error;
@@ -316,12 +313,12 @@
     <h3 class="font-bold">{welcomeWordList[randomNum]}</h3>
   </div>
   <div id="homepage-drawing">
-    <p>진행 중인 드로잉</p>
+    <p class="mt-2 font-bold">진행 중인 드로잉</p>
     <div id="drawing-list">
       {#if ongoingDrawingList}
         {#each ongoingDrawingList as drawing}
           <Card
-            class="m-2 mt-3 mb-3 text-xs p-0 w-c-30"
+            class="m-2 mb-0 text-xs p-0 w-c-30"
             size="xs"
             on:click={() => clickOngoingDrawing(drawing.drawingId)}
           >
@@ -350,6 +347,7 @@
   </div>
   <div id="homepage-chart">
     <Card class="w-80">
+      <p class="font-bold text-black">주간 운동 정보</p>
       {#if isLoad}
         <Chart {options} />
       {/if}
@@ -379,8 +377,17 @@
   }
 
   #homepage-drawing {
-    height: 30vh;
+    height: 27vh;
     padding-top: 0%;
+    width: 90%;
+    margin-left: 5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    background-color: #ffffff;
+    margin-bottom: 6vh;
+    border-radius: 5%;
   }
 
   #drawing-list {
@@ -392,7 +399,7 @@
   }
 
   #homepage-chart {
-    height: 30vh;
+    height: 25vh;
     display: flex;
     justify-content: center;
     align-items: center;
