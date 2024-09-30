@@ -3,6 +3,7 @@ import { writable } from 'svelte/store';
 import { Client } from '@stomp/stompjs';
 import type { IFrame } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import { formatTimeToHMS } from '@/utils/formatter';
 
 let stompClient: Client | null = null;
 
@@ -46,9 +47,9 @@ export function connectWebSocket() {
 
 export function sendRealTimePosition(location: Object, nickname: string) {
   if (stompClient && stompClient.connected) {
-    const accessToken = localStorage.getItem('access_token');
+    const accessToken = localStorage.getItem('accessToken');
     const headers = { Authorization: `Bearer ${accessToken}` };
-    const data = { ...location, time: new Date().getTime() };
+    const data = { ...location, time: formatTimeToHMS() };
     console.log('Sending data:', data);
     stompClient.publish({
       destination: `/pub/running/${nickname}`,
@@ -69,6 +70,8 @@ export function disconnectWebSocket() {
 function restartSockJS() {
   console.log('Attempting to restart SockJS...');
   const socket = new SockJS(import.meta.env.VITE_WEB_SOCKET_URL);
-  stompClient.webSocketFactory = () => socket;
-  stompClient.activate();
+  if (stompClient) {
+    stompClient.webSocketFactory = () => socket;
+    stompClient.activate();
+  }
 }
