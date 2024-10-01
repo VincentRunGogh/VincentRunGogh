@@ -32,11 +32,13 @@ public class FindRoute {
         //사용자로부터 떨어진 거리
         Double distanceUser = DistanceCalculator.calculateDistance(route.getCenterLat(), route.getCenterLng(), lat, lng);
 
+        //평균 속력은 km/h
         if (averageSpeed <= 0) {
             throw new CustomException(ErrorCode.SPEED_DIVIDE_BY_ZERO);
         }
 
-        int predictTime = (int) (route.getDistance() / averageSpeed);
+        //속력은 Km, 거리는 m단위
+        int predictTime = (int) (route.getDistance() / (averageSpeed * (5.0 / 18.0)));
 
         Double distance = Math.round((route.getDistance() / 1000.0) * 100) / 100.0;
 

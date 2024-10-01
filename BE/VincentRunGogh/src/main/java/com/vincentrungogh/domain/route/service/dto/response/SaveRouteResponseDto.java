@@ -31,7 +31,7 @@ public class SaveRouteResponseDto {
                 .routeId(route.getId())
                 .artImage(route.getArtImage())
                 .distance(distance)
-                .predictTime((int) (route.getDistance() / averageSpeed))
+                .predictTime((int) (route.getDistance() / (averageSpeed * (5.0 / 18.0))))
                 .build();
     }
 }
