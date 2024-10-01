@@ -42,20 +42,24 @@
 
   /* Gradients */
   --yellow-linear-gradient: linear-gradient(
-    95%,
-    var(--yellow-linear-start) 89%,
-    var(--yellow-linear-end) 95%
+    to bottom,
+    var(--yellow-linear-start) 0%,
+    var(--yellow-linear-end) 100%
   );
-  --red-linear-gradient: linear-gradient(100%, var(--red-linear-start), var(--red-linear-end));
+  --red-linear-gradient: linear-gradient(
+    to bottom,
+    var(--red-linear-start) 0%,
+    var(--red-linear-end) 100%
+  );
   --green-linear-gradient: linear-gradient(
-    100%,
-    var(--green-linear-start),
-    var(--green-linear-end)
+    to bottom,
+    var(--green-linear-start) 0%,
+    var(--green-linear-end) 100%
   );
   --font-size-title: 1.8rem;
   --font-size-large: 2rem;
   --font-size-medium: 1.7rem;
-  --font-size-small: 1.32rem;
+  --font-size-small: 1rem;
 
   --margin-lr-default: 3rem;
 }
