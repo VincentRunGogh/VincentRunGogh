@@ -55,10 +55,7 @@
       </svg>
     </button>
   </div>
-  <div
-    class="flex flex-row items-center justify-between
-"
-  >
+  <div class="flex flex-row items-center w-[inherit] justify-around">
     <button class="text-green-500 focus:outline-none" on:click={clickMute} aria-label="Mute Button">
       <!-- Mute icon -->
       <svg
@@ -101,7 +98,7 @@
     </button>
   </div>
 
-  <div class="text-center mt-12">
+  <div class="text-center mt-4">
     <div class="text-4xl font-bold text-gray-800">{formatSecToMMSS($elapsedTime)}</div>
     <div class="mt-4 space-x-4 flex justify-center items-center">
       <!-- Display dynamic data in an organized manner -->
