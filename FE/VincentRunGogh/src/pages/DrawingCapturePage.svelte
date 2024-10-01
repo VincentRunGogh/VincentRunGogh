@@ -143,8 +143,9 @@
       step: 0,
       ...endInfo,
     };
-
-    data.title = inputName;
+    if (isComplete) {
+      data.title = inputName;
+    }
     console.log(data);
     if (isComplete) {
       completeDrawing(
@@ -171,21 +172,23 @@
   let errorMessage: string = '';
 
   async function lockMap() {
-    if (inputName.length === 0) {
-      errorMessage = '루트 이름을 입력해 주세요.';
-      Swal.fire({
-        text: errorMessage,
-        icon: 'error',
-      });
-      return;
-    } else if (inputName.length > 10) {
-      errorMessage = '최대 10글자까지만 가능합니다.';
-      Swal.fire({
-        text: errorMessage,
-        icon: 'error',
-      });
-      return;
-    } else errorMessage = '';
+    if (isComplete) {
+      if (inputName.length === 0) {
+        errorMessage = '루트 이름을 입력해 주세요.';
+        Swal.fire({
+          text: errorMessage,
+          icon: 'error',
+        });
+        return;
+      } else if (inputName.length > 10) {
+        errorMessage = '최대 10글자까지만 가능합니다.';
+        Swal.fire({
+          text: errorMessage,
+          icon: 'error',
+        });
+        return;
+      } else errorMessage = '';
+    }
     await mapCapture(true);
     await changeMapWithSingleColor();
 

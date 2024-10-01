@@ -405,6 +405,7 @@ fill="#000000" stroke="none">
   onMount(() => {
     userStore.initialize(); // 스토어에서 사용자 정보 초기화
     countdown = 3;
+    console.log(options);
     startDrawing(
       options,
       async (response) => {
