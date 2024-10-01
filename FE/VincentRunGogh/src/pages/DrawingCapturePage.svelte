@@ -268,7 +268,7 @@
 <div class="make-route">
   {#if !isLocked}
     <div bind:this={mapRef} id="map"></div>
-    <div id="makeroute-footer" class="flex flex-col items-center justify-end h-96">
+    <div id="makeroute-footer" class="flex flex-col items-center justify-end">
       <div
         class="fixed left-1/2 transform -translate-x-1/2 text-red-500 font-bold px-2 py-1 top-[12vh] overflow-hidden text-ellipsis whitespace-nowrap bg-[#FFFFFF67]"
       >
@@ -313,7 +313,7 @@
       title={inputName}
       distance={$totalDistance}
       time={$elapsedTime}
-      image={drawingDetailImage}
+      image={$drawingDetailImage}
       isRoute={false}
     />
   {/if}
