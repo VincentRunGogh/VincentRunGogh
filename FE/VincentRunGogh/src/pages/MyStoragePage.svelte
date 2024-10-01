@@ -1,9 +1,11 @@
 <script lang="ts">
   import Tabbar from '@/components/tabbar/Tabbar.svelte';
-  import { Card, Button, Carousel, Tabs, TabItem } from 'flowbite-svelte';
+  import { Card, Button, Carousel, Tabs, TabItem, Avatar } from 'flowbite-svelte';
   import { replace } from 'svelte-spa-router';
-  import { PaletteOutline, HeartSolid, TrashBinSolid } from 'flowbite-svelte-icons';
+  import { PaletteOutline, HeartSolid, TrashBinSolid, HeartOutline } from 'flowbite-svelte-icons';
   import Swal from 'sweetalert2';
+  import BackButton from '@/components/buttons/BackButton.svelte';
+  import FeedArticle from '@/components/cards/FeedArticle.svelte';
 
   let dummyArticleList: {
     id: number;
@@ -161,7 +163,7 @@
     },
   ];
 
-  const dummyLikedList = [
+  let dummyLikedList = [
     {
       id: 21,
       nickname: 'test1',
@@ -363,110 +365,121 @@
       }
     });
   }
+
+  // 좋아요버튼 클릭
+  async function switchLiked(article: any) {
+    // 현재 좋아요 상태를 반전시키고 새로운 객체로 대체
+    const updatedArticle = { ...article, isLiked: !article.isLiked };
+
+    // dummyArticleList에서 해당 article 업데이트
+    const articleIndex = dummyArticleList.findIndex((dummy) => dummy.id === article.boardId);
+
+    if (articleIndex !== -1) {
+      dummyArticleList[articleIndex] = updatedArticle; // 배열 내 객체 교체
+    }
+
+    // API 요청하여 좋아요 처리하기
+    // 예: await api.likeArticle(updatedArticle);
+  }
 </script>
 
 <div id="community-body">
-  <div id="community-header">
-    <div id="community-logo">
-      <img src="/4.png" alt="logo" style="height: 100%;" />
-    </div>
-    <div id="community-title">
-      <h1 style="font-size: 20px; font-weight: bold;">커뮤니티</h1>
-    </div>
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <!-- svelte-ignore a11y-interactive-supports-focus -->
-    <div id="community-mystorage" role="button" on:click={() => replace('/community/mystorage')}>
-      <img src="/66.png" alt="logo" style="height: 100%;" />
-    </div>
+  <div id="community-header" class="flex justify-center items-center">
+    <BackButton />
+    <h2>내 보관함</h2>
+  </div>
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-interactive-supports-focus -->
+  <div id="community-mystorage" role="button" class="absolute top-3 right-3">
+    <Avatar dot={{ color: 'green' }} />
+  </div>
+  <div id="search-control">
+    <Button size="sm" on:click={searchCondition}>검색 반경 설정</Button>
+    <p class="my-3 font-bold">반경 {range}km내의 루트만 표시됩니다.</p>
   </div>
   <div id="community-content">
-    <button on:click={searchCondition}>검색 반경 설정</button>
-    <p>반경 {range}km내의 루트만 표시됩니다.</p>
-    <Tabs tabStyle="underline">
-      <TabItem open>
-        <div slot="title" class="flex items-center gap-2">
+    <Tabs defaultClass="flex justify-between" tabStyle="underline">
+      <!-- api 연결시 여기에 on:click 해야함 just like RouteListPage -->
+      <TabItem defaultClass="tab-item font-bold text-xs gap-2" open>
+        <div slot="title" class="flex items-center gap-1">
           <PaletteOutline size="md" />
-          내가 만든 루트
+          게시한 루트
         </div>
         {#each dummyArticleList as article}
           {#if article.distanceFromUser <= range * 1000}
-            <Card class="mb-5">
-              <div class="flex">
+            <Card size="sm" class="mb-5 p-1 grow">
+              <div class="flex mb-3 items-center justify-between">
                 <img src={article.profile} alt="" style="width: 50px;" />
-                <p>{article.nickname}</p>
+                <p class="ml-5">{article.nickname}</p>
                 <button on:click={() => deleteArticle(article)}>
                   <TrashBinSolid size="md" color="red" />
                 </button>
               </div>
-              <div class="max-w-4xl">
-                <Carousel
-                  images={[
-                    { src: article.drawingImage, alt: 'drawingImage' },
-                    { src: article.artImage, alt: 'artImage' },
-                  ]}
-                  let:Indicators
-                >
-                  <Indicators />
-                </Carousel>
-              </div>
+              <FeedArticle {article} />
               <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
                 {article.comment}
               </p>
-              <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
-                <span>나와의 거리 {article.distanceFromUser / 1000}km</span>
-                <span>총 길이 {article.distance / 1000}km</span>
-              </p>
-              <div>
-                {#if article.isLiked}
-                  찜!
-                {/if}
-                <Button color={article.isLiked ? 'red' : 'blue'}>
-                  {article.isLiked ? '좋아요 취소' : '좋아용'}
-                </Button>
-                {article.likeCount}
+              <div class="flex justify-between items-center">
+                <div class="flex justify-between items-center">
+                  {#if article.isLiked}
+                    <button
+                      on:click={() => switchLiked(article)}
+                      color={article.isLiked ? 'red' : 'blue'}
+                    >
+                      <HeartSolid size="lg" color={'red'} />
+                    </button>
+                    <p>{article.likeCount}</p>
+                  {:else}
+                    <button
+                      on:click={() => switchLiked(article)}
+                      color={article.isLiked ? 'red' : 'blue'}
+                    >
+                      <HeartOutline size="lg" />
+                    </button>
+                    <p>{article.likeCount}</p>
+                  {/if}
+                </div>
               </div>
             </Card>
           {/if}
         {/each}
       </TabItem>
-      <TabItem>
-        <div slot="title" class="flex items-center gap-2">
+      <TabItem defaultClass="tab-item font-bold text-xs gap-2">
+        <div slot="title" class="flex items-center gap-1">
           <HeartSolid size="md" />
           찜한 루트
         </div>
         {#each dummyLikedList as article}
           {#if article.distanceFromUser <= range * 1000}
-            <Card class="mb-5">
-              <div class="flex">
+            <Card size="sm" class="mb-5 p-1 grow">
+              <div class="flex mb-3 items-center justify-between">
                 <img src={article.profile} alt="" style="width: 50px;" />
-                <p>{article.nickname}</p>
+                <p class="ml-5">{article.nickname}</p>
               </div>
-              <div class="max-w-4xl">
-                <Carousel
-                  images={[
-                    { src: article.drawingImage, alt: 'drawingImage' },
-                    { src: article.artImage, alt: 'artImage' },
-                  ]}
-                  let:Indicators
-                >
-                  <Indicators />
-                </Carousel>
-              </div>
+              <FeedArticle {article} />
               <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
                 {article.comment}
               </p>
-              <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
-                <span>나와의 거리 {article.distanceFromUser / 1000}km</span>
-                <span>총 길이 {article.distance / 1000}km</span>
-              </p>
-              <div>
-                {#if article.isLiked}
-                  찜!
-                {/if}
-                <Button color={article.isLiked ? 'red' : 'blue'}>
-                  {article.isLiked ? '좋아요 취소' : '좋아용'}
-                </Button>
-                {article.likeCount}
+              <div class="flex justify-between items-center">
+                <div class="flex justify-between items-center">
+                  {#if article.isLiked}
+                    <button
+                      on:click={() => switchLiked(article)}
+                      color={article.isLiked ? 'red' : 'blue'}
+                    >
+                      <HeartSolid size="lg" color={'red'} />
+                    </button>
+                    <p>{article.likeCount}</p>
+                  {:else}
+                    <button
+                      on:click={() => switchLiked(article)}
+                      color={article.isLiked ? 'red' : 'blue'}
+                    >
+                      <HeartOutline size="lg" />
+                    </button>
+                    <p>{article.likeCount}</p>
+                  {/if}
+                </div>
               </div>
             </Card>
           {/if}
@@ -493,19 +506,7 @@
 
   #community-header {
     height: 10vh;
-    display: flex;
-    justify-content: space-between;
-  }
-
-  #community-logo {
-    width: 15%;
-  }
-
-  #community-title {
-    width: 40%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 100%;
   }
 
   #community-mystorage {
@@ -527,14 +528,5 @@
 
   #community-tabbar {
     height: 15vh;
-  }
-  .carousel-indicators button {
-    background-color: transparent; /* 배경을 투명하게 설정 */
-    border: none; /* 불필요한 테두리 제거 */
-    box-shadow: none; /* 네모 그림자가 있으면 제거 */
-  }
-
-  .carousel-indicators button.active {
-    background-color: gray; /* 활성화된 Indicator의 색상 */
   }
 </style>
