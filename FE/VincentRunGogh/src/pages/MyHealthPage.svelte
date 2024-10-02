@@ -20,6 +20,7 @@
   import { userStore } from '@/stores/userStore';
   import { getProfile, updateProfileImg, updateProfile } from '@/api/userApi';
   import { toastAlert } from '@/utils/notificationAlert';
+  import Spinner from '@/components/common/Spinner.svelte';
 
   let profile = writable('');
   let nickname = writable('');
@@ -188,6 +189,7 @@
   // onDestroy(unsubscribe);
 </script>
 
+<Spinner />
 <div class="flex flex-col items-center gap-10 bg-bg-main">
   <!-- // SECTION - profile -->
   <div class="flex items-center space-x-4 mt-12 gap-4">

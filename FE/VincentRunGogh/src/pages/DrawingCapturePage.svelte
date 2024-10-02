@@ -27,6 +27,9 @@
   import SaveRouteDrawing from '@components/cards/SaveRouteDrawing.svelte';
   import { sub } from 'date-fns';
   import { toastAlert } from '@/utils/notificationAlert';
+  import Spinner from '@/components/common/Spinner.svelte';
+
+  let isLoading = false;
   // 폼 형태 변수 임시저장 or 완료
   let isComplete = $querystring?.split('=')[1] === 'complete';
   let map: LeafletMap;
@@ -135,6 +138,7 @@
   }
 
   async function submitDrawing() {
+    isLoading = true;
     const { endInfo } = get(drawingStore);
 
     const data = {
@@ -146,25 +150,31 @@
     if (isComplete) {
       data.title = inputName;
     }
+
     console.log(data);
     if (isComplete) {
       completeDrawing(
         get(drawingStore).drawingId,
         data,
         (response) => {
-          // toastAlert('드로잉 완성 성공');
           isLocked = true;
+          isLoading = false;
         },
-        (error) => {}
+        (error) => {
+          isLoading = false;
+        }
       );
     } else {
       saveDrawing(
         get(drawingStore).drawingId,
         data,
         (response) => {
-          // toastAlert('드로잉 저장 성공');
+          isLoading = false;
+          isLocked = true;
         },
-        (error) => {}
+        (error) => {
+          isLoading = false;
+        }
       );
     }
   }
@@ -193,7 +203,9 @@
     await changeMapWithSingleColor();
 
     await mapCapture(false);
-    await submitDrawing();
+    if (!isLoading) {
+      await submitDrawing();
+    }
   }
 
   let inputName: string = '';
@@ -217,8 +229,8 @@
     svg.style.display = '';
 
     const finalCanvas = document.createElement('canvas');
-    finalCanvas.width = 500;
-    finalCanvas.height = 500;
+    finalCanvas.width = 350;
+    finalCanvas.height = 350;
     const ctx = finalCanvas.getContext('2d');
     const mapImg = new Image();
     const svgImg = new Image();
@@ -231,13 +243,13 @@
     await new Promise((resolve) => {
       mapImg.onload = () => {
         svgImg.onload = () => {
-          const cropX = (mapCanvas.width - 500) / 2;
-          const cropY = (mapCanvas.height - 500) / 2;
-          const svgCropX = (svgCanvas.width - 500) / 2;
-          const svgCropY = (svgCanvas.height - 500) / 2;
+          const cropX = (mapCanvas.width - 350) / 2;
+          const cropY = (mapCanvas.height - 350) / 2;
+          const svgCropX = (svgCanvas.width - 350) / 2;
+          const svgCropY = (svgCanvas.height - 350) / 2;
 
-          ctx.drawImage(mapImg, cropX, cropY, 500, 500, 0, 0, 500, 500);
-          ctx.drawImage(svgImg, svgCropX, svgCropY, 500, 500, 0, 0, 500, 500);
+          ctx.drawImage(mapImg, cropX, cropY, 350, 350, 0, 0, 350, 350);
+          ctx.drawImage(svgImg, svgCropX, svgCropY, 350, 350, 0, 0, 350, 350);
 
           resolve();
         };
@@ -247,10 +259,11 @@
     const finalImage = finalCanvas.toDataURL('image/png');
     if (isTypeColorLine) {
       console.log('속도 색');
-      $drawingDetailImage = finalImage;
+
+      $drawingDetailImage = finalImage.split(',')[1];
     } else {
       console.log('단일 색');
-      $drawingImage = finalImage;
+      $drawingImage = finalImage.split(',')[1];
     }
   }
 
@@ -273,7 +286,7 @@
     <div bind:this={mapRef} id="map"></div>
     <div id="makeroute-footer" class="flex flex-col items-center justify-end">
       <div
-        class="fixed left-1/2 transform -translate-x-1/2 text-red-500 font-bold px-2 py-1 top-[12vh] overflow-hidden text-ellipsis whitespace-nowrap bg-[#FFFFFF67]"
+        class="fixed left-1/2 transform -translate-x-1/2 text-red-350 font-bold px-2 py-1 top-[12vh] overflow-hidden text-ellipsis whitespace-nowrap bg-[#FFFFFF67]"
       >
         {latLngMessage}
       </div>
@@ -321,6 +334,10 @@
     />
   {/if}
 </div>
+
+<!-- {#if isLoading}
+  <Spinner />
+{/if} -->
 
 <style>
   #makeroute-header {
