@@ -68,6 +68,7 @@
         weight: 5,
         opacity: 0.8,
       }).addTo(map);
+      // map.fitBounds(polyline.getBounds());
     });
   }
   // route 배열에 있는 좌표를 기준으로 점선 스타일로 선을 그리기
