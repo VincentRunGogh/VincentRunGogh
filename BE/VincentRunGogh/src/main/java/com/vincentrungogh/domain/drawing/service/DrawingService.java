@@ -162,12 +162,12 @@ public class DrawingService {
                 .orElseThrow(() -> new CustomException(ErrorCode.DRAWING_NOT_FOUND));
 
         // 3. 드로잉 업데이트
-        drawing.changeAccumulatedDrawingImage(getImageUrl(request.getDrawingImage()));
+        drawing.changeAccumulatedDrawingImage(this.getImageUrl(request.getDrawingImage()));
         drawingRepository.save(drawing);
 
         // 4. 드로잉 디테일 저장
         DrawingDetail drawingDetail = DrawingDetail
-                .createDrawingDetail(response, getImageUrl(request.getDrawingDetailImage()),
+                .createDrawingDetail(response, this.getImageUrl(request.getDrawingDetailImage()),
                         drawing);
         drawingDetailRepository.save(drawingDetail);
     }
@@ -185,11 +185,11 @@ public class DrawingService {
                 .orElseThrow(() -> new CustomException(ErrorCode.DRAWING_NOT_FOUND));
 
         // 3. 드로잉 업데이트
-        drawing.completeDrawing(request.getTitle(), getImageUrl(request.getDrawingImage()));
+        drawing.completeDrawing(request.getTitle(), this.getImageUrl(request.getDrawingImage()));
 
         // 4. 드로잉 디테일 저장
         DrawingDetail drawingDetail = DrawingDetail
-                .completeDrawingDetail(response, getImageUrl(request.getDrawingDetailImage()),
+                .completeDrawingDetail(response, this.getImageUrl(request.getDrawingDetailImage()),
                         drawing);
         drawingDetailRepository.save(drawingDetail);
     }
