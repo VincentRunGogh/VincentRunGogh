@@ -153,7 +153,9 @@
   }
 </script>
 
-<FullCalendar {options} />
+<div id="calendar">
+  <FullCalendar {options} />
+</div>
 
 {#if $selectedDayInfo}
   <div>
@@ -179,3 +181,86 @@
     distance={$monthInfo.monthTotalDistance}
   />
 {/if}
+
+<!-- <style>
+  #calendar {
+    width: 100%;
+    height: 60%;
+
+    display: flex;
+    justify-content: center;
+  }
+
+  .fc .fc-media-screen .fc-direction-ltr .fc-theme-standard {
+    width: 80vh;
+  }
+
+  #calendar .fc .fc-toolbar.fc-header-toolbar {
+    background-color: var(--yellow-linear-start) !important;
+    height: 63px !important;
+    font-weight: 600 !important;
+    font-size: 12px !important;
+    color: white !important;
+    border-radius: 20px 20px 0 0 !important;
+  }
+
+  #calendar .fc-button-primary {
+    background-color: transparent;
+    border: none;
+  }
+
+  #calendar .fc-button-primary span {
+    font-weight: 500;
+    font-size: 28px;
+  }
+
+  #calendar .fc-button-primary:hover {
+    background-color: transparent;
+  }
+  .fc .fc-button-primary:focus {
+    border: none;
+    box-shadow: none;
+  }
+
+  #calendar .fc-theme-standard th {
+    height: 32px;
+    padding-top: 3.5px;
+    background: #e5edff;
+    border: 1px solid #dddee0;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 19px;
+    color: #7b7b7b;
+  }
+
+  #calendar .fc-daygrid-day.fc-day-today {
+    background-color: #fff8bd;
+  }
+
+  #calendar .fc-daygrid-day-frame {
+    padding: 10px;
+  }
+
+  #calendar .fc-daygrid-day-top {
+    flex-direction: row;
+    margin-bottom: 3px;
+  }
+
+  #calendar .fc-event {
+    cursor: pointer;
+    padding: 5px 8px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 14px;
+  }
+
+  #calendar .fc-day-sun a {
+    color: #ff4040;
+    text-decoration: none;
+  }
+  .fc-day-sat a {
+    /* 토요일 컬러 */
+    color: #a2fea5;
+  }
+</style> -->

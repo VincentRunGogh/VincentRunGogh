@@ -16,6 +16,7 @@
     updateDrawingInfo,
     setDrawingPos,
     updateDistanceAndSpeed,
+    resetDrawingStore,
   } from '@/stores/drawingStore';
   import DrawingPauseModal from '@/components/modals/DrawingPauseModal.svelte';
   import { userStore } from '@/stores/userStore';
@@ -414,6 +415,7 @@ fill="#000000" stroke="none">
       clearInterval(trackingIntervalId);
     }
     disconnectWebSocket();
+    resetDrawingStore();
   });
 </script>
 

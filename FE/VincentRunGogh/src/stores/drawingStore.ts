@@ -92,3 +92,16 @@ export function updateDistanceAndSpeed(posList: PositionData[]) {
     return totalDistance;
   });
 }
+export function resetDrawingStore(): void {
+  drawingStore.set({
+    ...initialState,
+  });
+  // 다른 스토어들도 초기화
+  isLockScreen.set(false);
+  isPause.set(false);
+  totalDistance.set(0);
+  currentPace.set('');
+  elapsedTime.set(0);
+  posList.set([]);
+  route.set([]);
+}
