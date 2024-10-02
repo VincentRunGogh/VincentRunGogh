@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getRouteList } from '@/api/routeApi';
   import BackButton from '@/components/buttons/BackButton.svelte';
+  import Header from '@/components/common/Header.svelte';
   import RouteDetail from '@/components/modals/RouteDetail.svelte';
   import { formatSecToMMSS } from '@/utils/formatter';
   import { Tabs, TabItem, Card, Button } from 'flowbite-svelte';
@@ -162,10 +163,8 @@
   }
 </script>
 
-<div id="routelist-header" class="flex justify-center items-center">
-  <BackButton />
-  <h2>루트 조회</h2>
-</div>
+<Header title="루트 조회" />
+
 <div id="search-control">
   <Button size="sm" on:click={searchCondition}>검색 반경 설정</Button>
   <p class="my-3 font-bold">반경 {range}km내의 루트만 표시됩니다.</p>
@@ -342,11 +341,6 @@
 </div>
 
 <style>
-  #routelist-header {
-    height: 10vh;
-    width: 100%;
-  }
-
   #search-control {
     display: flex;
     flex-direction: column;
