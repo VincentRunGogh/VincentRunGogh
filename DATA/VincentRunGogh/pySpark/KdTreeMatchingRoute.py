@@ -2,7 +2,6 @@ from scipy.spatial import KDTree
 import networkx as nx
 
 from pySpark.RouteTotalDistance import haversine
-from frechetdist import frdist
 
 def matching_user_path_to_roads(user_drawn_path, pedestrian_df):
 
