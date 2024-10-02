@@ -41,8 +41,9 @@
   let latLngMessageList: string[] = ['지도를 움직여 표지를 지정해주세요', '드로잉을 저장했습니다!'];
   let latLngMessage: string = latLngMessageList[0];
 
-  let drawingImage = writable('');
   let drawingDetailImage = writable('');
+  let drawingImage = writable('');
+  let showingImage = writable('');
 
   // 속도에 따른 색상을 반환하는 함수
   function getSpeedColor(speed: number): string {
@@ -264,6 +265,7 @@
     } else {
       console.log('단일 색');
       $drawingImage = finalImage.split(',')[1];
+      $showingImage = finalImage;
     }
   }
 
@@ -329,7 +331,7 @@
       title={inputName}
       distance={$totalDistance}
       time={$elapsedTime}
-      image={$drawingDetailImage}
+      image={$showingImage}
       isRoute={false}
     />
   {/if}

@@ -20,7 +20,6 @@
   import { userStore } from '@/stores/userStore';
   import { getProfile, updateProfileImg, updateProfile } from '@/api/userApi';
   import { toastAlert } from '@/utils/notificationAlert';
-  import Spinner from '@/components/common/Spinner.svelte';
 
   let profile = writable('');
   let nickname = writable('');
@@ -189,8 +188,7 @@
   // onDestroy(unsubscribe);
 </script>
 
-<Spinner />
-<div class="flex flex-col items-center gap-10 bg-bg-main">
+<div class="flex flex-col items-center gap-10 bg-bg-main h-[85vh]">
   <!-- // SECTION - profile -->
   <div class="flex items-center space-x-4 mt-12 gap-4">
     <div class="wrap">
@@ -233,20 +231,25 @@
   <!-- //!SECTION - menu -->
   <div class="w-full pl-12 pr-12">
     <Listgroup active items={dataMenuIcons} let:item>
-      <!-- <a use:link href={item.href}> -->
-      <svelte:component this={item.icon} class="w-4 h-4 me-2.5" />
-      {item.name}
-      <!-- </a> -->
+      <div class="flex flex-row items-center content-center justify-start">
+        <svelte:component this={item.icon} class="w-4 h-4 me-2.5" />
+        {item.name}
+      </div>
     </Listgroup>
   </div>
   <div class="w-full pl-12 pr-12">
     <Listgroup active items={accountMenuIcons} let:item>
-      <svelte:component this={item.icon} class="w-4 h-4 me-2.5" />
-      {item.name}
+      <div class="flex flex-row items-center content-center justify-start">
+        <svelte:component this={item.icon} class="w-4 h-4 me-2.5" />
+        {item.name}
+      </div>
     </Listgroup>
   </div>
 </div>
-<Tabbar />
+<div>
+  <Tabbar />
+</div>
+
 <Modal title="프로필 변경" bind:open={editFormModal}>
   <ProfileForm />
   <svelte:fragment slot="footer">
