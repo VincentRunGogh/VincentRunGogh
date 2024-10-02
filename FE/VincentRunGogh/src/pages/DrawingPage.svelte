@@ -70,7 +70,7 @@
           data,
           async (response) => {
             console.log('api 연결 후 드로잉 데이터:', response);
-            updateDrawingInfo(response.data.data); // 스토어를 업데이트
+            updateDrawingInfo({ ...response.data.data, routeId }); // 스토어를 업데이트
             //TODO - 루트의 좌표 값들을 url의 routeId 파람으로 조회
             //이전에 한 드로잉은 다른 색으로 보여주기
             if (routeLineLayers) {

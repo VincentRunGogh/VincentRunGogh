@@ -188,66 +188,68 @@
   // onDestroy(unsubscribe);
 </script>
 
-<div class="flex flex-col items-center gap-10 bg-bg-main h-[85vh]">
-  <!-- // SECTION - profile -->
-  <div class="flex items-center space-x-4 mt-12 gap-4">
-    <div class="wrap">
-      <img src={$profile} alt="프로필 이미지" class="main-profile-img" />
-      <button class="icon" on:click={onClickEditImageBtn}><EditOutline /></button>
-    </div>
-    <div class="space-y-1 font-medium dark:text-white wrap">
-      <div>
-        <div>{$nickname}</div>
-        <div class="text-sm text-gray-500 dark:text-gray-400">
-          {$birth}
-          {getGenderSymbol($gender)}
+<div class="bg-bg-main">
+  <div class="overflow-auto flex flex-col items-center gap-10 h-[85vh]">
+    <!-- // SECTION - profile -->
+    <div class="flex items-center space-x-4 mt-12 gap-4">
+      <div class="wrap">
+        <img src={$profile} alt="프로필 이미지" class="main-profile-img" />
+        <button class="icon" on:click={onClickEditImageBtn}><EditOutline /></button>
+      </div>
+      <div class="space-y-1 font-medium dark:text-white wrap">
+        <div>
+          <div>{$nickname}</div>
+          <div class="text-sm text-gray-500 dark:text-gray-400">
+            {$birth}
+            {getGenderSymbol($gender)}
+          </div>
+        </div>
+        <div class="absolute top-[-1.00rem] right-[-2.00rem]">
+          <button on:click={onClickEditBtn}><EditOutline /></button>
         </div>
       </div>
-      <div class="absolute top-[-1.00rem] right-[-2.00rem]">
-        <button on:click={onClickEditBtn}><EditOutline /></button>
-      </div>
+    </div>
+
+    <!-- //SECTION - bmi -->
+    <Card class="w-[80vw] pb-1 pt-3 flex flex-col items-center rounded-3xl bg-[#F0F8EC] shadow-md">
+      <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">BMI</h5>
+      <BMIChart bmi={$bmi} />
+      <span class="flex gap-1">
+        <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
+          {$nickname}님의 체질량지수는
+        </p>
+        <p class="text-gray-800 dark:text-gray-400 leading-tight font-bold">
+          {getBMICategory($bmi)}
+        </p>
+        <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">입니다.</p>
+      </span>
+      <p
+        class="font-normal text-gray-400 dark:text-gray-200 overflow-hidden text-ellipsis text-center break-keep"
+      >
+        BMI는 근육량, 유전적 원인, 다른 개인적 차이를 반영하지 않습니다.
+      </p>
+    </Card>
+    <!-- //!SECTION - menu -->
+    <div class="w-full pl-12 pr-12">
+      <Listgroup active items={dataMenuIcons} let:item>
+        <div class="flex flex-row items-center content-center justify-start">
+          <svelte:component this={item.icon} class="w-4 h-4 me-2.5" />
+          {item.name}
+        </div>
+      </Listgroup>
+    </div>
+    <div class="w-full pl-12 pr-12">
+      <Listgroup active items={accountMenuIcons} let:item>
+        <div class="flex flex-row items-center content-center justify-start">
+          <svelte:component this={item.icon} class="w-4 h-4 me-2.5" />
+          {item.name}
+        </div>
+      </Listgroup>
     </div>
   </div>
-
-  <!-- //SECTION - bmi -->
-  <Card class="w-[80vw] pb-1 pt-3 flex flex-col items-center rounded-3xl bg-[#F0F8EC] shadow-md">
-    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">BMI</h5>
-    <BMIChart bmi={$bmi} />
-    <span class="flex gap-1">
-      <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
-        {$nickname}님의 체질량지수는
-      </p>
-      <p class="text-gray-800 dark:text-gray-400 leading-tight font-bold">
-        {getBMICategory($bmi)}
-      </p>
-      <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">입니다.</p>
-    </span>
-    <p
-      class="font-normal text-gray-400 dark:text-gray-200 overflow-hidden text-ellipsis text-center break-keep"
-    >
-      BMI는 근육량, 유전적 원인, 다른 개인적 차이를 반영하지 않습니다.
-    </p>
-  </Card>
-  <!-- //!SECTION - menu -->
-  <div class="w-full pl-12 pr-12">
-    <Listgroup active items={dataMenuIcons} let:item>
-      <div class="flex flex-row items-center content-center justify-start">
-        <svelte:component this={item.icon} class="w-4 h-4 me-2.5" />
-        {item.name}
-      </div>
-    </Listgroup>
+  <div>
+    <Tabbar />
   </div>
-  <div class="w-full pl-12 pr-12">
-    <Listgroup active items={accountMenuIcons} let:item>
-      <div class="flex flex-row items-center content-center justify-start">
-        <svelte:component this={item.icon} class="w-4 h-4 me-2.5" />
-        {item.name}
-      </div>
-    </Listgroup>
-  </div>
-</div>
-<div>
-  <Tabbar />
 </div>
 
 <Modal title="프로필 변경" bind:open={editFormModal}>
@@ -292,7 +294,6 @@
     top: 0;
     left: 113px;
     background: white;
-    color: blue;
   }
   button.icon {
     position: absolute;

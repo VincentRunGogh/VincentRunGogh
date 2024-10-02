@@ -40,13 +40,13 @@ const initialState: DrawingInfo = {
 // drawingStore를 생성하고 초기 상태를 할당
 export const drawingStore: Writable<DrawingInfo> = writable(initialState);
 
-// API 응답을 처리하여 스토어 업데이트
 export function updateDrawingInfo(data: Partial<DrawingInfo>): void {
   drawingStore.set({
     title: data.title || '',
     drawingPositionList: data.drawingPositionList || [],
     routePositionList: data.routePositionList || [],
     drawingId: data.drawingId || '',
+    routeId: data.routeId,
   });
 }
 
