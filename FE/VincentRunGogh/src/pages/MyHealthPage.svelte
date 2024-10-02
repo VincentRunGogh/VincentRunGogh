@@ -100,9 +100,6 @@
     editImageFormModal = true;
   };
   const setProfile = async () => {
-    if (userInitialized) {
-      return;
-    }
     await getProfile(
       async (response) => {
         if (response.data.status == 200) {
@@ -188,7 +185,7 @@
   // onDestroy(unsubscribe);
 </script>
 
-<div class="bg-bg-main">
+<div class="bg-bg-main h-screen">
   <div class="overflow-auto flex flex-col items-center gap-10 h-[85vh]">
     <!-- // SECTION - profile -->
     <div class="flex items-center space-x-4 mt-12 gap-4">

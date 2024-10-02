@@ -398,8 +398,9 @@ fill="#000000" stroke="none">
     // Update options inside the reactive statement
     options = {
       ...(drawingId ? { drawingId } : {}),
-      ...(routeId ? { rootId: routeId.toString() } : {}),
+      ...(routeId ? { routeId: routeId.toString() } : {}),
     };
+    console.log(options);
   }
 
   onMount(() => {
