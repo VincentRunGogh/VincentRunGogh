@@ -16,7 +16,7 @@ interface PositionData {
 export const isLockScreen = writable<boolean>(false);
 export const isPause = writable(false);
 export const totalDistance = writable(0);
-export const currentPace = writable('');
+export const currentPace = writable('00:00');
 export const elapsedTime = writable(0);
 export const posList = writable([]);
 export const route = writable([]);
@@ -45,7 +45,7 @@ export function updateDrawingInfo(data: Partial<DrawingInfo>): void {
     title: data.title || '',
     drawingPositionList: data.drawingPositionList || [],
     routePositionList: data.routePositionList || [],
-    drawingId: data.drawingId || '',
+    drawingId: data.drawingId && data.drawingId,
     routeId: data.routeId,
   });
 }

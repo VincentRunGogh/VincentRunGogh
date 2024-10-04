@@ -321,18 +321,20 @@ button:focus-visible {
 }
 .fc-daygrid-day .fc-event-title {
   color: var(--blue-select-color, rgba(139, 162, 231));
+  font-size: 0.7rem;
 }
 .fc .fc-daygrid-day:hover .fc-event-title,
 .fc .fc-daygrid-day:focus .fc-event-title,
 .fc .fc-daygrid-day.fc-day-selected .fc-event-title {
   color: var(--white-color-100) !important;
 }
-.fc-day-today .fc-event {
+.fc-day-today .fc-event .fc-event-title {
   cursor: pointer;
   margin-bottom: 5px;
   border-radius: 55px;
   width: 30px !important;
   height: 10px;
+  overflow: visible;
 }
 /* 선택한 날짜 스타일 적용 */
 .fc-daygrid-day:hover,
@@ -369,7 +371,14 @@ button:focus-visible {
 #calendar .fc-daygrid-day-events {
   display: flex;
   justify-content: center;
+  flex-direction: column;
   height: auto;
+  width: 100%;
+}
+.fc-daygrid-event-harness {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 #calendar .fc-event {
   cursor: pointer;

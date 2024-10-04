@@ -18,7 +18,7 @@
   import ImageForm from '@/components/forms/ImageForm.svelte';
   import { profileFormStore } from '@/stores/profileFormStore';
   import { userStore } from '@/stores/userStore';
-  import { getProfile, updateProfileImg, updateProfile } from '@/api/userApi';
+  import { getProfile, updateProfileImg, updateProfile, logout } from '@/api/userApi';
   import { toastAlert } from '@/utils/notificationAlert';
 
   let profile = writable('');
@@ -181,6 +181,29 @@
       }
     });
   });
+  function handleLogout() {
+    // 로그아웃 처리 로직
+    console.log('로그아웃을 수행합니다.');
+    logout(
+      (response) => {
+        if (response.status === 200) {
+          toastAlert('로그아웃 성공');
+          userStore.logout();
+        }
+      },
+      (error) => {}
+    );
+  }
+
+  // Listgroup 항목 클릭 핸들러
+  function handleMenuClick(item) {
+    if (item.href === '/#/logout') {
+      handleLogout();
+    } else {
+      // 일반적인 라우팅으로 이동
+      link(item.href);
+    }
+  }
   //FIXME - Uncaught (in promise) TypeError: fn is not a function
   // onDestroy(unsubscribe);
 </script>
@@ -237,7 +260,10 @@
     </div>
     <div class="w-full pl-12 pr-12">
       <Listgroup active items={accountMenuIcons} let:item>
-        <div class="flex flex-row items-center content-center justify-start">
+        <div
+          on:click={() => handleMenuClick(item)}
+          class="flex flex-row items-center content-center justify-start"
+        >
           <svelte:component this={item.icon} class="w-4 h-4 me-2.5" />
           {item.name}
         </div>

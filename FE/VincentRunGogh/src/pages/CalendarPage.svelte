@@ -92,18 +92,22 @@
       plugins: [daygridPlugin, interactionPlugin],
       dateClick: handleDateClick,
       events: [
-        ...$monthInfo.dayList.map((day) => ({
-          date: day.date,
-          title: day.date === today.toISOString().slice(0, 10) ? '오늘' : '',
-          color: getEventColor(day),
-        })),
         {
           date: today.toISOString().slice(0, 10), // 오늘 날짜
           title: '오늘', // '오늘'이라는 제목
           color: 'transparent',
         },
+        ...$monthInfo.dayList.map((day) => ({
+          date: day.date,
+          color: getEventColor(day),
+        })),
       ],
-
+      eventOrder: (a, b) => {
+        // '오늘' 이벤트가 항상 먼저 오도록 정렬
+        if (a.title === '오늘') return -1;
+        if (b.title === '오늘') return 1;
+        return 0;
+      },
       datesSet: handleDatesSet,
       headerToolbar: {
         left: 'prev',

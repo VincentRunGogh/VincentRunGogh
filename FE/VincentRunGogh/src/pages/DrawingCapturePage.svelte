@@ -101,12 +101,10 @@
     drawLinesOnMap(map);
 
     // posList에 있는 모든 좌표에 맞게 지도의 위치 및 줌 조정
-    const posListData = get(posList).map((item: any) => item.latlng);
-    const bounds = L.latLngBounds(posListData);
-    map.fitBounds(bounds, { padding: [50, 50] });
+    // const posListData = get(posList).map((item: any) => item.latlng);
+    // const bounds = L.latLngBounds(posListData);
+    // map.fitBounds(bounds, { padding: [50, 50] });
   }
-
-  let imgData1, imgData2;
 
   async function changeMapWithSingleColor() {
     // posList 선을 단일 색상으로 그리기 위해 기존의 선 제거 후 재생성
@@ -321,7 +319,7 @@
   {:else}
     <SaveRouteDrawing
       title={inputName}
-      distance={$totalDistance}
+      distance={$totalDistance.toFixed(2)}
       time={$elapsedTime}
       image={$showingImage}
       isRoute={false}
