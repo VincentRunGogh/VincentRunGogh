@@ -31,7 +31,8 @@
     drawingTime: number;
     drawingDistance: number;
   }
-  let date = writable(new Date());
+  let today = new Date();
+
   let monthInfo = writable<MonthInfo | null>(null);
   let selectedDayInfo = writable<DayInfo | null>(null);
   let selectedYear = writable<number | null>(null);
@@ -40,11 +41,11 @@
 
   function getEventColor(day) {
     if (day.isDrawing) {
-      return 'yellow';
+      return 'var(--yellow-main-color)';
     } else if (day.isRun) {
-      return 'green';
+      return 'var(--green-main-color)';
     }
-    return 'gray';
+    return 'transparent';
   }
 
   function handleDateClick(info) {
@@ -66,201 +67,97 @@
     getMonthInfo();
   }
   const getMonthInfo = async () => {
-    //FIXME - api 연결
-    // getMonthData(
-    //   $selectedYear,
-    //   $selectedMonth,
-    //   (response) => {
-    //     monthInfo.set({ ...response.data.data });
-    //   },
-    //   (error) => {}
-    // );
-  };
-  onMount(() => {
-    const today = new Date();
     const year = today.getFullYear();
     const month = today.getMonth() + 1; // JavaScript에서 월은 0부터 시작하므로 +1
 
     selectedYear.set(year);
     selectedMonth.set(month);
+    //FIXME - api 연결, 오늘 이벤트 추가
+    $selectedMonth = getMonthData(
+      $selectedYear,
+      $selectedMonth,
+      (response) => {
+        let data = response.data.data;
+        monthInfo.set({ ...response.data.data });
+      },
+      (error) => {}
+    );
+  };
+  onMount(() => {
     getMonthInfo();
-    monthInfo.set({
-      monthTotalTime: 78061,
-      monthTotalDistance: 32553,
-      dayList: [
-        {
-          date: '2024-09-13',
-          isRun: true,
-          isDrawing: false,
-          dayTotalTime: 4120,
-          dayTotalDistance: 2612,
-          drawingList: [
-            {
-              drawingId: 123,
-              drawingName: '마루는 강쥐',
-              drawingTime: 620,
-              drawingDistance: 503,
-            },
-            {
-              drawingId: 112,
-              drawingName: '고래 그림',
-              drawingTime: 546,
-              drawingDistance: 806,
-            },
-            {
-              drawingId: 154,
-              drawingName: '거북이 그림',
-              drawingTime: 442,
-              drawingDistance: 336,
-            },
-          ],
-        },
-        {
-          date: '2024-09-14',
-          isRun: true,
-          isDrawing: true,
-          dayTotalTime: 4120,
-          dayTotalDistance: 2612,
-          drawingList: [
-            {
-              drawingId: 123,
-              drawingName: '마루는 강쥐',
-              drawingTime: 620,
-              drawingDistance: 503,
-            },
-          ],
-        },
-      ],
-    });
   });
   $: if ($monthInfo) {
     options = {
       initialView: 'dayGridMonth',
       plugins: [daygridPlugin, interactionPlugin],
       dateClick: handleDateClick,
-      events: $monthInfo.dayList.map((day) => ({
-        date: day.date,
-        color: getEventColor(day),
-      })),
-      datesSet: handleDatesSet,
+      events: [
+        ...$monthInfo.dayList.map((day) => ({
+          date: day.date,
+          title: day.date === today.toISOString().slice(0, 10) ? '오늘' : '',
+          color: getEventColor(day),
+        })),
+        {
+          date: today.toISOString().slice(0, 10), // 오늘 날짜
+          title: '오늘', // '오늘'이라는 제목
+          color: 'transparent',
+        },
+      ],
 
+      datesSet: handleDatesSet,
+      headerToolbar: {
+        left: 'prev',
+        center: 'title,today',
+        right: 'next ',
+      },
+      buttonText: {
+        today: '오늘',
+      },
+
+      dayCellContent: function (arg) {
+        const dayNumber = arg.dayNumberText.replace('일', '');
+        return dayNumber;
+      },
       displayEventTime: false,
       locale: 'ko',
       selectable: true,
       showNonCurrentDates: false,
       fixedWeekCount: false,
+      // contentHeight: 400,
     };
   }
 </script>
 
-<div id="calendar">
-  <FullCalendar {options} />
+<div class="flex flex-col items-center h-screen">
+  <div id="calendar" class="h-[80vh]">
+    <FullCalendar {options} />
+  </div>
+
+  {#if $selectedDayInfo}
+    <div>
+      <h2>Day Details:</h2>
+      <p>Total Time: {$selectedDayInfo.dayTotalTime} seconds</p>
+      <p>Total Distance: {$selectedDayInfo.dayTotalDistance} meters</p>
+      <h3>Drawings:</h3>
+      <ul>
+        {#each $selectedDayInfo.drawingList as drawing}
+          <a use:link href="/drawingdetail?id={drawing.drawingId}&date={$selectedDayInfo.date}">
+            <li>
+              {drawing.drawingName} - Time: {drawing.drawingTime}, Distance: {drawing.drawingDistance}
+            </li>
+          </a>
+        {/each}
+      </ul>
+    </div>
+  {:else if $monthInfo}
+    <h2>{$selectedYear}년 {$selectedMonth}월 통계</h2>
+    <DrawingSummaryInfo
+      time={$monthInfo.monthTotalTime}
+      averagePace={null}
+      distance={$monthInfo.monthTotalDistance}
+    />
+  {/if}
 </div>
 
-{#if $selectedDayInfo}
-  <div>
-    <h2>Day Details:</h2>
-    <p>Total Time: {$selectedDayInfo.dayTotalTime} seconds</p>
-    <p>Total Distance: {$selectedDayInfo.dayTotalDistance} meters</p>
-    <h3>Drawings:</h3>
-    <ul>
-      {#each $selectedDayInfo.drawingList as drawing}
-        <a use:link href="/drawingdetail?id={drawing.drawingId}&date={$selectedDayInfo.date}">
-          <li>
-            {drawing.drawingName} - Time: {drawing.drawingTime}, Distance: {drawing.drawingDistance}
-          </li>
-        </a>
-      {/each}
-    </ul>
-  </div>
-{:else if $monthInfo}
-  <h2>{$selectedYear}년 {$selectedMonth}월 통계</h2>
-  <DrawingSummaryInfo
-    time={$monthInfo.monthTotalTime}
-    averagePace={null}
-    distance={$monthInfo.monthTotalDistance}
-  />
-{/if}
-
-<!-- <style>
-  #calendar {
-    width: 100%;
-    height: 60%;
-
-    display: flex;
-    justify-content: center;
-  }
-
-  .fc .fc-media-screen .fc-direction-ltr .fc-theme-standard {
-    width: 80vh;
-  }
-
-  #calendar .fc .fc-toolbar.fc-header-toolbar {
-    background-color: var(--yellow-linear-start) !important;
-    height: 63px !important;
-    font-weight: 600 !important;
-    font-size: 12px !important;
-    color: white !important;
-    border-radius: 20px 20px 0 0 !important;
-  }
-
-  #calendar .fc-button-primary {
-    background-color: transparent;
-    border: none;
-  }
-
-  #calendar .fc-button-primary span {
-    font-weight: 500;
-    font-size: 28px;
-  }
-
-  #calendar .fc-button-primary:hover {
-    background-color: transparent;
-  }
-  .fc .fc-button-primary:focus {
-    border: none;
-    box-shadow: none;
-  }
-
-  #calendar .fc-theme-standard th {
-    height: 32px;
-    padding-top: 3.5px;
-    background: #e5edff;
-    border: 1px solid #dddee0;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 19px;
-    color: #7b7b7b;
-  }
-
-  #calendar .fc-daygrid-day.fc-day-today {
-    background-color: #fff8bd;
-  }
-
-  #calendar .fc-daygrid-day-frame {
-    padding: 10px;
-  }
-
-  #calendar .fc-daygrid-day-top {
-    flex-direction: row;
-    margin-bottom: 3px;
-  }
-
-  #calendar .fc-event {
-    cursor: pointer;
-    padding: 5px 8px;
-    margin-bottom: 5px;
-    border-radius: 4px;
-    font-weight: 500;
-    font-size: 14px;
-  }
-
-  #calendar .fc-day-sun a {
-    color: #ff4040;
-    text-decoration: none;
-  }
-  .fc-day-sat a {
-    /* 토요일 컬러 */
-    color: #a2fea5;
-  }
-</style> -->
+<style>
+</style>

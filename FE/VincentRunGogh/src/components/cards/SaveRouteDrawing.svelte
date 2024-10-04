@@ -4,7 +4,7 @@
   import { RedoOutline } from 'flowbite-svelte-icons';
   import { formatSecToMMSS } from '@/utils/formatter';
   export let title: string;
-  export let distance: number;
+  export let distance: string;
   export let time: number;
   export let image: string;
   export let isRoute: boolean;

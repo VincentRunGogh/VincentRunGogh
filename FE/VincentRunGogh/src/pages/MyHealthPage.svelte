@@ -210,7 +210,7 @@
     <!-- //SECTION - bmi -->
     <Card class="w-[80vw] pb-1 pt-3 flex flex-col items-center rounded-3xl bg-[#F0F8EC] shadow-md">
       <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">BMI</h5>
-      <BMIChart bmi={$bmi} />
+      <BMIChart bmi={$bmi.toFixed(0)} />
       <span class="flex gap-1">
         <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
           {$nickname}님의 체질량지수는
