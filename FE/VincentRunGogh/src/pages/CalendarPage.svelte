@@ -6,6 +6,8 @@
   import type { CalendarOptions } from 'svelte-fullcalendar';
   import daygridPlugin from '@fullcalendar/daygrid';
   import interactionPlugin from '@fullcalendar/interaction';
+  import Swal from 'sweetalert2';
+
   import { getMonthData } from '@/api/myhealthApi';
   import DrawingSummaryInfo from '@/components/calendar/DrawingSummaryInfo.svelte';
   type CalendarOptions = typeof CalendarOptions;
@@ -55,6 +57,27 @@
     } else {
       selectedDayInfo.set(null); // 일치하는 날짜가 없을 경우 빈 객체를 설정
     }
+    Swal.fire({
+      title: 'Bottom drawer 👋',
+      position: 'bottom',
+      showClass: {
+        popup: `
+      animate__animated
+      animate__fadeInUp
+      animate__faster
+    `,
+      },
+      hideClass: {
+        popup: `
+      animate__animated
+      animate__fadeOutDown
+      animate__faster
+    `,
+      },
+      grow: 'row',
+      showConfirmButton: false,
+      showCloseButton: true,
+    });
     // info.dayEl.style.backgroundColor = '#8BA2E7AD';
     console.log($selectedDayInfo.date);
   }
@@ -111,7 +134,7 @@
       datesSet: handleDatesSet,
       headerToolbar: {
         left: 'prev',
-        center: 'title,today',
+        center: 'title', //,today,
         right: 'next ',
       },
       buttonText: {
@@ -132,8 +155,12 @@
   }
 </script>
 
-<div class="flex flex-col items-center h-screen">
-  <div id="calendar" class="h-[80vh]">
+<div class="flex flex-col items-center h-screen bg-bg-main">
+  <div
+    id="calendar"
+    class="h-[80vh] w-80 bg-white rounded-2xl mt-16
+"
+  >
     <FullCalendar {options} />
   </div>
 
