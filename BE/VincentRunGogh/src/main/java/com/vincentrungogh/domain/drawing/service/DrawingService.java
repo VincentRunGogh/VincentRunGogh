@@ -3,12 +3,8 @@ package com.vincentrungogh.domain.drawing.service;
 import com.vincentrungogh.domain.drawing.entity.DrawingDetail;
 import com.vincentrungogh.domain.drawing.entity.MongoDrawingDetail;
 import com.vincentrungogh.domain.drawing.repository.MongoDrawingRepository;
-import com.vincentrungogh.domain.drawing.service.dto.request.CompleteDrawingRequest;
-import com.vincentrungogh.domain.drawing.service.dto.request.DataSaveDrawingDetailRequset;
-import com.vincentrungogh.domain.drawing.service.dto.request.SaveDrawingRequest;
-import com.vincentrungogh.domain.drawing.service.dto.response.DataSaveDrawingDetailResponse;
-import com.vincentrungogh.domain.drawing.service.dto.response.RestartDrawingResponse;
-import com.vincentrungogh.domain.drawing.service.dto.response.StartDrawingResponse;
+import com.vincentrungogh.domain.drawing.service.dto.request.*;
+import com.vincentrungogh.domain.drawing.service.dto.response.*;
 import com.vincentrungogh.domain.route.entity.MongoRoute;
 import com.vincentrungogh.domain.route.entity.Route;
 import com.vincentrungogh.domain.route.repository.MongoRouteRepository;
@@ -16,26 +12,22 @@ import com.vincentrungogh.domain.route.repository.RouteRepository;
 import com.vincentrungogh.domain.route.service.dto.common.Position;
 import com.vincentrungogh.domain.running.service.dto.request.RunningRequest;
 import com.vincentrungogh.domain.user.service.UserService;
+import com.vincentrungogh.global.service.AwsService;
 import com.vincentrungogh.global.service.PythonApiService;
 import com.vincentrungogh.global.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import com.vincentrungogh.domain.drawing.entity.Drawing;
 import com.vincentrungogh.domain.drawing.repository.DrawingDetailRepository;
 import com.vincentrungogh.domain.drawing.repository.DrawingRepository;
-import com.vincentrungogh.domain.drawing.service.dto.response.DrawingResponseDto;
 import com.vincentrungogh.domain.user.entity.User;
 import com.vincentrungogh.domain.user.repository.UserRepository;
 import com.vincentrungogh.global.exception.CustomException;
 import com.vincentrungogh.global.exception.ErrorCode;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -51,6 +43,7 @@ public class DrawingService {
     private final UserService userService;
     private final RedisService redisService;
     private final PythonApiService pythonApiService;
+    private final AwsService awsService;
 
     @Transactional
     public DrawingResponseDto getDrawing(int userId, int drawingId) {
@@ -66,13 +59,21 @@ public class DrawingService {
 
         //드로잉 디테일에서 평균 속력이랑 총 거리 구하기
         double avgSpeed = drawingDetailRepository.findByDrawingAverageSpeed(drawing);
-        int distance = drawingDetailRepository.findByDrawingSumDistance(drawing);
+//        int distance = drawingDetailRepository.findByDrawingSumDistance(drawing);
+        int distance = 0;
+        if(drawing.getRoute()!=null) {
+            distance = drawing.getRoute().getDistance();
+        }
 
         return DrawingResponseDto.createDrawingResponseDto(drawing,  avgSpeed, distance);
     }
 
     @Transactional
-    public StartDrawingResponse startDrawing(int userId, String routeId) {
+    public StartDrawingResponse startDrawing(int userId, StartDrawingRequest request) {
+        // 0. 레디스 저장
+        String routeId = request.getRouteId();
+        redisService.removeRunning(userId);
+        redisService.saveRunning(userId, RunningRequest.createRunningRequest(request.getLat(), request.getLng(), request.getTime()));
 
         // 1. 유저 여부
         User user = userService.getUserById(userId);
@@ -97,6 +98,12 @@ public class DrawingService {
 
 
     private StartDrawingResponse drawingRunning(String routeId, User user) {
+
+        // 0. 진행 중인 드로잉 개수
+        int count = drawingRepository.countAllByUserAndIsCompleted(user, false);
+        if(count >= 3){
+            throw new CustomException(ErrorCode.MORE_THAN_THREE_DRAWINGS);
+        }
         // 1. 루트 찾기
         Route route = routeRepository.findById(routeId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ROUTE_NOT_FOUND));
@@ -118,23 +125,27 @@ public class DrawingService {
 
     }
 
-    public RestartDrawingResponse restartDrawing(int drawingId){
-        // 0. 드로잉 찾기
+    public RestartDrawingResponse restartDrawing(int drawingId, RestartDrawingRequest request, int userId){
+        // 0. 레디스 저장
+        redisService.removeRunning(userId);
+        redisService.saveRunning(userId, RunningRequest.createRunningRequest(request.getLat(), request.getLng(), request.getTime()));
+
+        // 1. 드로잉 찾기
         Drawing drawing = drawingRepository.findById(drawingId)
                 .orElseThrow(() -> new CustomException(ErrorCode.DRAWING_NOT_FOUND));
 
-        // 1. 드로잉디테일 찾기
+        // 2. 드로잉디테일 찾기
         List<String> drawingDetailIds = drawingDetailRepository.findAllIdsByDrawing(drawing);
 
-        // 2. 드로잉 디테일 정보 찾기
+        // 3. 드로잉 디테일 정보 찾기
         List<MongoDrawingDetail> mongoDrawingPositionList = mongoDrawingRepository.findAllByIdIn(drawingDetailIds);
 
-        // 3.
+        // 4.
         List<Position> drawingPositionList = mongoDrawingPositionList.stream()
                 .flatMap(mongoDrawing -> mongoDrawing.getPositionList().stream())
                 .toList();
 
-        // 4. 루트 정보
+        // 5. 루트 정보
         List<Position> routePositionList = mongoRouteRepository.findById(drawing.getRoute().getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.ROUTE_NOT_FOUND)).getPositionList();
 
@@ -146,7 +157,10 @@ public class DrawingService {
     }
 
     @Transactional
-    public void saveDrawing(int userId, int drawingId, SaveDrawingRequest request) {
+    public SaveDrawingResponse saveDrawing(int userId, int drawingId, SaveDrawingRequest request) {
+        // 0. 레디스 저장
+        redisService.saveRunning(userId, RunningRequest.createRunningRequest(request.getLat(), request.getLng(), request.getTime()));
+
         // 1. 파이썬 호출
         DataSaveDrawingDetailResponse response = processDrawing(userId);
 
@@ -155,18 +169,26 @@ public class DrawingService {
                 .orElseThrow(() -> new CustomException(ErrorCode.DRAWING_NOT_FOUND));
 
         // 3. 드로잉 업데이트
-        drawing.changeAccumulatedDrawingImage(request.getDrawingImage());
+        String drawingImageURL = this.getImageUrl(request.getDrawingImage());
+        drawing.changeAccumulatedDrawingImage(drawingImageURL);
         drawingRepository.save(drawing);
 
         // 4. 드로잉 디테일 저장
+        String drawingDetailImageURL = this.getImageUrl(request.getDrawingDetailImage());
         DrawingDetail drawingDetail = DrawingDetail
-                .createDrawingDetail(response, request.getDrawingDetailImage(),
+                .createDrawingDetail(response, drawingDetailImageURL,
                         drawing);
         drawingDetailRepository.save(drawingDetail);
+
+        return SaveDrawingResponse
+                .createSaveDrawingResponse(drawingImageURL, drawingDetailImageURL);
     }
 
     @Transactional
-    public void completeDrawing(int userId, int drawingId, CompleteDrawingRequest request) {
+    public SaveDrawingResponse completeDrawing(int userId, int drawingId, CompleteDrawingRequest request) {
+        // 0. 레디스 저장
+        redisService.saveRunning(userId, RunningRequest.createRunningRequest(request.getLat(), request.getLng(), request.getTime()));
+
         // 1. 파이썬 호출
         DataSaveDrawingDetailResponse response = processDrawing(userId);
 
@@ -175,13 +197,18 @@ public class DrawingService {
                 .orElseThrow(() -> new CustomException(ErrorCode.DRAWING_NOT_FOUND));
 
         // 3. 드로잉 업데이트
-        drawing.completeDrawing(request.getTitle(), request.getDrawingDetailImage());
+        String drawingImageURL = this.getImageUrl(request.getDrawingImage());
+        drawing.completeDrawing(request.getTitle(), drawingImageURL);
 
         // 4. 드로잉 디테일 저장
+        String drawingDetailImageURL = this.getImageUrl(request.getDrawingDetailImage());
         DrawingDetail drawingDetail = DrawingDetail
-                .completeDrawingDetail(response, request.getDrawingDetailImage(),
+                .completeDrawingDetail(response, drawingDetailImageURL,
                         drawing);
         drawingDetailRepository.save(drawingDetail);
+
+        return SaveDrawingResponse
+                .createSaveDrawingResponse(drawingImageURL, drawingDetailImageURL);
     }
 
     private DataSaveDrawingDetailResponse processDrawing(int userId) {
@@ -190,7 +217,7 @@ public class DrawingService {
 
         // 2. python 연결
         DataSaveDrawingDetailResponse response = pythonApiService.saveDrawingDetail(
-                DataSaveDrawingDetailRequset.createDataSaveDrawingDetailRequset(redisPositionList)
+                DataSaveDrawingDetailRequest.createDataSaveDrawingDetailRequset(redisPositionList)
         );
 
         log.info("saveDrawing : " + response);
@@ -199,5 +226,10 @@ public class DrawingService {
         redisService.removeRunning(userId);
 
         return response;
+    }
+
+    private String getImageUrl(String image){
+        String fileName = awsService.uploadDrawingFile(image);
+        return awsService.getImageUrl(fileName);
     }
 }

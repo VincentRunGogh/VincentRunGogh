@@ -57,7 +57,8 @@ public class UserService implements UserDetailsService {
 
         // 2. 닉네임 중복 확인
         Optional<User> optionalUser = userRepository.findByNickname(request.getNickname());
-        if(optionalUser.isPresent()){
+
+        if(optionalUser.isPresent() && optionalUser.get().getId() != userId){
             throw new CustomException(ErrorCode.DUPLICATED_NICKNAME);
         }
 
@@ -112,16 +113,12 @@ public class UserService implements UserDetailsService {
         // 2. 시작 날짜
         LocalDate startDate = date.minusDays(6);
 
-        // 3. 드로잉 정보 가져오기
-        List<Drawing> weekDrawings = drawingRepository.findAllByUser(user);
 
+        // 3. 드로잉 정보 가져오기
         // 4. 드로잉 디테일 가져오기
-        List<DrawingDetail> weekDrawingsDetail = new ArrayList<>();
-        for (Drawing drawing : weekDrawings) {
-            weekDrawingsDetail.addAll(drawingDetailRepository
-                    .findAllByDrawingAndCreatedBetween(drawing, startDate.atTime(LocalTime.MIN),
-                            date.atTime(LocalTime.MAX)));
-        }
+        List<DrawingDetail> weekDrawingsDetail = drawingDetailRepository.findAllByUserAndCreatedBetweenDates(
+                user, startDate, date
+        );
 
         // 5.일주일 정보 리스트 생성
         int[] distance = new int[7];

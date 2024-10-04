@@ -1,16 +1,14 @@
 package com.vincentrungogh.domain.drawing.controller;
 
 import com.vincentrungogh.domain.drawing.service.dto.request.CompleteDrawingRequest;
+import com.vincentrungogh.domain.drawing.service.dto.request.RestartDrawingRequest;
 import com.vincentrungogh.domain.drawing.service.dto.request.SaveDrawingRequest;
 import com.vincentrungogh.domain.drawing.service.dto.request.StartDrawingRequest;
-import com.vincentrungogh.domain.drawing.service.dto.response.RestartDrawingResponse;
-import com.vincentrungogh.domain.drawing.service.dto.response.StartDrawingResponse;
+import com.vincentrungogh.domain.drawing.service.dto.response.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.vincentrungogh.domain.drawing.service.DrawingService;
-import com.vincentrungogh.domain.drawing.service.dto.response.DrawingListResponseDto;
-import com.vincentrungogh.domain.drawing.service.dto.response.DrawingResponseDto;
 import com.vincentrungogh.domain.drawing.service.facade.DrawingFacade;
 import com.vincentrungogh.domain.route.service.dto.response.FindRouteResponseDto;
 import com.vincentrungogh.global.auth.service.dto.response.UserPrincipal;
@@ -83,6 +81,8 @@ public class DrawingController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "드로잉이 시작되었습니다.",
                     content = @Content(schema = @Schema(implementation = StartDrawingResponse.class))),
+            @ApiResponse(responseCode = "400", description = "3개의 드로잉이 진행 중입니다. 진행 중인 드로잉을 완료해주세요.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "드로잉을 시작하는데 실패했습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
@@ -90,7 +90,7 @@ public class DrawingController {
     @PostMapping("/start")
     public ResponseEntity<?> startDrawing(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody StartDrawingRequest request){
 
-        StartDrawingResponse response = drawingService.startDrawing(userPrincipal.getId(), request.getRouteId());
+        StartDrawingResponse response = drawingService.startDrawing(userPrincipal.getId(), request);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(), "드로잉이 시작되었습니다.", response));
@@ -105,9 +105,11 @@ public class DrawingController {
     })
     @CommonSwaggerResponse.CommonResponses
     @PostMapping("/start/{drawingId}")
-    public ResponseEntity<?> restartDrawing(@PathVariable int drawingId){
+    public ResponseEntity<?> restartDrawing(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                            @PathVariable int drawingId,
+                                            @RequestBody @Valid RestartDrawingRequest request){
 
-        RestartDrawingResponse response = drawingService.restartDrawing(drawingId);
+        RestartDrawingResponse response = drawingService.restartDrawing(drawingId, request, userPrincipal.getId());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(), "드로잉이 시작되었습니다.", response));
@@ -116,38 +118,42 @@ public class DrawingController {
     @Operation(summary = "드로잉 저장", description = "드로잉 저장")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "드로잉이 저장되었습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+                    content = @Content(schema = @Schema(implementation = SaveDrawingResponse.class))),
             @ApiResponse(responseCode = "500", description = "드로잉을 저장하는데 실패했습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
     @CommonSwaggerResponse.CommonResponses
     @PostMapping("/{drawingId}")
-    public ResponseEntity<?> saveDrawing(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable int drawingId, @RequestBody @Valid SaveDrawingRequest request){
+    public ResponseEntity<?> saveDrawing(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                         @PathVariable int drawingId,
+                                         @RequestBody @Valid SaveDrawingRequest request){
 
-        drawingService.saveDrawing(userPrincipal.getId(), drawingId, request);
+        SaveDrawingResponse response =  drawingService.saveDrawing(userPrincipal.getId(), drawingId, request);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ResultDto.res(HttpStatus.OK.value(), "드로잉이 저장되었습니다."));
+                .body(ResultDto.res(HttpStatus.OK.value(), "드로잉이 저장되었습니다.", response));
 
     }
 
     @Operation(summary = "드로잉 완료", description = "드로잉 완료")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "드로잉이 완료되었습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+                    content = @Content(schema = @Schema(implementation = SaveDrawingResponse.class))),
             @ApiResponse(responseCode = "500", description = "드로잉을 완료하는데 실패했습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
     @CommonSwaggerResponse.CommonResponses
     @PostMapping("/end/{drawingId}")
-    public ResponseEntity<?> completeDrawing(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable int drawingId, @RequestBody @Valid CompleteDrawingRequest request){
+    public ResponseEntity<?> completeDrawing(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                             @PathVariable int drawingId,
+                                             @RequestBody @Valid CompleteDrawingRequest request){
 
-        drawingService.completeDrawing(userPrincipal.getId(), drawingId, request);
+        SaveDrawingResponse response =  drawingService.completeDrawing(userPrincipal.getId(), drawingId, request);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ResultDto.res(HttpStatus.OK.value(), "드로잉이 완료되었습니다."));
+                .body(ResultDto.res(HttpStatus.OK.value(), "드로잉이 완료되었습니다.", response));
 
     }
 }

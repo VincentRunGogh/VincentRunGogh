@@ -4,10 +4,13 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanTemplate;
 import com.querydsl.core.types.dsl.DateTemplate;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.vincentrungogh.domain.drawing.entity.Drawing;
 import com.vincentrungogh.domain.drawing.entity.DrawingDetailGroup;
 import com.vincentrungogh.domain.drawing.entity.QDrawing;
+import com.vincentrungogh.domain.drawing.entity.DrawingDetail;
 import com.vincentrungogh.domain.drawing.entity.QDrawingDetail;
 import com.vincentrungogh.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -86,6 +91,19 @@ public class DrawingDetailRepositoryImpl implements DrawingDetailRepositoryCusto
                 .where(drawing.user.eq(user)
                         .and(drawingDetail.created.between(startOfMonth, endOfMonth)))
                 .groupBy(drawingDetail.drawing, dateGroupBy)
+                .fetch();
+    }
+
+    @Override
+    public List<DrawingDetail> findAllByUserAndCreatedBetweenDates(User user, LocalDate start, LocalDate end) {
+        return queryFactory
+                .selectFrom(drawingDetail)
+                .where(drawingDetail.drawing.in(
+                        JPAExpressions
+                                .select(drawing)
+                                .from(drawing)
+                                .where(drawing.user.eq(user)) // user 필터링
+                ).and(drawingDetail.created.between(start.atTime(LocalTime.MIN), end.atTime(LocalTime.MAX))))
                 .fetch();
     }
 }
