@@ -32,18 +32,9 @@ public class BoardController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 조회에 성공했습니다.",
                 content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "204", description = "게시글이 비어있습니다.",
-                content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.",
-                content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
-                content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
-                content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "500", description = "커뮤니티 화면을 불러오기 실패했습니다.",
+            @ApiResponse(responseCode = "500", description = "게시글 내용을 불러오기 실패했습니다.",
                 content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
-
     @CommonSwaggerResponse.CommonResponses
     @GetMapping
     public ResponseEntity<?> getBoard(
@@ -64,18 +55,11 @@ public class BoardController {
 
     @Operation(summary = "게시글 생성", description = "커뮤니티에 내가 쓴 게시글 넣기")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "게시글 생성에 성공했습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 페이지입니다.",
+            @ApiResponse(responseCode = "200", description = "게시글 생성에 성공했습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "커뮤니티에 게시글 생성에 실패했습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
-
     @CommonSwaggerResponse.CommonResponses
     @PostMapping
     public ResponseEntity<?> createBoard(
@@ -86,7 +70,7 @@ public class BoardController {
 
         boardFacade.createBoard(userPrincipal, requestDto);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(ResultDto.res(HttpStatus.CREATED.value(), "게시글 생성 완료되었습니다.",null));
+        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "게시글 생성 완료되었습니다.",null));
     }
 
 }
