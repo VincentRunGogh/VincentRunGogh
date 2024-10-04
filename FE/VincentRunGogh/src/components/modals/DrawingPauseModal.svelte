@@ -5,7 +5,6 @@
   import { drawingStore } from '@/stores/drawingStore';
 
   export let modalType: string;
-  console.log(get(drawingStore));
   const dispatch = createEventDispatcher();
   const modalData = {
     pause: {

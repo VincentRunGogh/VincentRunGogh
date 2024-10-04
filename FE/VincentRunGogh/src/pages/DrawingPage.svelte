@@ -17,6 +17,7 @@
     setDrawingPos,
     updateDistanceAndSpeed,
     resetDrawingStore,
+    drawingStore,
   } from '@/stores/drawingStore';
   import DrawingPauseModal from '@/components/modals/DrawingPauseModal.svelte';
   import { userStore } from '@/stores/userStore';
@@ -70,10 +71,9 @@
           options,
           data,
           async (response) => {
-            console.log('api 연결 후 드로잉 데이터:', response);
             updateDrawingInfo({ ...response.data.data, routeId }); // 스토어를 업데이트
-            //TODO - 루트의 좌표 값들을 url의 routeId 파람으로 조회
-            //이전에 한 드로잉은 다른 색으로 보여주기
+            console.log('api 연결 후 드로잉 데이터:', get(drawingStore));
+
             if (routeLineLayers) {
               routeLineLayers.remove();
             }
@@ -401,7 +401,6 @@ fill="#000000" stroke="none">
       ...(drawingId ? { drawingId } : {}),
       ...(routeId ? { routeId: routeId.toString() } : {}),
     };
-    console.log(options);
   }
 
   onMount(() => {
@@ -415,7 +414,6 @@ fill="#000000" stroke="none">
       clearInterval(trackingIntervalId);
     }
     disconnectWebSocket();
-    resetDrawingStore();
   });
 </script>
 

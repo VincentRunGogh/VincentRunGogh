@@ -20,6 +20,7 @@
   import { startDrawing, completeDrawing, saveDrawing } from '@/api/drawingApi';
   import SaveRouteDrawing from '@components/cards/SaveRouteDrawing.svelte';
 
+  let drawingInfo = get(drawingStore);
   let isLoading = false;
   // 폼 형태 변수 임시저장 or 완료
   let isComplete = $querystring?.split('=')[1] === 'complete';
@@ -130,22 +131,21 @@
 
   async function submitDrawing() {
     isLoading = true;
-    const { endInfo } = get(drawingStore);
 
     const data = {
       drawingImage: $drawingImage,
       drawingDetailImage: $drawingDetailImage,
       step: 0,
-      ...endInfo,
+      ...drawingInfo.endInfo,
     };
     if (isComplete) {
       data.title = inputName;
     }
 
-    console.log(data);
+    console.log(drawingInfo);
     if (isComplete) {
       completeDrawing(
-        get(drawingStore).drawingId,
+        drawingInfo.drawingId,
         data,
         (response) => {
           isLocked = true;
@@ -157,7 +157,7 @@
       );
     } else {
       saveDrawing(
-        get(drawingStore).drawingId,
+        drawingInfo.drawingId,
         data,
         (response) => {
           isLoading = false;
@@ -262,7 +262,8 @@
   //초기 렌더링
   onMount(() => {
     initializeMap();
-    // console.log(get(drawingStore));
+
+    console.log(get(drawingStore));
   });
 </script>
 
@@ -319,7 +320,7 @@
   {:else}
     <SaveRouteDrawing
       title={inputName}
-      distance={$totalDistance.toFixed(2)}
+      distance={Number($totalDistance.toFixed(2))}
       time={$elapsedTime}
       image={$showingImage}
       isRoute={false}
