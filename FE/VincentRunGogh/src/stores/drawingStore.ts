@@ -114,6 +114,7 @@ export function setDrawingPos(data: Object): void {
     return current;
   });
 }
+
 // drawingStore 초기화 함수
 export function resetDrawingStore(): void {
   drawingStore.set({ ...initialState });
