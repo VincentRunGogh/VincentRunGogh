@@ -21,7 +21,7 @@ public class FindBoard {
     private String artImage;
     private String comment;
     private int likeCount;
-    private boolean isLiked;
+    private Boolean isLiked;
     private double distance;
     private int time;
     private LocalDateTime created;
