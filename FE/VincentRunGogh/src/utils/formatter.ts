@@ -23,9 +23,17 @@ export function formatSecToHMS(seconds: number): string {
 
   return `${hoursString}${minutesString}:${secondsString}`;
 }
+export function formatSecToMS(seconds: number) {
+  const minutes = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+
+  const minutesString = minutes.toString().padStart(2, '0');
+  const secondsString = secs.toString().padStart(2, '0');
+
+  return `${minutesString}:${secondsString}`;
+}
 
 export function formatSecToH(seconds: number): string {
-  if (seconds < 60) return `${seconds} sec`;
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   return `${hours > 0 ? hours + 'h' : ''} ${minutes < 10 ? '0' + minutes : minutes}${minutes > 0 ? 'min' : ''}`;

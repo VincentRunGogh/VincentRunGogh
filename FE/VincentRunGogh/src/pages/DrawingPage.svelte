@@ -87,8 +87,9 @@
         firstLocationFound.set(true);
         startPos = new L.LatLng(lat, lng);
         const data = { lat: lat, lng: lng, time: startTime };
+        console.log(data, get(options));
         startDrawing(
-          options,
+          get(options),
           data,
           async (response) => {
             const responseData = response.data.data;

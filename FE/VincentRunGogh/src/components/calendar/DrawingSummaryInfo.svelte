@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { formatSecToHMS } from '@/utils/formatter';
   export let time: string;
   export let averagePace: string | null;
   export let distance: string;

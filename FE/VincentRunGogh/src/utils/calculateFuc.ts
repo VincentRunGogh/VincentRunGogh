@@ -2,7 +2,6 @@ import { formatSecToHMS } from './formatter';
 
 export function getPace(distance: number, timeInSeconds: number) {
   if (distance <= 0 || timeInSeconds <= 0) {
-    console.log('aa');
     return '00:00'; // 거리나 시간이 0 이하면 유효하지 않음
   }
 
