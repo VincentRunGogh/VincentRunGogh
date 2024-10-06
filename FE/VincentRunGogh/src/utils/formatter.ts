@@ -20,3 +20,16 @@ export function formatSecToMMSS(seconds: number): string {
 
   return `${minutesString}:${secondsString}`;
 }
+
+export function formatSecToH(seconds: number): string {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  return `${hours > 0 ? hours + 'h' : ''} ${minutes < 10 ? '0' + minutes : minutes}${minutes > 0 ? 'min' : ''}`;
+}
+
+export function formatDistanceFix2(number: number): string {
+  if (number % 1 === 0) {
+    return number.toString();
+  }
+  return parseFloat(number.toFixed(2)).toString();
+}

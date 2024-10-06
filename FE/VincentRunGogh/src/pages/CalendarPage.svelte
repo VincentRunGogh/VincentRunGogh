@@ -1,87 +1,65 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
-  import { link } from 'svelte-spa-router';
   import { writable, get } from 'svelte/store';
   import FullCalendar from 'svelte-fullcalendar';
   import type { CalendarOptions } from 'svelte-fullcalendar';
   import daygridPlugin from '@fullcalendar/daygrid';
   import interactionPlugin from '@fullcalendar/interaction';
-  import Swal from 'sweetalert2';
+  import { Timeline, TimelineItem } from 'flowbite-svelte';
+  import { CalendarWeekSolid } from 'flowbite-svelte-icons';
 
   import { getMonthData } from '@/api/myhealthApi';
-  import DrawingSummaryInfo from '@/components/calendar/DrawingSummaryInfo.svelte';
+  import Header from '@/components/common/Header.svelte';
+  import { DrawingDetailContent, DrawingSummaryInfo } from '@components/calendar';
+
+  import BottomSheet from '@components/common/BottomSheet.svelte';
+  import { formatSecToH, formatDistanceFix2 } from '@/utils/formatter';
+  import { getPace } from '@/utils/calculateFuc';
+
   type CalendarOptions = typeof CalendarOptions;
 
-  interface MonthInfo {
-    monthTotalTime: number;
-    monthTotalDistance: number;
-    dayList: DayInfo[];
-  }
-
-  interface DayInfo {
-    date: string;
-    isRun: boolean;
-    isDrawing: boolean;
-    dayTotalTime: number;
-    dayTotalDistance: number;
-    drawingList: Drawing[];
-  }
-
-  interface Drawing {
-    drawingId: number;
-    drawingName: string;
-    drawingTime: number;
-    drawingDistance: number;
-  }
   let today = new Date();
 
   let monthInfo = writable<MonthInfo | null>(null);
   let selectedDayInfo = writable<DayInfo | null>(null);
   let selectedYear = writable<number | null>(null);
   let selectedMonth = writable<number | null>(null);
+  let selectedDate = writable<string | null>(null);
   let options: CalendarOptions;
+
+  let activeDrawing = writable(null); // 보여줄 드로잉의 세부 정보를 추적하기 위한 스토어
 
   function getEventColor(day) {
     if (day.isDrawing) {
       return 'var(--yellow-main-color)';
-    } else if (day.isRun) {
+    } else if (day.isRunning) {
       return 'var(--green-main-color)';
     }
     return 'transparent';
   }
 
   function handleDateClick(info) {
-    const dayData = get(monthInfo).dayList.find((day) => day.date === info.dateStr);
+    const dayData = get(monthInfo)?.dayList.find((day) => day.date === info.dateStr);
+    selectedDate.set(info.dateStr);
+
     if (dayData) {
       selectedDayInfo.set(dayData);
     } else {
       selectedDayInfo.set(null); // 일치하는 날짜가 없을 경우 빈 객체를 설정
     }
-    Swal.fire({
-      title: 'Bottom drawer 👋',
-      position: 'bottom',
-      showClass: {
-        popup: `
-      animate__animated
-      animate__fadeInUp
-      animate__faster
-    `,
-      },
-      hideClass: {
-        popup: `
-      animate__animated
-      animate__fadeOutDown
-      animate__faster
-    `,
-      },
-      grow: 'row',
-      showConfirmButton: false,
-      showCloseButton: true,
-    });
-    // info.dayEl.style.backgroundColor = '#8BA2E7AD';
-    console.log($selectedDayInfo.date);
+  }
+  let showModal = false;
+
+  function showDrawingDetails(drawing) {
+    activeDrawing.set(drawing);
+    showModal = true;
+    console.log('click');
   }
 
+  function closeDrawingDetails() {
+    activeDrawing.set(null);
+    showModal = false;
+  }
   function handleDatesSet(arg) {
     selectedYear.set(arg.start.getFullYear());
     selectedMonth.set(arg.start.getMonth() + 1); // 월은 0부터 시작하므로 +1
@@ -96,7 +74,7 @@
     selectedYear.set(year);
     selectedMonth.set(month);
     //FIXME - api 연결, 오늘 이벤트 추가
-    $selectedMonth = getMonthData(
+    getMonthData(
       $selectedYear,
       $selectedMonth,
       (response) => {
@@ -147,48 +125,79 @@
       },
       displayEventTime: false,
       locale: 'ko',
+      titleFormat: {
+        // 연도와 월을 숫자로만 표시
+        year: 'numeric', // YYYY 형식
+        month: '2-digit'.split('.')[0], // MM 형식
+      },
       selectable: true,
       showNonCurrentDates: false,
       fixedWeekCount: false,
-      // contentHeight: 400,
     };
   }
 </script>
 
-<div class="flex flex-col items-center h-screen bg-bg-main">
-  <div
-    id="calendar"
-    class="h-[80vh] w-80 bg-white rounded-2xl mt-16
-"
-  >
+<div class="flex flex-col items-center bg-bg-main h-screen">
+  <Header title="캘린더" />
+  <div id="calendar" class="h-3/5 w-[90vw] bg-white rounded-2xl">
     <FullCalendar {options} />
   </div>
 
-  {#if $selectedDayInfo}
-    <div>
-      <h2>Day Details:</h2>
-      <p>Total Time: {$selectedDayInfo.dayTotalTime} seconds</p>
-      <p>Total Distance: {$selectedDayInfo.dayTotalDistance} meters</p>
-      <h3>Drawings:</h3>
-      <ul>
-        {#each $selectedDayInfo.drawingList as drawing}
-          <a use:link href="/drawingdetail?id={drawing.drawingId}&date={$selectedDayInfo.date}">
-            <li>
-              {drawing.drawingName} - Time: {drawing.drawingTime}, Distance: {drawing.drawingDistance}
-            </li>
-          </a>
-        {/each}
-      </ul>
-    </div>
-  {:else if $monthInfo}
-    <h2>{$selectedYear}년 {$selectedMonth}월 통계</h2>
-    <DrawingSummaryInfo
-      time={$monthInfo.monthTotalTime}
-      averagePace={null}
-      distance={$monthInfo.monthTotalDistance}
-    />
-  {/if}
+  <div class=" w-[90vw] bg-white shadow-lg rounded-lg p-4 max-h-[25%] overflow-y-auto mt-4">
+    {#if $selectedDayInfo}
+      <div class="text-sm flex gap-4 flex-col">
+        <h2 class="text-gray-500 mb-1 font-bold">
+          {$selectedMonth}월 {$selectedDate?.split('-')[2]}일 운동
+        </h2>
+        <DrawingSummaryInfo
+          time={formatSecToH($selectedDayInfo.dayTotalTime)}
+          averagePace={getPace($selectedDayInfo.dayTotalDistance, $selectedDayInfo.dayTotalTime)}
+          distance={formatDistanceFix2($selectedDayInfo.dayTotalDistance)}
+          km
+        />
+
+        <ul class="list-disc pl-5">
+          {#each $selectedDayInfo.drawingList as drawing}
+            <div on:click={() => showDrawingDetails(drawing.drawingId)}>
+              <Timeline order="vertical">
+                <TimelineItem title={drawing.drawingName}>
+                  <svelte:fragment slot="icon">
+                    <span
+                      class="flex absolute -start-3 justify-center items-center w-6 h-6 bg-primary-200 rounded-full ring-8 ring-white dark:ring-gray-900 dark:bg-primary-900"
+                    >
+                      <CalendarWeekSolid class="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                    </span>
+                  </svelte:fragment>
+                  <p class="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">
+                    {formatSecToH(drawing.drawingTime)}
+                    {formatDistanceFix2(drawing.drawingDistance)} km
+                  </p>
+                </TimelineItem>
+              </Timeline>
+            </div>
+          {/each}
+        </ul>
+      </div>
+    {:else if $monthInfo}
+      <div class="text-sm">
+        <h2 class="text-gray-500 mb-1 font-bold">{$selectedYear}년 {$selectedMonth}월 통계</h2>
+        <DrawingSummaryInfo
+          time={formatSecToH($monthInfo.monthTotalTime)}
+          averagePace={getPace($monthInfo.monthTotalDistance, $monthInfo.monthTotalTime)}
+          distance={formatDistanceFix2($monthInfo.monthTotalDistance)}
+        />
+      </div>
+    {/if}
+  </div>
 </div>
+{#if showModal}
+  <!-- drawing을 button에 해당하는 drawing으로 설정 -->
+  <BottomSheet
+    Component={DrawingDetailContent}
+    props={{ drawingId: $activeDrawing, date: $selectedDate }}
+    onClose={closeDrawingDetails}
+  />
+{/if}
 
 <style>
 </style>

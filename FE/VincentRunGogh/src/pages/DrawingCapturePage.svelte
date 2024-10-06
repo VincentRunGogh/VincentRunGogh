@@ -19,6 +19,7 @@
   import { elapsedTime, posList, route, totalDistance, drawingStore } from '@/stores/drawingStore';
   import { startDrawing, completeDrawing, saveDrawing } from '@/api/drawingApi';
   import SaveRouteDrawing from '@components/cards/SaveRouteDrawing.svelte';
+  import { formatDistanceFix2 } from '@/utils/formatter';
 
   let drawingInfo = get(drawingStore);
   let isLoading = false;
@@ -320,7 +321,7 @@
   {:else}
     <SaveRouteDrawing
       title={inputName}
-      distance={Number($totalDistance.toFixed(2))}
+      distance={Number(formatDistanceFix2($totalDistance))}
       time={$elapsedTime}
       image={$showingImage}
       isRoute={false}
