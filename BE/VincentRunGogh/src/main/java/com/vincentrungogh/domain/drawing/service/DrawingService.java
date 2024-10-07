@@ -5,6 +5,8 @@ import com.vincentrungogh.domain.drawing.entity.MongoDrawingDetail;
 import com.vincentrungogh.domain.drawing.repository.MongoDrawingRepository;
 import com.vincentrungogh.domain.drawing.service.dto.request.*;
 import com.vincentrungogh.domain.drawing.service.dto.response.*;
+import com.vincentrungogh.domain.myhealth.entity.MyHealth;
+import com.vincentrungogh.domain.myhealth.repository.MyHealthRepository;
 import com.vincentrungogh.domain.route.entity.MongoRoute;
 import com.vincentrungogh.domain.route.entity.Route;
 import com.vincentrungogh.domain.route.repository.MongoRouteRepository;
@@ -38,6 +40,7 @@ public class DrawingService {
     private final DrawingRepository drawingRepository;
     private final UserRepository userRepository;
     private final RouteRepository routeRepository;
+    private final MyHealthRepository myHealthRepository;
     private final MongoDrawingRepository mongoDrawingRepository;
     private final MongoRouteRepository mongoRouteRepository;
     private final UserService userService;
@@ -122,7 +125,6 @@ public class DrawingService {
         return StartDrawingResponse
                 .createStartDrawingResponse(drawing.getTitle(),
                         drawing.getId(), mongoRoute.getPositionList());
-
     }
 
     public RestartDrawingResponse restartDrawing(int drawingId, RestartDrawingRequest request, int userId){
@@ -206,6 +208,18 @@ public class DrawingService {
                 .completeDrawingDetail(response, drawingDetailImageURL,
                         drawing);
         drawingDetailRepository.save(drawingDetail);
+
+        // 5. 마이헬스 저장
+        MyHealth myHealth = myHealthRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MYHEALTH_NOT_FOUND));
+
+        int totalTime = myHealth.getTotalTime() + response.getTime();
+        int totalDistance = myHealth.getTotalDistance() + response.getDistance();
+        double averageSpeed = Math.round(((myHealth.getAverageSpeed() + response.getSpeed()) / 2) * 100.0) / 100.0;
+        int totalStep = myHealth.getTotalStep() + request.getStep();
+
+        myHealth.updateMyHealth(totalTime, totalDistance, averageSpeed, totalStep);
+        myHealthRepository.save(myHealth);
 
         return SaveDrawingResponse
                 .createSaveDrawingResponse(drawingImageURL, drawingDetailImageURL);
