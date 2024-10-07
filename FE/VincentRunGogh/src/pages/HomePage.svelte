@@ -4,7 +4,12 @@
   import Tabbar from '@/components/common/Tabbar.svelte';
   import { Chart, Card, ImagePlaceholder } from 'flowbite-svelte';
   import { onMount } from 'svelte';
+<<<<<<< HEAD
   import { ongoing } from '@/stores/ongoingStore';
+=======
+  import { userStore } from '@/stores/userStore';
+  import { resetDrawingStore } from '@/stores/drawingStore';
+>>>>>>> 06203df94ac5b7a3838e69052587f2a724c1c44a
   import Swal from 'sweetalert2';
   import RouteDetail from '@/components/modals/RouteDetail.svelte';
 
@@ -313,6 +318,7 @@
   };
 
   onMount(async () => {
+    resetDrawingStore();
     await getWeekly();
     await getDrawings();
     let UserInfo = localStorage.getItem('user');

@@ -11,8 +11,11 @@
 
 <button
   type="button"
-  class={isMakeRoute ? 'single-click mt-[8vh]' : 'single-click'}
-  on:click={() => dispatch('click-reset')}
+  class="single-click"
+  on:click={(e) => {
+    e.stopPropagation();
+    dispatch('click-reset');
+  }}
   title="Reset View"
 >
   <svg
@@ -28,8 +31,6 @@
     />
   </svg>
 </button>
-
-<!-- gps 데이터  -->
 
 <style>
   button {

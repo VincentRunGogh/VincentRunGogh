@@ -2,7 +2,6 @@ import { writable, get } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 import { LatLng } from 'leaflet';
 import L from 'leaflet';
-import { getPace } from '@/utils/calculateFuc';
 
 // 데이터 타입 정의
 interface Position {
@@ -37,6 +36,8 @@ export const isPause = writable(false);
 export const currentPace = writable('00:00');
 export const route = writable([]);
 export const posList = writable([]);
+export const isRouteDrawing = writable<boolean>(false);
+export const stepCount = writable(0);
 
 // 로컬 스토리지에서 데이터 가져오기
 function loadFromLocalStorage(key, defaultValue) {
@@ -98,10 +99,10 @@ export function updateDistanceAndSpeed(posList: PositionData[]) {
         const paceSeconds = 3600 / speed;
         const paceMinutes = Math.floor(paceSeconds / 60);
         const remainingSeconds = Math.round(paceSeconds % 60);
-
-        currentPace.set(getPace(distance, timeDiff));
-      }
-
+        const minutesString = paceMinutes.toString().padStart(2, '0');
+        const secondsString = remainingSeconds.toString().padStart(2, '0');
+        currentPace.set(`${minutesString}:${secondsString}`);
+      } else currentPace.set('-');
       return currentDistance + distance;
     }
     return currentDistance;
@@ -126,7 +127,65 @@ export function resetDrawingStore(): void {
   elapsedTime.set(0);
   posList.set([]);
   route.set([]);
+  stepCount.set(0);
   localStorage.removeItem('drawingStore');
   localStorage.removeItem('totalDistance');
   localStorage.removeItem('elapsedTime');
+}
+
+export async function getMotion() {
+  if (!window.DeviceMotionEvent) {
+    alert('Your device does not support motion detection.');
+    return;
+  }
+
+  const threshold = 1.2; // 변화를 감지할 가속도 임계값
+  let lastReading = { x: 0, y: 0, z: 0 };
+
+  function incrementStepCount(x, y, z) {
+    const deltaX = Math.abs(x - lastReading.x);
+    const deltaY = Math.abs(y - lastReading.y);
+    const deltaZ = Math.abs(z - lastReading.z);
+
+    if (deltaX > threshold || deltaY > threshold || deltaZ > threshold) {
+      stepCount.update((n) => n + 1); // Svelte store의 값을 증가
+    }
+    console.log('stepCount: ' + get(stepCount));
+    lastReading = { x, y, z };
+  }
+
+  if ('Accelerometer' in window) {
+    const accelerometer = new Accelerometer({ frequency: 10 });
+    accelerometer.addEventListener('reading', () => {
+      incrementStepCount(accelerometer.x, accelerometer.y, accelerometer.z);
+    });
+    accelerometer.start();
+  } else if (DeviceMotionEvent.requestPermission) {
+    const permission = await DeviceMotionEvent.requestPermission();
+    if (permission === 'granted') {
+      window.addEventListener(
+        'devicemotion',
+        (event) => {
+          if (event.accelerationIncludingGravity) {
+            const { x, y, z } = event.accelerationIncludingGravity;
+            incrementStepCount(x, y, z);
+          }
+        },
+        true
+      );
+    } else {
+      alert('Permission to access motion sensors was denied.');
+    }
+  } else {
+    window.addEventListener(
+      'devicemotion',
+      (event) => {
+        if (event.accelerationIncludingGravity) {
+          const { x, y, z } = event.accelerationIncludingGravity;
+          incrementStepCount(x, y, z);
+        }
+      },
+      true
+    );
+  }
 }

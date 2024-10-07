@@ -16,8 +16,9 @@
     updateDrawingInfo,
     setDrawingPos,
     updateDistanceAndSpeed,
-    resetDrawingStore,
     drawingStore,
+    getMotion,
+    isRouteDrawing,
   } from '@/stores/drawingStore';
   import DrawingPauseModal from '@/components/modals/DrawingPauseModal.svelte';
   import { userStore } from '@/stores/userStore';
@@ -25,6 +26,7 @@
   import { startDrawing } from '@/api/drawingApi';
   import { connectWebSocket, disconnectWebSocket, sendRealTimePosition } from '@/api/websocket';
   import { formatTimeToHMS } from '@/utils/formatter';
+  import { set } from 'date-fns';
   $: $isLockScreen = $isLockScreen;
   $: $isPause = $isPause;
   $: $elapsedTime = $elapsedTime;
@@ -39,7 +41,8 @@
   let startPos: LatLng | null = null;
   let startTime: string | null = null;
   let firstLocationFound = writable(false); // 최초 위치 찾기 상태
-
+  let isFocusMarker: boolean = true;
+  let zoomLevel: number = 16;
   let routeId = writable(null);
   let drawingId = writable(null);
   let options = writable({});
@@ -49,9 +52,11 @@
     const newDrawingId = params.get('drawingId');
     if (newRouteId) {
       routeId.set(newRouteId);
+      isRouteDrawing.set(true);
     }
     if (newDrawingId) {
       drawingId.set(newDrawingId);
+      isRouteDrawing.set(true);
     }
 
     // 옵션 객체 업데이트
@@ -63,7 +68,7 @@
 
   function createMap(): LeafletMap {
     const m = L.map('map', { preferCanvas: true });
-    m.locate({ setView: true, maxZoom: 16 });
+    m.locate({ setView: true, maxZoom: zoomLevel });
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       // attribution: `&copy;<a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>,
@@ -80,6 +85,8 @@
 
     addPosition(lat, lng);
 
+    if (currPos && isFocusMarker) map.setView(currPos, zoomLevel, { animate: true });
+
     firstLocationFound.update((value) => {
       if (!value) {
         // 처음 위치 찾기
@@ -87,7 +94,7 @@
         firstLocationFound.set(true);
         startPos = new L.LatLng(lat, lng);
         const data = { lat: lat, lng: lng, time: startTime };
-        console.log(data, get(options));
+        // console.log(data, get(options));
         startDrawing(
           get(options),
           data,
@@ -102,7 +109,7 @@
             }
             updateDrawingInfo(updateData); // 스토어를 업데이트
 
-            console.log('api 연결 후 드로잉 데이터:', get(drawingStore));
+            // console.log('api 연결 후 드로잉 데이터:', get(drawingStore));
 
             if (routeLineLayers) {
               routeLineLayers.remove();
@@ -113,7 +120,7 @@
             }
             try {
               await connectWebSocket();
-              console.log('WebSocket connected successfully');
+              // console.log('WebSocket connected successfully');
             } catch (error) {
               console.error('Failed to connect WebSocket:', error);
             }
@@ -124,10 +131,10 @@
         );
       } else {
         // 주기적 위치 업데이트
-        console.log('주기적 found');
+        // console.log('주기적 found');
 
         if (!$isPause) {
-          console.log('소켓 데이터 보내기!');
+          // console.log('소켓 데이터 보내기!');
           const currentUser = get(userStore);
           const nickname = currentUser ? currentUser.nickname : '';
           sendRealTimePosition({ lat, lng }, nickname);
@@ -162,7 +169,8 @@
     });
 
     toolbarComponent.$on('click-reset', () => {
-      if (currPos) map.setView(currPos, 16, { animate: true });
+      if (currPos) map.setView(currPos, zoomLevel, { animate: true });
+      isFocusMarker = true;
     });
 
     return div;
@@ -290,8 +298,9 @@
 
   let marker = new Map<string, Marker>();
 
-  function markerIcon(): L.DivIcon {
-    const html = `<div class="map-marker"><svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+  function createMarker(loc: LatLngExpression, heading: number): Marker {
+    const iconHtml = `<div class="map-marker" style="transform: rotate(${heading}deg);">
+<div class="map-marker"><svg version="1.0" xmlns="http://www.w3.org/2000/svg"
  width="2rem" height="2rem" viewBox="0 0 256.000000 256.000000"
  preserveAspectRatio="xMidYMid meet">
 
@@ -303,19 +312,26 @@ fill="#000000" stroke="none">
 777 1809 0 34 -29 59 -66 58 -16 -1 -425 -172 -909 -380z"/>
 </g>
 </svg>
-</div>`;
-    return L.divIcon({
-      html,
+</div>
+    </div>`;
+    const icon = new L.DivIcon({
+      html: iconHtml,
       className: 'map-marker',
     });
+    if (map) return L.marker(loc, { icon }).addTo(map);
   }
 
-  function createMarker(loc: LatLngExpression): Marker {
-    const icon = markerIcon();
-    if (map) return L.marker(loc, { icon }).addTo(map); // 마커를 지도에 추가
-    return L.marker(loc, { icon });
-  }
-
+  window.addEventListener('deviceorientation', function (event) {
+    const heading = event.alpha;
+    // 마커의 방향 업데이트
+    if (marker.has('current')) {
+      const existingMarker = marker.get('current');
+      const newIconHtml = `<div class="map-marker" style="transform: rotate(${heading}deg);">
+          <svg ...></svg>
+        </div>`;
+      existingMarker.setIcon(L.divIcon({ html: newIconHtml, className: 'map-marker' }));
+    }
+  });
   function createLines(): Polyline {
     return L.polyline(
       $posList.map((p) => p.latlng),
@@ -343,6 +359,17 @@ fill="#000000" stroke="none">
     lineLayers = createLines();
     lineLayers.addTo(map);
 
+    map.on('dblclick', (e) => {
+      console.log('dblclick map');
+      isFocusMarker = true;
+    });
+    map.on('drag', (e) => {
+      console.log('drag map');
+      isFocusMarker = false;
+    });
+    map.on('zoom', (e) => {
+      zoomLevel = e.target._zoom;
+    });
     return {
       destroy: () => {
         if (map) {
@@ -370,7 +397,7 @@ fill="#000000" stroke="none">
   }
   async function toggleTracking() {
     const trackingActive = get(isPause);
-    map?.locate({ setView: true, maxZoom: 18 });
+    map?.locate({ setView: true, maxZoom: zoomLevel });
     map?.on('locationfound', handleLocationFound);
 
     map?.on('locationerror', (e: L.ErrorEvent) => {
@@ -420,7 +447,9 @@ fill="#000000" stroke="none">
 
   onMount(() => {
     userStore.initialize(); // 스토어에서 사용자 정보 초기화
+    // resetDrawingStore();
     countdown = 3;
+    getMotion();
   });
   onDestroy(() => {
     if (map) {
@@ -429,7 +458,6 @@ fill="#000000" stroke="none">
       clearInterval(trackingIntervalId);
     }
     disconnectWebSocket();
-    $elapsedTime = 0;
   });
 </script>
 
@@ -484,7 +512,7 @@ fill="#000000" stroke="none">
   }
 
   .unlock-btn {
-    bottom: 24vh;
+    bottom: 19vh;
     left: 58vw;
     color: white;
     border: none;
@@ -501,5 +529,8 @@ fill="#000000" stroke="none">
     justify-content: center;
     flex-wrap: wrap;
     border-radius: 55px;
+  }
+  .map-marker {
+    transition: transform 0.3s ease-in-out; /* 부드러운 회전 효과 */
   }
 </style>
