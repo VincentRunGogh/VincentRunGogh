@@ -1,8 +1,6 @@
 package com.vincentrungogh.domain.drawing.repository;
 
-import com.vincentrungogh.domain.drawing.entity.Drawing;
-import com.vincentrungogh.domain.drawing.entity.DrawingDetailGroup;
-import com.vincentrungogh.domain.drawing.entity.DrawingDetailSameDay;
+import com.vincentrungogh.domain.drawing.entity.*;
 import com.vincentrungogh.domain.user.entity.User;
 import com.vincentrungogh.domain.drawing.entity.DrawingDetail;
 
@@ -23,4 +21,6 @@ public interface DrawingDetailRepositoryCustom {
     List<DrawingDetailSameDay> findByDrawingIdAndDay(User user, int drawingId, String date);
 
     Long countAllByDrawings(List<Drawing> drawings);
+
+    List<EachMonthWalkDistanceTime> findWalkDistanceTimeByYearEachMonth(User user, int year);
 }

@@ -2,6 +2,7 @@ package com.vincentrungogh.domain.drawing.repository;
 
 import com.vincentrungogh.domain.drawing.entity.Drawing;
 import com.vincentrungogh.domain.drawing.entity.DrawingTitleArtImage;
+import com.vincentrungogh.domain.drawing.entity.EachMonthRouteFreeCount;
 import com.vincentrungogh.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,11 +16,15 @@ public interface DrawingRepository extends JpaRepository<Drawing, Integer>, Draw
     List<Drawing> findAllByUserId(int userId);
 
     List<Drawing> findAllByUserAndIsCompleted(User user, Boolean isCompleted);
+    List<Drawing> findAllByUserAndIsCompletedAndTitleIsNotNull(User user, Boolean isCompleted);
 
     List<Drawing> findAllByUserAndIsCreatedBoard(User user, Boolean isCreatedBoard);
 
-    int countAllByUserAndIsCompleted(User user, Boolean isCompleted);
+    int countAllByUserAndIsCompletedAndTitleIsNotNull(User user, Boolean isCompleted);
 
     @Override
     DrawingTitleArtImage findTitleAndArtImageById(int drawingId);
+
+    @Override
+    List<EachMonthRouteFreeCount> findRouteFreeCountByYearEachMonth(User user, int year);
 }
