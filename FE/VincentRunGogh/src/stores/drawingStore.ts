@@ -37,6 +37,7 @@ export const isPause = writable(false);
 export const currentPace = writable('00:00');
 export const route = writable([]);
 export const posList = writable([]);
+export const isRouteDrawing = writable<boolean>(false);
 const stepCount = writable(0);
 
 // 로컬 스토리지에서 데이터 가져오기

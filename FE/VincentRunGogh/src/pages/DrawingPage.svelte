@@ -18,6 +18,7 @@
     updateDistanceAndSpeed,
     drawingStore,
     getMotion,
+    isRouteDrawing,
   } from '@/stores/drawingStore';
   import DrawingPauseModal from '@/components/modals/DrawingPauseModal.svelte';
   import { userStore } from '@/stores/userStore';
@@ -49,9 +50,11 @@
     const newDrawingId = params.get('drawingId');
     if (newRouteId) {
       routeId.set(newRouteId);
+      isRouteDrawing.set(true);
     }
     if (newDrawingId) {
       drawingId.set(newDrawingId);
+      isRouteDrawing.set(true);
     }
 
     // 옵션 객체 업데이트
