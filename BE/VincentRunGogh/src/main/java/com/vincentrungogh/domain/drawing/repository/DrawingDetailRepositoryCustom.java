@@ -22,4 +22,6 @@ public interface DrawingDetailRepositoryCustom {
     List<DrawingDetailSameDay> findByDrawingIdAndDay(User user, int drawingId, String date);
 
     List<EachMonthWalkDistanceTime> findWalkDistanceTimeByYearEachMonth(User user, int year);
+
+    DrawingDetailToday findTodayByUser(User user);
 }
