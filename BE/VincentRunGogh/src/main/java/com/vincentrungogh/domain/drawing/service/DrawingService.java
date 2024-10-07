@@ -213,12 +213,7 @@ public class DrawingService {
         MyHealth myHealth = myHealthRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MYHEALTH_NOT_FOUND));
 
-        int totalTime = myHealth.getTotalTime() + response.getTime();
-        int totalDistance = myHealth.getTotalDistance() + response.getDistance();
-        double averageSpeed = Math.round(((myHealth.getAverageSpeed() + response.getSpeed()) / 2) * 100.0) / 100.0;
-        int totalStep = myHealth.getTotalStep() + request.getStep();
-
-        myHealth.updateMyHealth(totalTime, totalDistance, averageSpeed, totalStep);
+        myHealth.updateMyHealth(response, request.getStep());
         myHealthRepository.save(myHealth);
 
         return SaveDrawingResponse
