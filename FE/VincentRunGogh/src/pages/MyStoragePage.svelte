@@ -184,9 +184,15 @@
     if (isLiked) {
       // 이미 좋아요상태 -> 취소
       await dislikeArticle(boardId);
+      let index = articleList.findIndex((article) => article.boardId === boardId);
+      articleList[index].isLiked = !articleList[index].isLiked;
+      articleList[index].likeCount--;
     } else {
       // 좋아요상태가 아님 -> 등록
       await likeArticle(boardId);
+      let index = articleList.findIndex((article) => article.boardId === boardId);
+      articleList[index].isLiked = !articleList[index].isLiked;
+      articleList[index].likeCount++;
     }
   }
 
@@ -286,18 +292,12 @@
                   <div class="me-2 flex justify-end items-center">
                     <div class="flex justify-between items-center">
                       {#if article.isLiked}
-                        <button
-                          on:click={() => clickLiked(article.isLiked, article.boardId)}
-                          color={article.isLiked ? 'red' : 'blue'}
-                        >
+                        <button on:click={() => clickLiked(article.isLiked, article.boardId)}>
                           <HeartSolid size="lg" color={'red'} />
                         </button>
                         <p>{article.likeCount}</p>
                       {:else}
-                        <button
-                          on:click={() => clickLiked(article.isLiked, article.boardId)}
-                          color={article.isLiked ? 'red' : 'blue'}
-                        >
+                        <button on:click={() => clickLiked(article.isLiked, article.boardId)}>
                           <HeartOutline size="lg" />
                         </button>
                         <p>{article.likeCount}</p>
@@ -346,18 +346,12 @@
                     <div class="me-2 flex justify-end items-center">
                       <div class="flex justify-between items-center">
                         {#if article.isLiked}
-                          <button
-                            on:click={() => clickLiked(article.isLiked, article.boardId)}
-                            color={article.isLiked ? 'red' : 'blue'}
-                          >
+                          <button on:click={() => clickLiked(article.isLiked, article.boardId)}>
                             <HeartSolid size="lg" color={'red'} />
                           </button>
                           <p>{article.likeCount}</p>
                         {:else}
-                          <button
-                            on:click={() => clickLiked(article.isLiked, article.boardId)}
-                            color={article.isLiked ? 'red' : 'blue'}
-                          >
+                          <button on:click={() => clickLiked(article.isLiked, article.boardId)}>
                             <HeartOutline size="lg" />
                           </button>
                           <p>{article.likeCount}</p>
