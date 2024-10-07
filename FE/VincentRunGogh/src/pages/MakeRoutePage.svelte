@@ -384,9 +384,9 @@
         const svgCropY = (svgSizeY - 350) / 2;
 
         // 지도 그리기
-        ctx.drawImage(mapImg, cropX, cropY - 50, 350, 350, 0, 0, 350, 350);
+        ctx.drawImage(mapImg, cropX, cropY - 100, 350, 350, 0, 0, 350, 350);
         // SVG 그리기
-        ctx.drawImage(svgImg, svgCropX, svgCropY - 50, 350, 350, 0, 0, 350, 350);
+        ctx.drawImage(svgImg, svgCropX, svgCropY - 100, 350, 350, 0, 0, 350, 350);
 
         // 결과 이미지를 Base64로 변환하여 반환
         finalImage = finalCanvas.toDataURL('image/png');
