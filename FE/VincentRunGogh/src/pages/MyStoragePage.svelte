@@ -157,7 +157,7 @@
       cancelButtonColor: '#697386',
       confirmButtonText: '삭제',
       cancelButtonText: '취소',
-      didOpen: () => {
+      preConfirm: () => {
         deleteArticle(boardId)
           .then(() => {
             articleList = articleList.filter((article) => article.boardId != boardId);
@@ -165,6 +165,7 @@
               title: '삭제 완료!',
               text: '등록한 게시글을 삭제하였습니다',
               icon: 'success',
+              confirmButtonColor: '#FFB800',
             });
           })
           .catch((error) => {

@@ -342,13 +342,18 @@
       {#if ongoingDrawingList}
         {#each ongoingDrawingList as drawing}
           <Card
-            class="m-2 mb-0 text-xs p-0 w-c-30"
+            class="m-2 mb-0 text-xs p-0 w-[30%] h-[85%] sm:p-0"
             size="xs"
             on:click={() => clickOngoingDrawing(drawing.artImage, drawing.drawingId)}
           >
-            <img class="rounded-t-lg" src={drawing.artImage} alt="" />
-            <div class="p-1">
-              <h5 class="mb-2 font-bold tracking-tight text-gray-900 dark:text-white">
+            <img
+              id="ongoing-img"
+              class="rounded-t-lg h-[70%] border-none"
+              src={drawing.artImage}
+              alt=""
+            />
+            <div class="p-1 flex flex-col justify-around">
+              <h5 class="font-bold tracking-tight text-gray-900 dark:text-white">
                 {drawing.title}
               </h5>
               <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
@@ -371,7 +376,7 @@
     </div>
   </div>
   <div id="homepage-chart">
-    <Card class="w-80 pb-1 pt-3 bg-opacity-80">
+    <Card class="w-80 h-full pb-1 pt-3 bg-opacity-80">
       <p class="font-bold text-black">주간 운동 정보</p>
       {#if isLoad}
         <div class="flex ms-3 justify-center items-center">
@@ -464,6 +469,9 @@
     z-index: 2;
   }
 
+  #ongoing-img {
+    object-fit: cover;
+  }
   #homepage-chart {
     height: 27vh;
     gap: 1vh;
