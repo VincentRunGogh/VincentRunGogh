@@ -4,12 +4,8 @@
   import Tabbar from '@/components/common/Tabbar.svelte';
   import { Chart, Card, ImagePlaceholder } from 'flowbite-svelte';
   import { onMount } from 'svelte';
-<<<<<<< HEAD
-  import { ongoing } from '@/stores/ongoingStore';
-=======
-  import { userStore } from '@/stores/userStore';
   import { resetDrawingStore } from '@/stores/drawingStore';
->>>>>>> 06203df94ac5b7a3838e69052587f2a724c1c44a
+  import { ongoing } from '@/stores/ongoingStore';
   import Swal from 'sweetalert2';
   import RouteDetail from '@/components/modals/RouteDetail.svelte';
 
@@ -391,7 +387,7 @@
     </Card>
   </div>
   <div id="homepage-tabbar">
-    <Tabbar ongoing={ongoingDrawingList.length} />
+    <Tabbar />
   </div>
   <div id="background">
     <svg width="200" height="100" xmlns="http://www.w3.org/2000/svg" style="overflow: visible;">
