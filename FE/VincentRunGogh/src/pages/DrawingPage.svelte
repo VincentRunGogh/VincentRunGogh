@@ -47,8 +47,12 @@
     const params = new URLSearchParams($querystring);
     const newRouteId = params.get('routeId');
     const newDrawingId = params.get('drawingId');
-    routeId.set(newRouteId);
-    drawingId.set(newDrawingId);
+    if (newRouteId) {
+      routeId.set(newRouteId);
+    }
+    if (newDrawingId) {
+      drawingId.set(newDrawingId);
+    }
 
     // 옵션 객체 업데이트
     options.set({
@@ -83,15 +87,21 @@
         firstLocationFound.set(true);
         startPos = new L.LatLng(lat, lng);
         const data = { lat: lat, lng: lng, time: startTime };
+        console.log(data, get(options));
         startDrawing(
-          options,
+          get(options),
           data,
           async (response) => {
-            updateDrawingInfo({
-              ...response.data.data,
+            const responseData = response.data.data;
+            const updateData = {
+              ...responseData,
               routeId: get(routeId),
-              drawingId: get(drawingId),
-            }); // 스토어를 업데이트
+            };
+            if (!responseData.drawingId) {
+              updateData.drawingId = get(drawingId);
+            }
+            updateDrawingInfo(updateData); // 스토어를 업데이트
+
             console.log('api 연결 후 드로잉 데이터:', get(drawingStore));
 
             if (routeLineLayers) {
@@ -434,7 +444,19 @@ fill="#000000" stroke="none">
 </div>
 <div class="lock-overlay" class:is-active={$isLockScreen}>
   <div class="overlay-content">
-    <button on:click={clickLockScreen} class="unlock-btn"> </button>
+    <button on:click={clickLockScreen} class="unlock-btn"
+      ><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" {...$$props}>
+        <path
+          fill="none"
+          stroke="#749b59"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.85"
+          d="M17.893 21.988c-.052-1.913.077-2.143.214-2.569s1.093-1.96 1.431-3.057c1.095-3.548.075-4.303-1.285-5.309c-1.509-1.115-4.354-1.68-5.765-1.558V3.744a1.744 1.744 0 0 0-3.489 0v10.26l-2.06-2.18c-.64-.694-1.668-.764-2.37-.133a1.72 1.72 0 0 0-.222 2.318l1.292 1.713M8.869 22l-.019-1.05c.043-1.232-.853-2.035-2.021-3.641l-.246-.336m0 0a72 72 0 0 0-.944-1.251m.944 1.25l1.17 1.55m-1.17-1.55l-.944-1.25m0 0c-.572-.742-1.003-1.281-1.375-1.816"
+          color="#749b59"
+        />
+      </svg>
+    </button>
   </div>
 </div>
 
@@ -461,21 +483,23 @@ fill="#000000" stroke="none">
     pointer-events: auto;
   }
 
-  .overlay-content {
-    background: rgba(255, 255, 255, 0.9);
-    padding: 1rem 2rem;
-    border-radius: 0.5rem;
-    text-align: center;
-  }
-
   .unlock-btn {
-    background-color: purple;
+    bottom: 24vh;
+    left: 58vw;
     color: white;
     border: none;
-    padding: 0.5rem 1rem;
     font-size: 1rem;
     cursor: pointer;
-    border-radius: 0.25rem;
-    margin-top: 1rem;
+    border-radius: 55px;
+    background: rgba(255, 255, 255);
+    padding: 0.8rem;
+    text-align: center;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    border-radius: 55px;
   }
 </style>
