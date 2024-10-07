@@ -1,6 +1,8 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
 
+  export let isMakeRoute: boolean | null = null;
+
   // Dispatching events
   const dispatch = createEventDispatcher<{
     'click-reset': void;
@@ -9,7 +11,7 @@
 
 <button
   type="button"
-  class="single-click"
+  class={isMakeRoute ? 'single-click mt-[8vh]' : 'single-click'}
   on:click={() => dispatch('click-reset')}
   title="Reset View"
 >
