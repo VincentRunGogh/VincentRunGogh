@@ -442,7 +442,6 @@ fill="#000000" stroke="none">
       clearInterval(trackingIntervalId);
     }
     disconnectWebSocket();
-    $elapsedTime = 0;
   });
 </script>
 
