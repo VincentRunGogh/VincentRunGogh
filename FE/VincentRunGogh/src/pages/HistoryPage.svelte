@@ -11,7 +11,7 @@
   import BackButton from '@/components/buttons/BackButton.svelte';
   import FeedArticle from '@/components/cards/FeedArticle.svelte';
   import { getRouteList } from '@/api/routeApi';
-  import { getDrawingList } from '@/api/drawingApi2';
+  import { getDrawingList } from '@/api/drawingApi';
   import Header from '@/components/common/Header.svelte';
   import { formatToKoreanTime } from '@/utils/formatter';
 
