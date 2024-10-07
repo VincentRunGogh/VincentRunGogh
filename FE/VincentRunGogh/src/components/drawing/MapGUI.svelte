@@ -19,7 +19,6 @@
   }>();
   $: $isLockScreen = $isLockScreen;
   $: $isPause = $isPause;
-  $: $stepCount = $stepCount;
 
   let isMute = false;
   let hasRoute = false;
@@ -38,7 +37,7 @@
   }
 </script>
 
-<div class="flex flex-col items-center w-[60vw] h-[25vh] bg-white shadow-lg rounded-lg p-4">
+<div class="flex flex-col items-center w-[60vw] h-[30vh] bg-white shadow-lg rounded-lg p-4">
   <div>
     <button
       class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-yellow-main p-2 rounded-full focus:outline-none h-14 w-14"
@@ -123,7 +122,6 @@
           <span class="text-lg text-gray-700 text-2xl font-bold">{$currentPace} </span>
         </div>
       </div>
-
       <div class=" flex flex-col items-center justify-center">
         <span class="text-sm"> 걸음수 </span>
         <div>
