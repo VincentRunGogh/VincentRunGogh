@@ -46,16 +46,9 @@
 
   // 홈 문구 대사
   // 내 그룹 설정
-  let groupIn: string = '';
-  if (!dummyGroupInfo.gender) {
-    groupIn = `${Math.floor(dummyGroupInfo.age / 10) * 10}대 남자`;
-  } else {
-    groupIn = `${Math.floor(dummyGroupInfo.age / 10) * 10}대 여자`;
-  }
+
   let welcomeWordList: string[] = [
     '오운완했나요?',
-    `${groupIn}는 오늘 평균 ${Math.floor(dummyGroupInfo.averageDayRuntime / 60)}분 운동했습니다!`,
-    `${groupIn}는 오늘 평균 ${Math.floor(dummyGroupInfo.averageDayDistance / 1000)}km 뛰었습니다!`,
     `오늘은 ${Math.floor(dummyGroupInfo.myDayRuntime / 60)}분 뛰었군요!`,
     `오늘은 ${parseFloat((dummyGroupInfo.myDayDistance / 1000).toFixed(2))}km를 뛰었군요!`,
   ];
@@ -332,7 +325,7 @@
 
 <div id="homepage-body">
   <div id="homepage-header">
-    <h1 style="font-family: 'Brush Script MT'; font-size:30px;">Vincent Run Gogh</h1>
+    <h1 style="font-family: 'BRUSH'; font-size:30px;">Vincent Run Gogh</h1>
     <p><span class="text-xl font-bold">{user.nickname}</span>님!</p>
     <h3 class="font-bold">{welcomeWordList[randomNum]}</h3>
   </div>

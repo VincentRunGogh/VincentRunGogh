@@ -245,7 +245,7 @@
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-interactive-supports-focus -->
   <div id="community-mystorage" role="button" class="absolute top-5 right-3">
-    <Avatar src={userInfo.profile} dot={{ color: 'green' }} />
+    <Avatar rounded src={userInfo.profile} dot={{ color: 'green' }} />
   </div>
   <div id="search-control">
     <Button size="sm" on:click={searchCondition}>검색 반경 설정</Button>
