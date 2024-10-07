@@ -5,6 +5,8 @@ import com.vincentrungogh.domain.drawing.entity.MongoDrawingDetail;
 import com.vincentrungogh.domain.drawing.repository.MongoDrawingRepository;
 import com.vincentrungogh.domain.drawing.service.dto.request.*;
 import com.vincentrungogh.domain.drawing.service.dto.response.*;
+import com.vincentrungogh.domain.myhealth.entity.MyHealth;
+import com.vincentrungogh.domain.myhealth.repository.MyHealthRepository;
 import com.vincentrungogh.domain.route.entity.MongoRoute;
 import com.vincentrungogh.domain.route.entity.Route;
 import com.vincentrungogh.domain.route.repository.MongoRouteRepository;
@@ -38,6 +40,7 @@ public class DrawingService {
     private final DrawingRepository drawingRepository;
     private final UserRepository userRepository;
     private final RouteRepository routeRepository;
+    private final MyHealthRepository myHealthRepository;
     private final MongoDrawingRepository mongoDrawingRepository;
     private final MongoRouteRepository mongoRouteRepository;
     private final UserService userService;
@@ -69,7 +72,12 @@ public class DrawingService {
     }
 
     @Transactional
-    public StartDrawingResponse startDrawing(int userId, StartDrawingRequest request) {
+    public StartDrawingResponse startDrawing(int userId, StartDrawingRequest request, String type) {
+
+        if(!(type.equals("free") || type.equals("route"))) {
+            throw new CustomException(ErrorCode.INVALID_PARAM_TYPE);
+        }
+
         // 0. 레디스 저장
         String routeId = request.getRouteId();
         redisService.removeRunning(userId);
@@ -79,9 +87,13 @@ public class DrawingService {
         User user = userService.getUserById(userId);
 
         // 2. route 여부
-        if(routeId == null) {
+        if(type.equals("free")) {
             // 자유 달리기
             return freeRunning(user);
+        }
+
+        if(request.getRouteId() == null){
+            throw new CustomException(ErrorCode.ROUTE_IS_NULL);
         }
         return drawingRunning(routeId, user);
     }
@@ -122,7 +134,6 @@ public class DrawingService {
         return StartDrawingResponse
                 .createStartDrawingResponse(drawing.getTitle(),
                         drawing.getId(), mongoRoute.getPositionList());
-
     }
 
     public RestartDrawingResponse restartDrawing(int drawingId, RestartDrawingRequest request, int userId){
@@ -207,6 +218,15 @@ public class DrawingService {
                         drawing);
         drawingDetailRepository.save(drawingDetail);
 
+        // 5. 마이헬스 저장
+        MyHealth myHealth = myHealthRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MYHEALTH_NOT_FOUND));
+
+        List<Drawing> drawings = drawingRepository.findAllByUserId(userId);
+        int runningCount = drawingDetailRepository.countAllByDrawings(drawings).intValue();
+        myHealth.updateMyHealth(response, request.getStep(), runningCount);
+        myHealthRepository.save(myHealth);
+
         return SaveDrawingResponse
                 .createSaveDrawingResponse(drawingImageURL, drawingDetailImageURL);
     }
@@ -214,6 +234,7 @@ public class DrawingService {
     private DataSaveDrawingDetailResponse processDrawing(int userId) {
         // 1. redis에서 정보 가져오기
         List<RunningRequest> redisPositionList = redisService.getRunning(userId);
+        log.info("드로잉 좌표 리스트 : " + redisPositionList);
 
         // 2. python 연결
         DataSaveDrawingDetailResponse response = pythonApiService.saveDrawingDetail(
