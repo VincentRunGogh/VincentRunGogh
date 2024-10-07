@@ -213,7 +213,9 @@ public class DrawingService {
         MyHealth myHealth = myHealthRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MYHEALTH_NOT_FOUND));
 
-        myHealth.updateMyHealth(response, request.getStep());
+        List<Drawing> drawings = drawingRepository.findAllByUserId(userId);
+        int runningCount = drawingDetailRepository.countAllByDrawings(drawings).intValue();
+        myHealth.updateMyHealth(response, request.getStep(), runningCount);
         myHealthRepository.save(myHealth);
 
         return SaveDrawingResponse

@@ -59,10 +59,10 @@ public class MyHealth {
     }
 
     // 총 운동 시간/거리, 평균 속력, 총 걸을 수 업데이트
-    public void updateMyHealth(DataSaveDrawingDetailResponse data, int totalStep){
+    public void updateMyHealth(DataSaveDrawingDetailResponse data, int totalStep, int count){
         this.totalTime += data.getTime();
         this.totalDistance += data.getDistance();
-        this.averageSpeed = Math.round(((this.averageSpeed + data.getSpeed()) / 2) * 100.0) / 100.0;
+        this.averageSpeed = Math.round(((this.averageSpeed *  count + data.getSpeed()) / (count + 1)) * 100.0) / 100.0;
         this.totalStep += totalStep;
     }
 }
