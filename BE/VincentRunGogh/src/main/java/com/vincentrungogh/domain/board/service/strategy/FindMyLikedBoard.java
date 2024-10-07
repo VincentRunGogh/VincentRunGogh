@@ -34,7 +34,11 @@ public class FindMyLikedBoard implements BoardStrategy {
         MyHealth myHealth = myHealthRepository.findByUser(user)
                 .orElseThrow(() -> new CustomException(ErrorCode.MYHEALTH_NOT_FOUND));
 
-        double averageSpeed =  15;//myHealth.getAverageSpeed();
+        double averageSpeed =  15; //myHealth.getAverageSpeed();
+
+        if(averageSpeed <= 0){
+            throw new CustomException(ErrorCode.SPEED_DIVIDE_BY_ZERO);
+        }
 
         // 우선 사용자가 좋아요한 userLike 목록 조회하기
         List<Board> likedBoardList = userLikeRepository.findAllByUser(user).stream()

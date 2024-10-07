@@ -32,6 +32,9 @@ public class FindMineBoard implements BoardStrategy {
                 .orElseThrow(() -> new CustomException(ErrorCode.MYHEALTH_NOT_FOUND));
 
         double averageSpeed =  15;//myHealth.getAverageSpeed();
+        if(averageSpeed <= 0){
+            throw new CustomException(ErrorCode.SPEED_DIVIDE_BY_ZERO);
+        }
 
         // 내가 쓴 게시글 sql에서 조회하기
         List<Board> boardList = boardRepository.findByRouteUserOrderByCreatedDesc(user);

@@ -32,7 +32,10 @@ public class FindAllBoard implements BoardStrategy {
         MyHealth myHealth = myHealthRepository.findByUser(user)
                 .orElseThrow(() -> new CustomException(ErrorCode.MYHEALTH_NOT_FOUND));
 
-        double averageSpeed =  15;//myHealth.getAverageSpeed();
+        double averageSpeed = 15; // myHealth.getAverageSpeed();
+        if(averageSpeed <= 0){
+            throw new CustomException(ErrorCode.SPEED_DIVIDE_BY_ZERO);
+        }
 
         // 모든 게시글 sql에서 조회하기
         List<Board> boardList = boardRepository.findAllByOrderByCreatedDesc();
