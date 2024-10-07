@@ -214,6 +214,7 @@ public class DrawingService {
     private DataSaveDrawingDetailResponse processDrawing(int userId) {
         // 1. redis에서 정보 가져오기
         List<RunningRequest> redisPositionList = redisService.getRunning(userId);
+        log.info("드로잉 좌표 리스트 : " + redisPositionList);
 
         // 2. python 연결
         DataSaveDrawingDetailResponse response = pythonApiService.saveDrawingDetail(
