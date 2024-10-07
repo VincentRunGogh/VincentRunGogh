@@ -19,6 +19,7 @@
 
   import Header from '@components/common/Header.svelte';
   import { formatSecToH, formatDistanceFix2 } from '@/utils/formatter';
+  import { getDrawingProgress } from '@/api/myhealthApi';
   ChartJS.register(
     LinearScale,
     CategoryScale,
@@ -38,7 +39,7 @@
   ];
   const onChangeYear = () => {
     console.log('change year');
-    //TODO - api 연결
+    setChartData();
     activeCategory.update(() => 'walk');
   };
 
@@ -113,7 +114,16 @@
     }
     return { labels, datasets };
   });
-
+  const setChartData = () => {
+    getDrawingProgress(
+      selectedYear,
+      (response) => {
+        console.log(response.data.data);
+        categoryData.set(response.data.data);
+      },
+      (error) => {}
+    );
+  };
   let options = {
     responsive: true,
 
@@ -149,7 +159,7 @@
     },
   };
   onMount(() => {
-    //TODO - api 연결 드로잉 활동 정보 조회 /api/v1/myhealth/drawings?year={year}
+    setChartData();
   });
 </script>
 
