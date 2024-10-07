@@ -5,6 +5,7 @@
   import { Chart, Card, ImagePlaceholder } from 'flowbite-svelte';
   import { onMount } from 'svelte';
   import { userStore } from '@/stores/userStore';
+  import { resetDrawingStore } from '@/stores/drawingStore';
   import Swal from 'sweetalert2';
   import { writable } from 'svelte/store';
   import RouteDetail from '@/components/modals/RouteDetail.svelte';
@@ -314,6 +315,7 @@
   };
 
   onMount(async () => {
+    resetDrawingStore();
     await getWeekly();
     await getDrawings();
     let UserInfo = localStorage.getItem('user');
