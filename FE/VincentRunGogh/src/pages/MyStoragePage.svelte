@@ -142,6 +142,7 @@
   async function getUnpostArticleInfo() {
     let responseAllArticle = await getDrawingList('community');
     unpostArticles = responseAllArticle.data.findDrawingList.slice().reverse();
+    console.log('받아옴', unpostArticles);
   }
 
   // 게시글 삭제
@@ -198,7 +199,13 @@
   }
 
   // 게시글 생성 버튼 클릭
-  function clickPost(article: {}) {
+  function clickPost(article: {
+    drawingId: number;
+    title: string;
+    artImage: string;
+    drawingImage: string;
+    updated: string;
+  }) {
     Swal.fire({
       html: '<div id="post-article"></div>',
       showConfirmButton: false,
@@ -210,10 +217,8 @@
           props: {
             article: article,
             onClose: () => {
-              let index = unpostArticles.findIndex(
-                (article) => article.drawingId === article.drawingId
-              );
-              unpostArticles.splice(index, 1);
+              unpostArticles = unpostArticles.filter((one) => one.drawingId != article.drawingId);
+              console.log('게시후', unpostArticles);
               Swal.close(); // 모달 닫기
             },
           },
