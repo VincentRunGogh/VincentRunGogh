@@ -83,9 +83,12 @@ export function setupMotionEventListeners() {
 }
 export function setupStepEventListeners() {
   window.addEventListener('devicemotion', motion);
+  let intervalId = setInterval(updateStatus, 100);
+
 }
 export function stopStepEventListeners() {
   window.removeEventListener('devicemotion', motion);
+  clearInterval(intervalId);
 }
 export function clearMotionEventListeners() {
   window.removeEventListener('devicemotion', motion);
