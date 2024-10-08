@@ -164,7 +164,7 @@
   }
 </script>
 
-<Header title="루트 조회" />
+<Header title="루트 조회" to={'/'} />
 
 <div id="routelist-body">
   <div id="search-control">

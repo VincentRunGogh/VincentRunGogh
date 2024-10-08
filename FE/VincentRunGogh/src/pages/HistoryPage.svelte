@@ -27,7 +27,7 @@
   });
 </script>
 
-<Header title="히스토리" />
+<Header title="히스토리" to={'/myhealth'} />
 <div id="mystorage-body">
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-interactive-supports-focus -->
