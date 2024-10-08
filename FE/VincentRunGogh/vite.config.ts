@@ -67,5 +67,6 @@ export default defineConfig({
     // },
     // host: '192.168.132.1', // 실제 IP 주소
     port: 5173,
+    historyApiFallback: true,
   },
 });

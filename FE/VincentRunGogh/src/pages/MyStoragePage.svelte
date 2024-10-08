@@ -245,7 +245,7 @@
   }
 </script>
 
-<Header title="내 보관함" />
+<Header title="내 보관함" to={'/community'} />
 <div id="mystorage-body">
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-interactive-supports-focus -->

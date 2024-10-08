@@ -467,7 +467,7 @@
 </script>
 
 <div id="makeroute-header" class="flex justify-center items-center">
-  <BackButton />
+  <BackButton to={'/'} />
   <h2 class="font-bold">루트 생성</h2>
 </div>
 <div id="make-route">
