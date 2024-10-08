@@ -96,7 +96,8 @@ def matching_user_path_to_roads(user_drawn_path, pedestrian_df):
 
     #print(matched_nodes)
 
-    matched_nodes.append(matched_nodes[0]) # 처음과 끝 연결
+    # 처음과 끝을 연결하지 않음
+    #matched_nodes.append(matched_nodes[0])
 
     # 후처리
     # 도로와 연결되었는지 검증하기
