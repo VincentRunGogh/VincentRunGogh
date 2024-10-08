@@ -141,7 +141,7 @@
   // 아직 안올린 게시물
   async function getUnpostArticleInfo() {
     let responseAllArticle = await getDrawingList('community');
-    unpostArticles = responseAllArticle.data.findDrawingList;
+    unpostArticles = responseAllArticle.data.findDrawingList.slice().reverse();
   }
 
   // 게시글 삭제
@@ -202,6 +202,7 @@
     Swal.fire({
       html: '<div id="post-article"></div>',
       showConfirmButton: false,
+      allowOutsideClick: false,
       didOpen: () => {
         // 'route-detail'라는 ID를 가진 div에 Svelte 컴포넌트 렌더링
         new PostArticle({
@@ -209,6 +210,10 @@
           props: {
             article: article,
             onClose: () => {
+              let index = unpostArticles.findIndex(
+                (article) => article.drawingId === article.drawingId
+              );
+              unpostArticles.splice(index, 1);
               Swal.close(); // 모달 닫기
             },
           },
@@ -270,7 +275,7 @@
             {#each articleList as article}
               <div class="mb-3 relative z-10 text-center">
                 <Card size="sm" class="mb-5 p-1 grow">
-                  <div class="flex ms-1 mt-1 mb-3 items-center">
+                  <div class="flex ms-1 mt-1 mb-3 items-center text-center">
                     <img
                       src={article.profile}
                       alt=""
@@ -332,10 +337,14 @@
           {:else}
             {#each articleList as article}
               {#if article.distanceFromUser <= range}
-                <div class="mb-3 relative z-10">
+                <div class="mb-3 relative z-10 text-center">
                   <Card size="sm" class="mb-5 p-1 grow">
-                    <div class="flex mb-3 items-center justify-between">
-                      <img src={article.profile} alt="" style="width: 50px;  height: 50px;" />
+                    <div class="flex ms-1 mt-1 mb-3 items-center text-center">
+                      <img
+                        src={article.profile}
+                        alt=""
+                        style="width: 50px;  height: 50px; border-radius: 50%;"
+                      />
                       <p class="ml-5">{article.nickname}</p>
                     </div>
                     <FeedArticle
@@ -345,7 +354,7 @@
                       distance={article.distance}
                       time={article.time}
                     />
-                    <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
+                    <p class="mt-2 mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
                       {article.comment}
                     </p>
                     <div class="me-2 flex justify-end items-center">

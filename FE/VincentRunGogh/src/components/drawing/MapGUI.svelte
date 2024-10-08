@@ -7,8 +7,8 @@
     elapsedTime,
     totalDistance,
     currentPace,
-    stepCount,
   } from '@/stores/drawingStore';
+  import { stepCount } from '@/stores/deviceMotionStore';
   import { get } from 'svelte/store';
   import { formatSecToMS } from '@/utils/formatter';
 
@@ -19,6 +19,7 @@
   }>();
   $: $isLockScreen = $isLockScreen;
   $: $isPause = $isPause;
+  $: $stepCount = $stepCount;
 
   let isMute = false;
   let hasRoute = false;
@@ -111,8 +112,8 @@
       <div class=" flex flex-col items-center justify-center">
         <span class="text-sm"> 이동거리 </span>
         <div>
-          <span class="text-lg text-gray-700 text-2xl font-bold"
-            >{Math.round($totalDistance * 10) / 10}
+          <span class="text-lg text-gray-700 text-2xl font-bold">
+            {Math.round($totalDistance * 10) / 10}
           </span> km
         </div>
       </div>

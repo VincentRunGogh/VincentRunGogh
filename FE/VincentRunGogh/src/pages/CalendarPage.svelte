@@ -64,19 +64,14 @@
     selectedYear.set(arg.start.getFullYear());
     selectedMonth.set(arg.start.getMonth() + 1); // 월은 0부터 시작하므로 +1
     selectedDayInfo.set(null);
-    //TODO - 월별정보 가져오는 api 연결
     getMonthInfo();
   }
   const getMonthInfo = async () => {
-    const year = today.getFullYear();
-    const month = today.getMonth() + 1; // JavaScript에서 월은 0부터 시작하므로 +1
-
-    selectedYear.set(year);
-    selectedMonth.set(month);
-    //FIXME - api 연결, 오늘 이벤트 추가
+    const year = get(selectedYear);
+    const month = get(selectedMonth); // 선택된 월을 사용
     getMonthData(
-      $selectedYear,
-      $selectedMonth,
+      year,
+      month,
       (response) => {
         let data = response.data.data;
         monthInfo.set({ ...response.data.data });
@@ -86,6 +81,11 @@
     );
   };
   onMount(() => {
+    const year = today.getFullYear();
+    const month = today.getMonth() + 1; // JavaScript에서 월은 0부터 시작하므로 +1
+
+    selectedYear.set(year);
+    selectedMonth.set(month);
     getMonthInfo();
   });
   $: if ($monthInfo) {
@@ -183,7 +183,7 @@
       <div class="text-sm">
         <h2 class="text-gray-500 mb-1 font-bold">{$selectedYear}년 {$selectedMonth}월 통계</h2>
         <DrawingSummaryInfo
-          time={formatSecToH($monthInfo.monthTotalTime)}
+          time={`${formatSecToH($monthInfo.monthTotalTime)} hrs`}
           averagePace={getPace($monthInfo.monthTotalDistance, $monthInfo.monthTotalTime)}
           distance={formatDistanceFix2($monthInfo.monthTotalDistance)}
         />

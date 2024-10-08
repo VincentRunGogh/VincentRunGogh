@@ -16,14 +16,8 @@
   import { Input, GradientButton, Label, Card } from 'flowbite-svelte';
   import { LockSolid } from 'flowbite-svelte-icons';
 
-  import {
-    stepCount,
-    elapsedTime,
-    posList,
-    route,
-    totalDistance,
-    drawingStore,
-  } from '@/stores/drawingStore';
+  import { elapsedTime, posList, route, totalDistance, drawingStore } from '@/stores/drawingStore';
+  import { stepCount } from '@/stores/deviceMotionStore';
   import { completeDrawing, saveDrawing } from '@/api/drawingApi';
   import SaveRouteDrawing from '@components/cards/SaveRouteDrawing.svelte';
   import { formatDistanceFix2 } from '@/utils/formatter';
@@ -198,7 +192,7 @@
   async function lockMap() {
     if (isComplete) {
       if (inputName.length === 0) {
-        errorMessage = '루트 이름을 입력해 주세요.';
+        errorMessage = '드로잉 이름을 입력해 주세요.';
         Swal.fire({
           text: errorMessage,
           icon: 'error',
@@ -238,6 +232,7 @@
 
     const mapCanvas = await html2canvas(document.querySelector('#map'), {
       useCORS: true,
+      scale: 1,
     });
 
     svg.style.display = '';

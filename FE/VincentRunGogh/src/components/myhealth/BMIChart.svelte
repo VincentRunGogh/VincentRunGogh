@@ -41,14 +41,21 @@
 
   // Reactive declarations
   $: markerPosition = () => {
+
+  // Reactive declarations
+  $: markerPosition = () => {
     if (bmi < MIN_BMI) return '0%'; // 최소 범위 이하일 때
     if (bmi > MAX_BMI) return '100%'; // 최대 범위 이상일 때
+    return `${((bmi - MIN_BMI) / (MAX_BMI - MIN_BMI)) * 100}%`;
     return `${((bmi - MIN_BMI) / (MAX_BMI - MIN_BMI)) * 100}%`;
   };
 
   $: currentCategory =
+
+  $: currentCategory =
     groupList.find((category) => bmi >= category.range[0] && bmi < category.range[1]) ??
     groupList[0];
+  $: markerStyle = `left: ${markerPosition()};`;
   $: markerStyle = `left: ${markerPosition()};`;
 </script>
 
