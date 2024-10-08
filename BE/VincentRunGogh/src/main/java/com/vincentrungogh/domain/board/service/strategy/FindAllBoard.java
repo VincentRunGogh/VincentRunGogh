@@ -33,6 +33,7 @@ public class FindAllBoard implements BoardStrategy {
                 .orElseThrow(() -> new CustomException(ErrorCode.MYHEALTH_NOT_FOUND));
 
         double averageSpeed = myHealth.getAverageSpeed();
+        log.info("내 속도 : " + averageSpeed);
         boolean averageSpeedUnderZero = averageSpeed <= 0;
 
         // 모든 게시글 sql에서 조회하기
@@ -44,7 +45,7 @@ public class FindAllBoard implements BoardStrategy {
                 .filter(board -> !board.getIsDelete())
                 .map(board -> {
                     boolean isLiked = userLikeRepository.findByUserAndBoard(user, board).isPresent();
-                    int predictedTime = averageSpeedUnderZero ? 0: (int) ((board.getRoute().getDistance() / 1000.0) / (averageSpeed * 3600)) ;
+                    int predictedTime = averageSpeedUnderZero ? 0: (int) ((board.getRoute().getDistance() / 1000.0) / averageSpeed * 3600) ;
                     return FindBoard.createFindBoard(board, lat, lng, isLiked, predictedTime);
                 })
                 .filter(Objects::nonNull) // null 값 제거

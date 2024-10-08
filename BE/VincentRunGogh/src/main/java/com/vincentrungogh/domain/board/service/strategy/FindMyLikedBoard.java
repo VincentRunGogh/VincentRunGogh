@@ -51,7 +51,7 @@ public class FindMyLikedBoard implements BoardStrategy {
                 .sorted(Comparator.comparing(Board::getCreated).reversed()) // 쿼리 수정말고, stream 내에서 처리
                 .map(board -> {
                     boolean isLiked = true;
-                    int predictedTime = averageSpeedUnderZero ? 0: (int) ((board.getRoute().getDistance() / 1000.0) / (averageSpeed * 3600)) ;
+                    int predictedTime = averageSpeedUnderZero ? 0: (int) ((board.getRoute().getDistance() / 1000.0) / averageSpeed * 3600) ;
                     return FindBoard.createFindBoard(board, lat, lng, isLiked, predictedTime);
                         })
                 .filter(Objects::nonNull)

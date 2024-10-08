@@ -41,7 +41,7 @@ public class FindMineBoard implements BoardStrategy {
                 .filter(board -> !board.getIsDelete())
                 .map(board -> {
                     boolean isLiked = userLikeRepository.findByUserAndBoard(user, board).isPresent();
-                    int predictedTime = averageSpeedUnderZero ? 0: (int) ((board.getRoute().getDistance() / 1000.0) / (averageSpeed * 3600)) ;
+                    int predictedTime = averageSpeedUnderZero ? 0: (int) ((board.getRoute().getDistance() / 1000.0) / averageSpeed * 3600) ;
                     return FindBoard.createFindBoard(board, lat, lng, isLiked, predictedTime);
                 })
                 .filter(Objects::nonNull) // null 값 제거
