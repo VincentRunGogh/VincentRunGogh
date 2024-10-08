@@ -238,6 +238,7 @@
 
     const mapCanvas = await html2canvas(document.querySelector('#map'), {
       useCORS: true,
+      scale: 1,
     });
 
     svg.style.display = '';
