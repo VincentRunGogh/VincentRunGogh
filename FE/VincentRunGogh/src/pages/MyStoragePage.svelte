@@ -397,11 +397,13 @@
             {#each unpostArticles as article}
               <div class="mb-3 relative z-10">
                 <Card size="sm" class="mb-5 p-1 grow">
-                  <div class="flex ms-1 mt-1 mb-3 items-center bg-black">
-                    <button class="absolute top-5 right-3 z-20" on:click={() => clickPost(article)}>
-                      <UploadSolid size="md" />
-                    </button>
-                  </div>
+                  <button
+                    class="absolute top-5 right-3 z-20 bg-gray-600 text-white bg-opacity-70 rounded-md p-1"
+                    on:click={() => clickPost(article)}
+                  >
+                    <UploadSolid size="md" />
+                  </button>
+
                   <FeedArticle
                     title={article.title}
                     artImage={article.artImage}
