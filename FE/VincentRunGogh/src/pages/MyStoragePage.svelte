@@ -142,7 +142,6 @@
   async function getUnpostArticleInfo() {
     let responseAllArticle = await getDrawingList('community');
     unpostArticles = responseAllArticle.data.findDrawingList.slice().reverse();
-    console.log('받아옴', unpostArticles);
   }
 
   // 게시글 삭제
@@ -218,7 +217,6 @@
             article: article,
             onClose: () => {
               unpostArticles = unpostArticles.filter((one) => one.drawingId != article.drawingId);
-              console.log('게시후', unpostArticles);
               Swal.close(); // 모달 닫기
             },
           },
