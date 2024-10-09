@@ -16,7 +16,6 @@ public class DrawingDetailsResponse {
 
     private int totalTime;
     private int totalDistance;
-    private double avgSpeed;
     private int totalStep;
     private double avgPace;
     @Setter
@@ -24,12 +23,11 @@ public class DrawingDetailsResponse {
     private List<DrawingDetailResponseDto> drawingDetails;
 
     @Builder
-    private DrawingDetailsResponse(List<DrawingDetailResponseDto> drawingDetails, int totalTime, int totalDistance, double avgSpeed, int totalStep,
+    private DrawingDetailsResponse(List<DrawingDetailResponseDto> drawingDetails, int totalTime, int totalDistance, int totalStep,
                                    String routeImage, double avgPace) {
         this.drawingDetails = drawingDetails;
         this.totalTime = totalTime;
         this.totalDistance = totalDistance;
-        this.avgSpeed = avgSpeed;
         this.totalStep = totalStep;
         this.routeImage = routeImage;
         this.avgPace = avgPace;
@@ -53,7 +51,6 @@ public class DrawingDetailsResponse {
                 .builder()
                 .totalDistance(summary.getTotalDistance())
                 .totalTime(summary.getTotalTime())
-                .avgSpeed(avgSpeed)
                 .avgPace(avgPace)
                 .totalStep(summary.getTotalStep())
                 .drawingDetails(list)
