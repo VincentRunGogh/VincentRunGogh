@@ -35,5 +35,5 @@ public interface DrawingDetailRepository extends JpaRepository<DrawingDetail, In
     DrawingDetailToday findTodayByUser(User user);
 
     @Override
-    DrawingDetailsSummary findDrawingDetailDataByDrawing(Drawing drawing);
+    DrawingDetailsSummary findDrawingSummary(Drawing drawing);
 }

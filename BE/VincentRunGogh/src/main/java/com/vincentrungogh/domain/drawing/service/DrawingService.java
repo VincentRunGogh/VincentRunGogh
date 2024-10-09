@@ -245,7 +245,7 @@ public class DrawingService {
         List<DrawingDetail> drawingDetails = drawingDetailRepository.findAllByDrawingOrderByCreated(drawing);
 
         // 2.
-        DrawingDetailsSummary summary = drawingDetailRepository.findDrawingDetailDataByDrawing(drawing);
+        DrawingDetailsSummary summary = drawingDetailRepository.findDrawingSummary(drawing);
 
         DrawingDetailsResponse response =  DrawingDetailsResponse.createDrawingDetailsResponse(drawingDetails, summary);
 

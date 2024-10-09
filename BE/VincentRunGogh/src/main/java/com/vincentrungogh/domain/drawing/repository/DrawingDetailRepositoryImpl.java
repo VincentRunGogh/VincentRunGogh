@@ -184,7 +184,7 @@ public class DrawingDetailRepositoryImpl implements DrawingDetailRepositoryCusto
     }
 
     @Override
-    public DrawingDetailsSummary findDrawingDetailDataByDrawing(Drawing drawing) {
+    public DrawingDetailsSummary findDrawingSummary(Drawing drawing) {
         return queryFactory
                 .select(
                         Projections.constructor(DrawingDetailsSummary.class,
