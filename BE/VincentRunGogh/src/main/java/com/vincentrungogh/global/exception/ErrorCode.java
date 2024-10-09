@@ -27,7 +27,7 @@ public enum ErrorCode {
     INVALID_PASSWORD_LENGTH("20자 이하의 비밀번호만 가능합니다. ", HttpStatus.BAD_REQUEST),
     ROUTE_NOT_FOUND("존재하지 않은 루트입니다", HttpStatus.NOT_FOUND),
     DRAWING_NOT_FOUND("드로잉 정보가 없습니다. ", HttpStatus.NOT_FOUND),
-    DRAWINGDETAUL_NOT_FOUND("드로잉 디테일 정보가 없습니다.", HttpStatus.NOT_FOUND),
+    DRAWINGDETAIL_NOT_FOUND("드로잉 디테일 정보가 없습니다.", HttpStatus.NOT_FOUND),
     FAILED_SAVE_DRAWINGDETAIL("드로잉 디테일을 저장하는데 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     MORE_THAN_THREE_DRAWINGS("3개의 드로잉이 진행 중입니다. 진행 중인 드로잉을 완료해주세요.", HttpStatus.BAD_REQUEST),
     USERLIKE_BOARD_NOT_FOUND("유저가 좋아요한 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
