@@ -75,7 +75,6 @@
       (response) => {
         let data = response.data.data;
         monthInfo.set({ ...response.data.data });
-        console.log(get(monthInfo));
       },
       (error) => {}
     );
@@ -98,6 +97,7 @@
           date: today.toISOString().slice(0, 10), // 오늘 날짜
           title: '오늘', // '오늘'이라는 제목
           color: 'transparent',
+          className: ['today_indicator'],
         },
         ...$monthInfo.dayList.map((day) => ({
           date: day.date,
@@ -151,7 +151,7 @@
           {$selectedMonth}월 {$selectedDate?.split('-')[2]}일 운동
         </h2>
         <DrawingSummaryInfo
-          time={formatSecToH($selectedDayInfo.dayTotalTime)}
+          time={`${formatSecToH($selectedDayInfo.dayTotalTime)} hrs`}
           averagePace={getPace($selectedDayInfo.dayTotalDistance, $selectedDayInfo.dayTotalTime)}
           distance={formatDistanceFix2($selectedDayInfo.dayTotalDistance)}
           km
@@ -183,7 +183,7 @@
       <div class="text-sm">
         <h2 class="text-gray-500 mb-1 font-bold">{$selectedYear}년 {$selectedMonth}월 통계</h2>
         <DrawingSummaryInfo
-          time={formatSecToH($monthInfo.monthTotalTime)}
+          time={`${formatSecToH($monthInfo.monthTotalTime)} hrs`}
           averagePace={getPace($monthInfo.monthTotalDistance, $monthInfo.monthTotalTime)}
           distance={formatDistanceFix2($monthInfo.monthTotalDistance)}
         />

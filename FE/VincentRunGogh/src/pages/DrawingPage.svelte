@@ -16,7 +16,6 @@
     updateDrawingInfo,
     setDrawingPos,
     updateDistanceAndSpeed,
-    drawingStore,
     isRouteDrawing,
   } from '@/stores/drawingStore';
   import {
@@ -33,7 +32,7 @@
   import { startDrawing } from '@/api/drawingApi';
   import { connectWebSocket, disconnectWebSocket, sendRealTimePosition } from '@/api/websocket';
   import { formatTimeToHMS } from '@/utils/formatter';
-  import { set } from 'date-fns';
+
   $: $isLockScreen = $isLockScreen;
   $: $isPause = $isPause;
   $: $elapsedTime = $elapsedTime;
@@ -125,8 +124,15 @@
               routeLineLayers.remove();
             }
             if (response.data.data.routePositionList) {
-              routeLineLayers = createRouteLines(response.data.data.routePositionList);
+              routeLineLayers = createExtraLines(response.data.data.routePositionList, true);
               routeLineLayers.addTo(map);
+            }
+            if (prevDrawingLayers) {
+              prevDrawingLayers.remove();
+            }
+            if (response.data.data.drawingPositionList) {
+              prevDrawingLayers = createExtraLines(response.data.data.drawingPositionList, false);
+              prevDrawingLayers.addTo(map);
             }
             try {
               await connectWebSocket();
@@ -148,7 +154,7 @@
           const currentUser = get(userStore);
           const nickname = currentUser ? currentUser.nickname : '';
           sendRealTimePosition({ lat, lng }, nickname);
-          updateDistanceAndSpeed($posList);
+          updateDistanceAndSpeed();
         }
         setDrawingPos({ lat, lng, time: formatTimeToHMS() });
         if (map !== null) {
@@ -157,6 +163,9 @@
             marker = createMarker(currPos); // 새 마커 생성
           } else {
             marker.setLatLng(currPos); // 기존 마커 위치 업데이트
+          }
+          if (lineLayers) {
+            lineLayers?.addLatLng(currPos);
           }
         }
       }
@@ -362,17 +371,19 @@ fill="#000000" stroke="none">
 
   let lineLayers: Polyline;
   let routeLineLayers: Polyline;
+  let prevDrawingLayers: Polyline;
 
-  function createRouteLines(positions) {
+  function createExtraLines(positions: [], isRoute: boolean) {
     const latlngs = positions.map((pos) => new L.LatLng(pos.lat, pos.lng));
     console.log(latlngs);
     return L.polyline(latlngs, {
-      color: 'gray',
+      color: isRoute ? '#b5b5b5' : '#606060',
       weight: 5,
       opacity: 0.7,
-      dashArray: '10, 20',
+      dashArray: isRoute ? '5, 10' : '',
     });
   }
+
   function mapAction() {
     map = createMap();
     toolbar.addTo(map);
