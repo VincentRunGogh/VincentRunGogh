@@ -26,5 +26,5 @@ public interface DrawingDetailRepositoryCustom {
 
     DrawingDetailToday findTodayByUser(User user);
 
-    DrawingDetailsSummary findDrawingSummary(Drawing drawing);
+    DrawingDetailsSummary findDrawingDetailsSummary(Drawing drawing);
 }
