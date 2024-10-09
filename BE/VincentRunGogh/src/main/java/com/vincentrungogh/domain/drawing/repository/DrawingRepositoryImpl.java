@@ -38,7 +38,7 @@ public class DrawingRepositoryImpl implements DrawingRepositoryCustom {
         return queryFactory
                 .select(Projections.constructor(EachMonthRouteFreeCount.class,
                         monthGroupBy.as("whatYearAndMonth"),
-                        drawing.count().as("monthRouteDrawingCnt"),
+                        drawing.route.count().as("monthRouteDrawingCnt"),
                         drawing.count().subtract(drawing.route.count()).as("monthFreeDrawingCnt")
                         ))
                 .from(drawing)
