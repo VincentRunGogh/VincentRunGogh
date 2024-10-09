@@ -22,7 +22,7 @@ public enum ErrorCode {
     INVALID_REFRESH_TOKEN("만료된 리프레시 토큰입니다.", HttpStatus.UNAUTHORIZED),
     INVALID_PARAM_TYPE("유효하지 않는 타입입니다.", HttpStatus.BAD_REQUEST),
     SPEED_DIVIDE_BY_ZERO("평균 속력은 0보다 커야 합니다.", HttpStatus.BAD_REQUEST),
-    INVALID_WEIGHT_AND_HEIGHT("몸무게와 키는 0 이상이어야 합니다.", HttpStatus.BAD_REQUEST),
+    INVALID_WEIGHT_AND_HEIGHT("몸무게와 키는 0보다 크고 300보다 작아야 합니다.", HttpStatus.BAD_REQUEST),
     FAILED_UPDATE_PROFILE("프로필 수정에 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_PASSWORD_LENGTH("20자 이하의 비밀번호만 가능합니다. ", HttpStatus.BAD_REQUEST),
     ROUTE_NOT_FOUND("존재하지 않은 루트입니다", HttpStatus.NOT_FOUND),
@@ -34,6 +34,7 @@ public enum ErrorCode {
     BOARD_NOT_FOUND("요청을 처리할 게시글 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     MYHEALTH_NOT_FOUND("마이헬스 정보를 찾는데 실패했습니다.", HttpStatus.NOT_FOUND),
     ROUTE_IS_NULL("루트가 null입니다. 루트 드로잉을 시작할 수 없습니다", HttpStatus.NOT_FOUND),
+    INVALID_COMMENT_LENGTH("게시글 내용은 최대 30자까지 가능합니다.", HttpStatus.BAD_REQUEST),
     PYTHON_API_TIMEOUT_ERROR("파이썬 서버에서 응답 시간이 초과되었습니다.", HttpStatus.NOT_IMPLEMENTED),
     ;
 
