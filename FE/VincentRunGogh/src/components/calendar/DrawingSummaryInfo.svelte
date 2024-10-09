@@ -21,7 +21,7 @@
       />
     </svg>
     <div class="label">Time</div>
-    <div class="value">{formatSecToH(time)} h</div>
+    <div class="value">{formatSecToH(time)}</div>
   </div>
   <div class="info">
     <svg

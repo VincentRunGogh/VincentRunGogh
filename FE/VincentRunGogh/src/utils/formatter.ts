@@ -35,9 +35,16 @@ export function formatSecToMS(seconds: number) {
 }
 
 export function formatSecToH(seconds: number): string {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  return `${hours > 0 ? hours : '0'} ${minutes > 0 ? '.' + minutes : ''}`;
+  if (seconds < 30) {
+    return '30초미만';
+  } else {
+    let result = (seconds / 3600).toFixed(2);
+    while (result.endsWith('0')) {
+      result = result.substring(0, result.length - 1);
+    }
+
+    return result + ' 시간';
+  }
 }
 
 export function formatDistanceFix2(number: number): string {

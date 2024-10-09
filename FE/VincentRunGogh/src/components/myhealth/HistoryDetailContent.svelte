@@ -7,7 +7,6 @@
   import DrawingSummaryInfo from '@components/calendar/DrawingSummaryInfo.svelte';
   import { getDrawingInfo } from '@/api/drawingApi';
   import { formatToKoreanTime } from '@/utils/formatter';
-  import { formatSecToHMS, formatSecToH } from '@/utils/formatter';
 
   interface DrawingInfo {
     routeImage: string;
@@ -47,14 +46,16 @@
 
 {#if drawingDetail}
   <div class="p-4 bg-white rounded-lg overflow-hidden">
-    <div class="flex flex-row justify-between items-start mb-1">
-      <h6 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-        {title}
-      </h6>
-      <span class="mb-2 text-sm font-bold tracking-tight text-gray-900 dark:text-white">
-        {#if drawingDetail && drawingDetail.totalStep >= 0}
-          {drawingDetail.totalStep} 걸음{/if}
-      </span>
+    <div class="flex flex-row justify-between items-center mb-1">
+      <div>
+        <h6 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+          {title}
+        </h6>
+        <span class="mb-2 text-sm tracking-tight text-gray-800 dark:text-white">
+          {#if drawingDetail && drawingDetail.totalStep >= 0}
+            {drawingDetail.totalStep} 걸음{/if}
+        </span>
+      </div>
       {#if drawingDetail && drawingDetail.routeImage}
         <button
           class="flex items-center justify-center p-2 rounded bg-gray-200 hover:bg-gray-300"
