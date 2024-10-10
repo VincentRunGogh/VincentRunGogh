@@ -53,15 +53,17 @@
   const bmi = derived([height, weight], ([$height, $weight]) => {
     if ($height > 0 && $weight > 0) {
       let heightInMeters = $height / 100;
-      return $weight / (heightInMeters * heightInMeters);
+      let result = $weight / (heightInMeters * heightInMeters);
+      return parseInt(result.toFixed(0), 10);
     }
     return 0;
   });
 
   function getBMICategory(bmi: number): string {
+    console.log(bmi);
     if (bmi >= 30) return '비만';
     else if (bmi >= 25) return '과체중';
-    else if (bmi > 18.5) return '정상';
+    else if (bmi >= 18.5) return '정상';
     else return '저체중';
     return '';
   }
@@ -233,12 +235,18 @@
     <!-- //SECTION - bmi -->
     <Card class="w-[80vw] pb-1 pt-3 flex flex-col items-center rounded-3xl bg-[#F0F8EC] shadow-md">
       <h5 class="mb-2 ttext-3xl font-semibold">BMI</h5>
-      <BMIChart bmi={$bmi.toFixed(0)} />
-      <div class="flex flex-col justify-center items-center gap-2">
-        <span class="flex gap-1">
-          <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
-            {$nickname}님의 체질량지수는
+      <BMIChart bmi={$bmi} />
+      <div class="flex flex-col justify-center items-center gap-2 w-[90%]">
+        <span class="flex gap-1 whitespace-nowrap">
+          <p
+            class="font-normal text-gray-700 dark:text-gray-400 leading-tight overflow-hidden text-ellipsis max-w-[4rem]"
+          >
+            {$nickname}
           </p>
+          <p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
+            님의 체질량지수는
+          </p>
+
           <p class="text-gray-800 dark:text-gray-400 leading-tight font-bold">
             {getBMICategory($bmi)}
           </p>
