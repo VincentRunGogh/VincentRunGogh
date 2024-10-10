@@ -97,12 +97,11 @@ export function updateLastPosSpeed(speed: number) {
   });
 }
 // 경과 시간 및 좌표 목록 업데이트 함수
-export function updateDistanceAndSpeed() {
+export function updateDistanceAndSpeed(posList: PositionData[]) {
   totalDistance.update((currentDistance) => {
-    const positions = get(posList); // 스토어에서 현재 위치 목록을 가져옵니다.
-    if (positions.length > 1) {
-      const lastPosData = positions[positions.length - 2];
-      const newPosData = positions[positions.length - 1];
+    if (posList.length > 1) {
+      const lastPosData = posList[posList.length - 2];
+      const newPosData = posList[posList.length - 1];
       const lastPos = lastPosData.latlng;
       const newPos = newPosData.latlng;
 

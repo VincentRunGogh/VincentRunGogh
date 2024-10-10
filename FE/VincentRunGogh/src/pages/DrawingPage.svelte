@@ -172,7 +172,7 @@
           const currentUser = get(userStore);
           const nickname = currentUser ? currentUser.nickname : '';
           sendRealTimePosition({ lat, lng }, nickname);
-          updateDistanceAndSpeed();
+          updateDistanceAndSpeed($posList);
         }
         setDrawingPos({ lat, lng, time: formatTimeToHMS() });
         if (map !== null) {
