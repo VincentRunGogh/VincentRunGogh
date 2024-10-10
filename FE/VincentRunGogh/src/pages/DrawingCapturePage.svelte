@@ -28,6 +28,8 @@
   import SaveRouteDrawing from '@components/cards/SaveRouteDrawing.svelte';
   import { formatDistanceFix2 } from '@/utils/formatter';
   import { loadingAlert } from '@/utils/notificationAlert';
+  import { toastAlert } from '@/utils/notificationAlert';
+
   let drawingInfo = get(drawingStore);
   // 폼 형태 변수 임시저장 or 완료
   let isComplete = $querystring?.split('=')[1] === 'complete';
@@ -196,6 +198,7 @@
     if (isComplete) {
       data.title = inputName;
     }
+    console.log(data);
     if (isComplete) {
       completeDrawing(
         drawingInfo.drawingId,
@@ -228,6 +231,8 @@
         }
       );
     } else {
+      console.log(data);
+
       saveDrawing(
         drawingInfo.drawingId,
         data,
@@ -264,6 +269,8 @@
   let errorMessage: string = '';
 
   async function lockMap() {
+    document.getElementById('route-name')?.blur();
+
     if (isComplete) {
       if (inputName.length === 0) {
         errorMessage = '드로잉 이름을 입력해 주세요.';
@@ -290,24 +297,34 @@
     });
   }
   async function handleCaptureClick(isTypeColorLine: boolean) {
-    if (!isMapLoaded) {
-      // 지도 로드가 완료되지 않았다면 로드 완료를 대기
-      await new Promise((resolve) => {
-        const checkLoad = setInterval(() => {
-          if (isMapLoaded) {
-            clearInterval(checkLoad);
-            resolve();
-          }
-        }, 100); // 100ms마다 로드 상태 확인
-      });
-    }
+    try {
+      if (!isMapLoaded) {
+        // 지도 로드가 완료되지 않았다면 로드 완료를 대기
+        await new Promise((resolve, reject) => {
+          const checkLoad = setInterval(() => {
+            if (isMapLoaded) {
+              clearInterval(checkLoad);
+              resolve();
+            }
+          }, 100); // 100ms마다 로드 상태 확인
 
-    // 지도 로드가 완료되었으므로 캡처 실행
-    await mapCapture(isTypeColorLine);
+          setTimeout(() => {
+            clearInterval(checkLoad);
+            reject(new Error('지도 로딩 시간 초과. 다시 시도해주세요.'));
+          }, 10000); // 10초 타임아웃
+        });
+      }
+      if (isMapLoaded) {
+        await mapCapture(isTypeColorLine);
+      }
+    } catch (error) {
+      console.error(error);
+      // 사용자에게 경고 메시지 표시
+      Swal.close();
+      toastAlert(error.message, '30em', false);
+    }
   }
   async function mapCapture(isTypeColorLine: boolean) {
-    document.getElementById('route-name')?.blur();
-
     map.invalidateSize();
     let guide = document.querySelector('#capture-guide');
     guide.style.display = 'none';
@@ -370,6 +387,7 @@
 
   //초기 렌더링
   onMount(() => {
+    alert(get(drawingStore).drawingId);
     initializeMap();
 
     console.log(get(drawingStore));
