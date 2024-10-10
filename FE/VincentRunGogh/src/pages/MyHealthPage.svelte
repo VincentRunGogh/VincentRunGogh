@@ -130,11 +130,11 @@
     if (Object.keys(data).length !== 0 && allValid && !allUnChanged) {
       updateProfile(
         data,
-        (response) => {
+        async (response) => {
           if (response.data.status === 200) {
             closeForm();
             toastAlert('프로필이 성공적으로 업데이트 되었습니다.!');
-            setProfile();
+            await setProfile();
           }
         },
         (error) => {}
@@ -147,11 +147,11 @@
       // helpers 접근 수정 및 imgData 존재 확인
       updateProfileImg(
         imgData,
-        (response) => {
+        async (response) => {
           if (response.status === 200) {
             closeForm();
             toastAlert('프로필 이미지가 성공적으로 업데이트 되었습니다.');
-            setProfile();
+            await setProfile();
           }
         },
         (error) => {
