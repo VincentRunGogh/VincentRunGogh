@@ -128,7 +128,12 @@
             if (routeLineLayers) {
               routeLineLayers.remove();
             }
-            if (response.data.data.routePositionList && response.data.data.routePositionList > 0) {
+            console.log('루트랑 직전 선 그리기');
+            if (
+              response.data.data.routePositionList &&
+              response.data.data.routePositionList.length > 0
+            ) {
+              // console.log(response.data.data.routePositionList);
               routeLineLayers = createExtraLines(response.data.data.routePositionList, true);
               routeLineLayers.addTo(map);
             }
@@ -137,8 +142,9 @@
             }
             if (
               response.data.data.drawingPositionList &&
-              response.data.data.drawingPositionList > 0
+              response.data.data.drawingPositionList.length > 0
             ) {
+              // console.log(response.data.data.drawingPositionList);
               response.data.data.drawingPositionList.forEach((positionList) => {
                 if (positionList && positionList.length > 0) {
                   let prevDrawingLayer = createExtraLines(positionList, false);
@@ -377,7 +383,7 @@ fill="#000000" stroke="none">
   function createLines(): Polyline {
     return L.polyline(
       $posList.map((p) => p.latlng),
-      { color: '#ffb800', opacity: 0.5, smoothFactor: 1, weight: 5 }
+      { color: '#ff4040', opacity: 0.5, smoothFactor: 1, weight: 5 }
     );
   }
 
