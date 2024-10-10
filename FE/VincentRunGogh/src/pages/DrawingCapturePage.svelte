@@ -245,7 +245,7 @@
           toastAlert('다시 시도해주세요', '20em', false);
           map.invalidateSize();
           let guide = document.querySelector('#capture-guide');
-          guide.style.display = 'visibility';
+          guide.style.display = '';
         }
       );
     } else {
