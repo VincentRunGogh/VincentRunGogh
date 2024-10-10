@@ -336,9 +336,9 @@
 
   let marker: Marker | null = null; // 마커 객체를 저장할 변수
   function createMarker(loc: LatLngExpression): Marker | null {
-    const iconHtml = `<div class="map-marker" style="transform: rotate(${90 + $deviceOrientation.alpha}}deg)">
+    const iconHtml = `<div class="map-marker" style="transform: rotate(${$deviceOrientation.alpha - 90}}deg)">
      <div class="map-marker">
-<img src="/mapmarker.png" class='map-marker' style="transform: rotate(${90 + $deviceOrientation.alpha}}deg)" />
+<img src="/mapmarker.png" class='map-marker' style="transform: rotate(${$deviceOrientation.alpha - 90}}deg)" />
 </div></div>`;
     const icon = new L.DivIcon({
       html: iconHtml,
@@ -355,9 +355,9 @@
   function updateMarkerRotation() {
     if (marker && marker.getIcon) {
       const icon = marker.getIcon();
-      icon.options.html = `<div class="map-marker" style="transform: rotate(${90 + $deviceOrientation.alpha}}deg)">
+      icon.options.html = `<div class="map-marker" style="transform: rotate(${$deviceOrientation.alpha - 90}}deg)">
      <div class="map-marker">
-<img src="/mapmarker.png" class='map-marker' style="transform: rotate(${90 + $deviceOrientation.alpha}}deg)" />
+<img src="/mapmarker.png" class='map-marker' style="transform: rotate(${$deviceOrientation.alpha - 90}}deg)" />
 </div></div>`;
       marker.setIcon(icon);
     }
