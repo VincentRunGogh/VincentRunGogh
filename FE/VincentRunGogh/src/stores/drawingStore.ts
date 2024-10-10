@@ -17,7 +17,7 @@ interface PositionData {
 
 interface DrawingInfo {
   title: string;
-  drawingPositionList?: Position[];
+  drawingPositionList?: Position[][];
   routePositionList?: Position[];
   routeId?: string;
   drawingId?: string;

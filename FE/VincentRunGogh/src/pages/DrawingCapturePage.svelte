@@ -88,35 +88,29 @@
     });
   }
 
-  function adjustMapBounds(map, bounds) {
-    const mapViewWidth = window.innerWidth;
-    const mapViewHeight = window.innerHeight;
-
-    const desiredViewSize = 350; // 중앙에 표시하고 싶은 영역의 크기
-
-    const paddingX = (mapViewWidth - desiredViewSize) / 2;
-    const paddingY = (mapViewHeight - desiredViewSize) / 2;
-
-    map.fitBounds(bounds, { padding: [paddingY, paddingX] });
-  }
-
   function drawPrevLines(map: L.Map, currList: []) {
     if (!map) return;
     const prevData = get(drawingStore).drawingPositionList;
     if (!prevData || prevData.length === 0) return;
+    let allPrevLatLng = [];
+    prevData.forEach((positionList) => {
+      if (positionList && positionList.length > 0) {
+        const prevLatlngs: L.LatLng[] = positionList.map(
+          (item) => new L.LatLng(item.lat, item.lng)
+        );
+        allPrevLatLng.push(prevLatlngs);
+        const prevPolyline = L.polyline(prevLatlngs, {
+          color: '#5e8358',
+          weight: 5,
+        }).addTo(map);
 
+        prevPolyline.setStyle({ zIndex: -1 });
+      }
+    });
     // prevData의 각 항목에서 lat과 lng를 사용하여 L.LatLng 객체 생성
-    const prevLatlngs: L.LatLng[] = prevData.map((item) => new L.LatLng(item.lat, item.lng));
 
-    const prevPolyline = L.polyline(prevLatlngs, {
-      color: '#5e8358',
-      weight: 5,
-    }).addTo(map);
-
-    prevPolyline.setStyle({ zIndex: -1 });
-
-    const bounds = L.latLngBounds([...prevLatlngs, ...currList]);
-    adjustMapBounds(map, bounds);
+    const bounds = L.latLngBounds([...allPrevLatLng, ...currList]);
+    map.fitBounds(bounds, { padding: [30, 30] });
   }
 
   // 전체 맵에 선을 그리는 함수
@@ -193,76 +187,114 @@
       drawingImage: $drawingImage,
       drawingDetailImage: $drawingDetailImage,
       step: $stepCount,
-      ...drawingInfo.endInfo,
+      // ...drawingInfo.endInfo,
     };
     if (isComplete) {
       data.title = inputName;
     }
-    console.log(data);
+    alert(
+      JSON.stringify({
+        drawingImage: $drawingImage.length > 0,
+        drawingDetailImage: $drawingDetailImage.length > 0,
+        step: $stepCount,
+        ...drawingInfo.endInfo,
+      })
+    );
     if (isComplete) {
-      completeDrawing(
+      // completeDrawing(
+      //   drawingInfo.drawingId,
+      //   data,
+      //   (response) => {
+      //     if (response.data.status === 200) {
+      //       isLocked = true;
+      //       Swal.close(); // 비동기 작업이 끝난 후에 모달 닫기
+      //     }
+      //   },
+      //   (error) => {
+      //     if (error.response.status === 501) {
+      //       data.positions = get(realTimePositions);
+      //       reCompleteDrawing(
+      //         drawingInfo.drawingId,
+      //         data,
+      //         (res) => {
+      //           if (response.data.status === 200) {
+      //             isLocked = true;
+      //             Swal.close(); // 비동기 작업이 끝난 후에 모달 닫기
+      //           }
+      //         },
+      //         (err) => {
+      //           Swal.close(); // 비동기 작업이 끝난 후에 모달 닫기
+
+      //           replace('/');
+      //         }
+      //       );
+      //     }
+      //   }
+      // );
+      data.positions = get(realTimePositions);
+      reCompleteDrawing(
         drawingInfo.drawingId,
         data,
-        (response) => {
+        (res) => {
           if (response.data.status === 200) {
             isLocked = true;
             Swal.close(); // 비동기 작업이 끝난 후에 모달 닫기
           }
         },
-        (error) => {
-          if (error.response.status === 501) {
-            data.positions = get(realTimePositions);
-            reCompleteDrawing(
-              drawingInfo.drawingId,
-              data,
-              (res) => {
-                if (response.data.status === 200) {
-                  isLocked = true;
-                  Swal.close(); // 비동기 작업이 끝난 후에 모달 닫기
-                }
-              },
-              (err) => {
-                Swal.close(); // 비동기 작업이 끝난 후에 모달 닫기
+        (err) => {
+          Swal.close(); // 비동기 작업이 끝난 후에 모달 닫기
 
-                replace('/');
-              }
-            );
-          }
+          replace('/');
         }
       );
     } else {
       console.log(data);
-
-      saveDrawing(
+      data.positions = get(realTimePositions);
+      reSaveDrawing(
         drawingInfo.drawingId,
         data,
-        (response) => {
-          if (response.data.status === 200) {
+        (res) => {
+          if (res.data.status === 200) {
             isLocked = true;
             Swal.close(); // 비동기 작업이 끝난 후에 모달 닫기
           }
         },
-        (error) => {
-          if (error.response.status === 501) {
-            data.positions = get(realTimePositions);
-            reSaveDrawing(
-              drawingInfo.drawingId,
-              data,
-              (res) => {
-                if (res.data.status === 200) {
-                  isLocked = true;
-                  Swal.close(); // 비동기 작업이 끝난 후에 모달 닫기
-                }
-              },
-              (err) => {
-                Swal.close(); // 비동기 작업이 끝난 후에 모달 닫기
+        (err) => {
+          Swal.close(); // 비동기 작업이 끝난 후에 모달 닫기
 
-                replace('/');
-              }
-            );
-          }
+          replace('/');
         }
       );
+      // saveDrawing(
+      //   drawingInfo.drawingId,
+      //   data,
+      //   (response) => {
+      //     if (response.data.status === 200) {
+      //       isLocked = true;
+      //       Swal.close(); // 비동기 작업이 끝난 후에 모달 닫기
+      //     }
+      //   },
+      //   (error) => {
+      //     if (error.response.status === 501) {
+      //       data.positions = get(realTimePositions);
+      //       reSaveDrawing(
+      //         drawingInfo.drawingId,
+      //         data,
+      //         (res) => {
+      //           if (res.data.status === 200) {
+      //             isLocked = true;
+      //             Swal.close(); // 비동기 작업이 끝난 후에 모달 닫기
+      //           }
+      //         },
+      //         (err) => {
+      //           Swal.close(); // 비동기 작업이 끝난 후에 모달 닫기
+
+      //           replace('/');
+      //         }
+      //       );
+      //     }
+      //   }
+      // );
     }
   }
   //지도 잠그기
@@ -289,11 +321,17 @@
       } else errorMessage = '';
     }
     loadingAlert('드로잉을 저장중입니다...', '/saveroute.gif', async () => {
-      await handleCaptureClick(true);
-      await changeMapWithSingleColor();
-      await handleCaptureClick(false);
-
-      await submitDrawing();
+      try {
+        await handleCaptureClick(true);
+        await changeMapWithSingleColor();
+        await handleCaptureClick(false);
+        await submitDrawing();
+      } catch (error) {
+        Swal.close();
+        isLocked = false;
+        toastAlert('다시 시도해주세요', '20em', false);
+        return;
+      }
     });
   }
   async function handleCaptureClick(isTypeColorLine: boolean) {
@@ -308,10 +346,10 @@
             }
           }, 100); // 100ms마다 로드 상태 확인
 
-          setTimeout(() => {
-            clearInterval(checkLoad);
-            reject(new Error('지도 로딩 시간 초과. 다시 시도해주세요.'));
-          }, 10000); // 10초 타임아웃
+          // setTimeout(() => {
+          //   clearInterval(checkLoad);
+          //   reject(new Error('지도 로딩 시간 초과. 다시 시도해주세요.'));
+          // }, 20000); // 10초 타임아웃
         });
       }
       if (isMapLoaded) {
@@ -320,8 +358,6 @@
     } catch (error) {
       console.error(error);
       // 사용자에게 경고 메시지 표시
-      Swal.close();
-      toastAlert(error.message, '30em', false);
     }
   }
   async function mapCapture(isTypeColorLine: boolean) {
@@ -376,7 +412,6 @@
     const finalImage = finalCanvas.toDataURL('image/png');
     if (isTypeColorLine) {
       console.log('속도 색');
-
       $drawingDetailImage = finalImage.split(',')[1];
     } else {
       console.log('단일 색');
@@ -387,7 +422,6 @@
 
   //초기 렌더링
   onMount(() => {
-    alert(get(drawingStore).drawingId);
     initializeMap();
 
     console.log(get(drawingStore));
@@ -469,7 +503,7 @@
   {:else}
     <SaveRouteDrawing
       title={inputName}
-      distance={Number(formatDistanceFix2($totalDistance))}
+      distance={Number(formatDistanceFix2($totalDistance / 1000))}
       time={$elapsedTime}
       image={$showingImage}
       isRoute={false}
