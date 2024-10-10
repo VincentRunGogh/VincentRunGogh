@@ -377,7 +377,7 @@ fill="#000000" stroke="none">
   function createLines(): Polyline {
     return L.polyline(
       $posList.map((p) => p.latlng),
-      { color: '#ffb800', opacity: 0.5, smoothFactor: 1, weight: 5 }
+      { color: 'blue', opacity: 0.5, smoothFactor: 1, weight: 5 }
     );
   }
 
