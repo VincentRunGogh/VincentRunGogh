@@ -171,7 +171,7 @@
           // console.log('소켓 데이터 보내기!');
           const currentUser = get(userStore);
           const nickname = currentUser ? currentUser.nickname : '';
-          sendRealTimePosition({ lat, lng }, nickname);
+          // sendRealTimePosition({ lat, lng }, nickname);
           updateDistanceAndSpeed($posList);
         }
         setDrawingPos({ lat, lng, time: formatTimeToHMS() });
