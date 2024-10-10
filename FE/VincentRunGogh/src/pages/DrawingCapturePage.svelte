@@ -2,7 +2,6 @@
   import { onDestroy, onMount } from 'svelte';
   import L, { Map as LeafletMap, Marker, Polyline } from 'leaflet';
   import type { LatLng, LatLngExpression, Control } from 'leaflet';
-  import { push, pop, replace } from 'svelte-spa-router';
 
   import 'leaflet/dist/leaflet.css';
   import 'leaflet-draw';
@@ -186,7 +185,7 @@
     const data = {
       drawingImage: $drawingImage,
       drawingDetailImage: $drawingDetailImage,
-      step: $stepCount,
+      step: get(stepCount),
       // ...drawingInfo.endInfo,
     };
     if (isComplete) {
@@ -231,6 +230,7 @@
       //     }
       //   }
       // );
+      console.log(data);
       data.positions = get(realTimePositions);
       reCompleteDrawing(
         drawingInfo.drawingId,
@@ -243,8 +243,8 @@
         },
         (err) => {
           Swal.close(); // 비동기 작업이 끝난 후에 모달 닫기
-
-          replace('/');
+          toastAlert('다시 시도해주세요', '20em', false);
+          // replace('/');
         }
       );
     } else {
@@ -261,8 +261,8 @@
         },
         (err) => {
           Swal.close(); // 비동기 작업이 끝난 후에 모달 닫기
-
-          replace('/');
+          toastAlert('다시 시도해주세요', '20em', false);
+          // replace('/');
         }
       );
       // saveDrawing(
@@ -330,6 +330,9 @@
         Swal.close();
         isLocked = false;
         toastAlert('다시 시도해주세요', '20em', false);
+        map.invalidateSize();
+        let guide = document.querySelector('#capture-guide');
+        guide.style.display = 'visibility';
         return;
       }
     });
