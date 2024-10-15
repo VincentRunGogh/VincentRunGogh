@@ -92,13 +92,13 @@
   function handleLocationFound(e: L.LocationEvent) {
     const { lat, lng } = e.latlng;
     currPos = new L.LatLng(lat, lng);
-    //처음이 아니고
-    if ($posList.length > 0) {
-      //이동거리가 12보다 크면
-      if (currPos.distanceTo($posList[$posList.length - 1].latlng) > 12) {
-        return;
-      }
-    }
+    // //처음이 아니고
+    // if ($posList.length > 0) {
+    //   //이동거리가 12보다 크면
+    //   if (currPos.distanceTo($posList[$posList.length - 1].latlng) > 12) {
+    //     return;
+    //   }
+    // }
     addPosition(lat, lng);
 
     if (currPos && isFocusMarker) map.setView(currPos, zoomLevel, { animate: true });
