@@ -9,8 +9,7 @@
 # Vincent Run Gogh 서비스 화면
 
 ### ■ 메인 페이지
-
-![KakaoTalk_Photo_2024-10-11-02-52-18 001.jpeg](img/c9156128-ec64-4577-96d9-f3b5ed01dec4.png)
+<img src="img/c9156128-ec64-4577-96d9-f3b5ed01dec4.png" alt="Image Description" width="400" />
 
 ### ■ 루트 생성 페이지
 
