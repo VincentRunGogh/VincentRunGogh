@@ -9,47 +9,34 @@
 # Vincent Run Gogh 서비스 화면
 
 ### ■ 메인 페이지
-<img src="img/c9156128-ec64-4577-96d9-f3b5ed01dec4.png" alt="Image Description" width="400" />
+<img src="img/main_page.jpg" alt="메인 페이지" width="600" />
 
 ### ■ 루트 생성 페이지
-
-![루트 생성.png](img/image%2038.png)
-
-![루트 생성.png](img/image%2039.png)
+<img src="img/image%2038.png" alt="루트 생성 화면 1" width="300" />
+<img src="img/image%2039.png" alt="루트 생성 화면 2" width="300" />
 
 ### ■ 루트 조회 페이지
-
-![image.png](img/image%2052.png)
+<img src="img/image%2052.png" alt="루트 조회 화면" width="300" />
 
 ### ■ 드로잉 페이지
-
-![드로잉.png](img/image%2034.png)
-
-![image.png](img/image%2031.png)
+<img src="img/image%2034.png" alt="드로잉 화면 1" width="300" />
+<img src="img/image%2031.png" alt="드로잉 화면 2" width="300" />
 
 ### ■ 마이 헬스 페이지
-
-![image.png](img/image.png)
+<img src="img/image.png" alt="마이 헬스 페이지" width="300" />
 
 ### ■ 캘린더 페이지
-
-![캘린더 화면.png](img/image%2042.png)
+<img src="img/image%2042.png" alt="캘린더 화면" width="300" />
 
 ### ■ 통계 페이지
-
-![image.png](img/3182ee61-2af5-43c7-88b4-e5bc83f39061.png)
-
-![image.png](img/b5fd1c70-7fd7-4042-b2b4-55b68e5e7108.png)
-
-![image.png](img/1a3f87aa-8f7d-49aa-9cc4-13377e6fb330.png)
-
-![image.png](img/8f2f1f4b-1510-43bb-bf23-b01f1f263035.png)
+<img src="img/3182ee61-2af5-43c7-88b4-e5bc83f39061.png" alt="통계 화면 1" width="300" />
+<img src="img/b5fd1c70-7fd7-4042-b2b4-55b68e5e7108.png" alt="통계 화면 2" width="300" />
+<img src="img/1a3f87aa-8f7d-49aa-9cc4-13377e6fb330.png" alt="통계 화면 3" width="300" />
+<img src="img/8f2f1f4b-1510-43bb-bf23-b01f1f263035.png" alt="통계 화면 4" width="300" />
 
 ### ■ 커뮤니티 페이지
-
-![image.png](img/image%2051.png)
-
-![커뮤니티 화면2.png](img/image%2053.png)
+<img src="img/image%2051.png" alt="커뮤니티 화면 1" width="300" />
+<img src="img/image%2053.png" alt="커뮤니티 화면 2" width="300" />
 
 # 주요 기능
 
@@ -134,126 +121,72 @@
 
 ### 기능 명세서
 
-![image.png](img/image%201.png)
-
-![image.png](img/image%202.png)
-
-![image.png](img/image%203.png)
+<img src="img/image%201.png" alt="기능 명세서 1" width="300" />
+<img src="img/image%202.png" alt="기능 명세서 2" width="300" />
+<img src="img/image%203.png" alt="기능 명세서 3" width="300" />
 
 ### 시스템 아키텍처
 
-![image 104.png](img/image_104.png)
+<img src="img/image_104.png" alt="시스템 아키텍처" width="600" />
 
 ### 유저 시나리오
 
-⬛ 회원가입
+⬛ 회원가입  
+<img src="img/image%204.png" alt="회원가입 시나리오" width="300" />
 
-![image.png](img/image%204.png)
+⬛ 아트 생성  
+<img src="img/image%205.png" alt="아트 생성 시나리오" width="300" />
 
-⬛ 아트 생성
+⬛ 드로잉(러닝)  
+<img src="img/image%206.png" alt="드로잉 시나리오" width="300" />
 
-![image.png](img/image%205.png)
+⬛ 캘린더  
+<img src="img/image%207.png" alt="캘린더 시나리오" width="300" />
 
-⬛ 드로잉(러닝)
-
-![image.png](img/image%206.png)
-
-⬛ 캘린더
-
-![image.png](img/image%207.png)
-
-⬛ 커뮤니티
-
-![image.png](img/image%208.png)
+⬛ 커뮤니티  
+<img src="img/image%208.png" alt="커뮤니티 시나리오" width="300" />
 
 ### API 명세서
 
-![image.png](img/image%209.png)
-
-![image.png](img/image%2010.png)
+<img src="img/image%209.png" alt="API 명세서 1" width="800" />
+<img src="img/image%2010.png" alt="API 명세서 2" width="800" />
 
 ### 화면 설계서
 
-⬛ 홈
+⬛ 홈  
+<img src="img/image%2060.png" alt="홈 화면 설계" width="600" />
 
-![image.png](img/image%2060.png)
+⬛ 회원가입  
+<img src="img/image%2054.png" alt="회원가입 화면 설계" width="600" />
 
-⬛ 회원가입
+⬛ 캘린더  
+<img src="img/image%2050.png" alt="캘린더 화면 설계" width="600" />
 
-![회원가입.png](img/image%2054.png)
+⬛ 커뮤니티  
+<img src="img/image%2036.png" alt="커뮤니티 화면 설계" width="600" />
 
-⬛ 캘린더
+⬛ 통계  
+<img src="img/image%2055.png" alt="통계 화면 설계" width="600" />
 
-![캘린더.png](img/image%2050.png)
+⬛ 드로잉 - 루트 달리기  
+<img src="img/image%2030.png" alt="드로잉 - 루트 달리기 설계" width="600" />
 
-⬛ 커뮤니티
+⬛ 드로잉 상세  
+<img src="img/image%2032.png" alt="드로잉 상세 설계" width="600" />
 
-![image.png](img/image%2036.png)
+⬛ 루트 생성  
+<img src="img/image%2037.png" alt="루트 생성 설계 1" width="600" />
+<img src="img/image%2035.png" alt="루트 생성 설계 2" width="600" />
 
-⬛ 통계
+⬛ 루트 조회  
+<img src="img/image%2040.png" alt="루트 조회 설계" width="600" />
 
-![프로그래스 통계.png](img/image%2055.png)
-
-⬛ 드로잉 - 루트 달리기
-
-![드로잉 - 루트 달리기.png](img/image%2030.png)
-
-⬛ 드로잉 상세
-
-![image.png](img/image%2032.png)
-
-
-⬛ 루트 생성
-
-![루트 생성 - 3.png](img/image%2037.png)
-![루트 생성 - 3.png](img/image%2035.png)
-
-
-⬛ 루트 조회
-
-![루트 조회.png](img/image%2040.png)
-
-⬛ 마이헬스
-
-![마이헬쓰.png](img/image%2041.png)
-
-### Git Commit 컨벤션
-
-- `feat` : 새로운 기능 추가
-- `fix` : 버그 수정
-- `docs` : 문서 내용 변경
-- `style` : 포맷팅, 세미콜론 누락, 코드 변경이 없는 경우 등
-- `design` : 디자인 추가 및 수정
-- `refactor` : 코드 리팩토링
-- `test` : 테스트 코드 작성
-- `chore` : 빌드 수정, 패키지 매니저 설정, 운영 코드 변경이 없는 경우 등
-
-```
-[type][FE/BE][developer] subject
-
-ex) 백엔드 회원가입 기능
-
-- [FEAT][BE][석범] 회원가입 기능 추가
-
-```
-
----
-
-### Git Branch 전략
-
-`git-flow`전략
-
-- `master`
-- `develop-FE_TS` : FE 배포 브랜치
-- `develop-BE` : BE 배포 브랜치
-- `develop-DATA`: DATA 배포 브랜치
-- `feature/FE/{issue-num}-function`: FE 기능 브랜치
-- `feature/BE/{issue-num}-function`: BE 기능 브랜치
-- `feature/DATA/{issue-num}-function` : DATA 기능 브랜치
+⬛ 마이헬스  
+<img src="img/image%2041.png" alt="마이헬스 설계" width="600" />
 
 ### ERD
 
-![image.png](img/e67b96d0-ee02-428d-918e-4063c253da29.png)
+<img src="img/e67b96d0-ee02-428d-918e-4063c253da29.png" alt="ERD" width="800" />
 
 ### EC2 포트 정리
 
@@ -275,4 +208,4 @@ ex) 백엔드 회원가입 기능
 
 ### 역할 분배
 
-![image.png](img/image%2011.png)
+<img src="img/image%2011.png" alt="역할 분배" width="600" />
