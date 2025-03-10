@@ -83,6 +83,9 @@
     - AWS S3
 - CI/CD
     - Jenkins
+    - Nginx
+    - Docker
+    - Docker-compose
 
 ### 상세 스택
 
